@@ -16,6 +16,15 @@ const configuration = {
 let room;
 let pc;
 
+var constraints = {
+  video: true,
+  audio: {
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+  }
+};
+
 
 function onSuccess() {};
 function onError(error) {
@@ -76,10 +85,7 @@ function startWebRTC(isOfferer) {
     }
   };
 
-  navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-  }).then(stream => {
+  navigator.mediaDevices.getUserMedia(constraints).then(stream => {
     // Display your local video in #localVideo element
     localVideo.srcObject = stream;
     // Add your stream to be sent to the conneting peer
