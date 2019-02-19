@@ -22,8 +22,12 @@ $(function () {
   //get roles
   socket.on('update role', function (role) {
     $('#role').append($('<option>').val(role).text(role));
-    console.log(role);
   });
+
+  socket.on('onlineUsers', function (onlineCount) {
+    $('#users').val(onlineCount);
+  });
+
   //add messages to log
   function addMessageToLog(header, msg) {
     $('#messages').append($('<li class="header">').text(header));
