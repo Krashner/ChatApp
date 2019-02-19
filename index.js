@@ -13,6 +13,8 @@ fs.readFile('admin.json', 'utf8', function (err, contents) {
 
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
+//bootstrap
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
