@@ -24,28 +24,31 @@ app.get('/', function (req, res) {
 
 io.on('connection', function (socket) {
 
-  //connect to room
-  socket.join("test voice");
 
-  //read the admin file on connect
-  roles.forEach(function (entry) {
-    socket.emit('update role', entry);
-  });
+  //send roles to clients
+  socket.emit('update roles', roles);
 
   //send the message out
   socket.on('chat message', function (role, msg) {
     socket.broadcast.emit('chat message', role, msg);
   });
 
-  //voice stuff
-  // onlineUsers.push(socket);
 
+  // //set the users and broadcast them to clients
+  // if(onlineUsers.includes({username: socket.id}) == false){
 
+  // }
   // // To subscribe the socket to a given channel
-  // socket.on('join', function (data) {
-  //   onlineUsers(socket);
-  //   // socket.join("test room");
-  // });
+  socket.on('join', function (role) {
+    //connect to room
+    socket.join("test voice");
+    onlineUsers.push({ id: socket.id, username: role });
+
+    console.log(onlineUsers);
+    console.log("-----------------------------------------------------");
+    // socket.emit('onlineUsers', Object.keys(onlineUsers).length);
+    socket.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
+  });
 
   // To keep track of online users
   // socket.on('userPresence', function (data) {
@@ -60,14 +63,49 @@ io.on('connection', function (socket) {
   //   io.sockets.to(data.toUsername).emit('message', data.data);
   // });
 
-  // // To listen for a client's disconnection from server and intimate other clients about the same
-  // socket.on('disconnect', function (data) {
-  //   socket.broadcast.emit('disconnected', onlineUsers[socket.id]);
+  socket.on('roll change', function (role) {
+    removeFromUsers(socket.id, role);
+  });
 
-  //   delete onlineUsers[socket.id];
-  //   socket.broadcast.emit('onlineUsers', onlineUsers);
-  // });
+  // // To listen for a client's disconnection from server and intimate other clients about the same
+  socket.on('disconnect', function (data) {
+
+    removeFromUsers(socket.id, null);
+
+    // socket.broadcast.emit('disconnected', onlineUsers[id]);
+    // delete onlineUsers[id];
+    // var index = onlineUsers.indexOf(s)
+    // console.log(Object.keys(onlineUsers));
+    //socket.broadcast.emit('onlineUsers', onlineUsers);
+    // socket.broadcast.emit('onlineUsers', Object.keys(onlineUsers).length);
+    // var index = findWithAttr(onlineUsers, 'id', socket.id);
+    // onlineUsers.splice(index, 1);
+    // console.log(index); 
+    // socket.broadcast.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
+  });
 });
+
+function removeFromUsers(id, safeRole) {
+  var result = onlineUsers.filter(obj => {
+    return obj.id === id && safeRole !== obj.role
+  })
+
+  result.forEach(element => {
+    var index = onlineUsers.indexOf(element);
+    onlineUsers.splice(index, 1);
+  });
+
+  console.log(onlineUsers);
+}
+
+function findWithAttr(array, attr, value) {
+  for (var i = 0; i < array.length; i += 1) {
+    if (array[i][attr] === value) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 http.listen(3000, function () {
   console.log('listening on *:3000');

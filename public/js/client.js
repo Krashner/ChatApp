@@ -1,7 +1,7 @@
  // Instantiate PeerConnection
 
- 
- var peer = new PeerConnection(socket);
+
+ //var peer = new PeerConnection(socket);
 
 
 
@@ -34,7 +34,7 @@
 //    peer.onStreamEnded = function (e) {
 //    };
 //  };
- 
+
 //  function addAudio() {
 //     // var audio_id = video.getAttribute('id');
 //     // if (audio_id == 'selfMedia') {
