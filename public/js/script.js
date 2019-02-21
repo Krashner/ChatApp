@@ -46,7 +46,7 @@ $(function () {
 
   //get the user roles
   socket.on('update roles', function (roles) {
-    $('#roles').text="";
+    $('#roles').text = "";
     roles.forEach(function (entry) {
       $('#roles').append($('<option>').val(entry).text(entry));
     });
@@ -71,4 +71,43 @@ $(function () {
       m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
     return h + ':' + m + ': ';
   }
+
+  // const isOfferer = onlineUsers.length === 2;
+  startWebRTC(true);
+
+  function startWebRTC() {
+
+    pc = new RTCPeerConnection();
+
+    navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true,
+    }).then(stream => {
+      // Display your local video in #localVideo element
+      localVideo.srcObject = stream;
+      // Add your stream to be sent to the conneting peer
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    }, onError);
+
+    var mediaConstraints = {
+      audio: true,            // We want an audio track
+      video: true             // ...and we want a video track
+    };
+
+    var desc = new RTCSessionDescription(sdp);
+
+    pc.setRemoteDescription(desc).then(function () {
+      return navigator.mediaDevices.getUserMedia(mediaConstraints);
+    })
+      .then(function (stream) {
+        previewElement.srcObject = stream;
+
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+      })
+  }
+
+  function onError(error) {
+    console.error(error);
+  };
+
 });
