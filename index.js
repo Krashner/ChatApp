@@ -4,9 +4,31 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 var path = require('path');
+var WebSocket = require("ws");
+var WebSocketServer = require('ws').Server;
+var wss = new WebSocketServer({ port: 8088 });
+
+var wsList = [];
 var roles = [];
 var onlineUsers = [];
 
+wss.on('connection', function (ws) {
+  console.log('WS connection established!')
+  wsList.push(ws);
+
+  ws.on('close', function () {
+    wsList.splice(wsList.indexOf(ws), 1);
+    console.log('WS closed!')
+  });
+
+  ws.on('message', function (message) {
+    console.log('Got ws message: ' + message);
+    for (var i = 0; i < wsList.length; i++) {
+      // send to everybody on the site
+      wsList[i].send(message);
+    }
+  });
+});
 
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function (err, contents) {
@@ -50,6 +72,11 @@ io.on('connection', function (socket) {
     socket.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
   });
 
+
+  socket.on('voice message', function (stream) {
+    console.log(stream);
+  });
+
   // To keep track of online users
   // socket.on('userPresence', function (data) {
   //   onlineUsers[socket.id] = {
@@ -63,7 +90,19 @@ io.on('connection', function (socket) {
   //   io.sockets.to(data.toUsername).emit('message', data.data);
   // });
 
-  socket.on('roll change', function (role) {
+  // socket.on('client-stream-request', function (data) {
+  //   var stream = ss.createStream();
+  //   var filename = __dirname + '/downloads/' + <YOURSONG.MP3>;
+  //   ss(socket).emit('audio-stream', stream, { name: filename });
+  //   fs.createReadStream(filename).pipe(stream);
+  // });
+
+  socket.on('radio', function (data) {
+    socket.broadcast.emit('voice', data.blob);//to(data.url).
+    socket.join("data.url");
+  });
+  
+  socket.on('role change', function (role) {
     removeFromUsers(socket.id, role);
   });
 
@@ -95,7 +134,7 @@ function removeFromUsers(id, safeRole) {
     onlineUsers.splice(index, 1);
   });
 
-  console.log(onlineUsers);
+  //console.log(onlineUsers);
 }
 
 function findWithAttr(array, attr, value) {
