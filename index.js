@@ -30,6 +30,7 @@ wss.on('connection', function (ws) {
   });
 });
 
+
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function (err, contents) {
   roles = JSON.parse(contents).roles;
@@ -39,6 +40,8 @@ fs.readFile('admin.json', 'utf8', function (err, contents) {
 app.use(express.static(path.join(__dirname, 'public')));
 //bootstrap
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
+//simple peer
+app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'));
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -55,72 +58,38 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('chat message', role, msg);
   });
 
-
-  // //set the users and broadcast them to clients
-  // if(onlineUsers.includes({username: socket.id}) == false){
-
-  // }
   // // To subscribe the socket to a given channel
   socket.on('join', function (role) {
-    //connect to room
-    socket.join("test voice");
-    onlineUsers.push({ id: socket.id, username: role });
 
+    //connect to room
+    onlineUsers.push({ id: socket.id, username: role });
     console.log(onlineUsers);
     console.log("-----------------------------------------------------");
-    // socket.emit('onlineUsers', Object.keys(onlineUsers).length);
     socket.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
   });
 
 
-  socket.on('voice message', function (stream) {
-    console.log(stream);
-  });
-
-  // To keep track of online users
-  // socket.on('userPresence', function (data) {
-  //   onlineUsers[socket.id] = {
-  //     username: socket.id
-  //   };
-  //   socket.emit('onlineUsers', onlineUsers.length);
-  // });
-
-  // // For message passing
-  // socket.on('message', function (data) {
-  //   io.sockets.to(data.toUsername).emit('message', data.data);
-  // });
-
-  // socket.on('client-stream-request', function (data) {
-  //   var stream = ss.createStream();
-  //   var filename = __dirname + '/downloads/' + <YOURSONG.MP3>;
-  //   ss(socket).emit('audio-stream', stream, { name: filename });
-  //   fs.createReadStream(filename).pipe(stream);
-  // });
-
-  socket.on('radio', function (data) {
-    socket.broadcast.emit('voice', data.blob);//to(data.url).
-    socket.join("data.url");
-  });
-  
   socket.on('role change', function (role) {
     removeFromUsers(socket.id, role);
+  });
+
+  var testSignal = "";
+  socket.on('peer signal', function (data) {
+    //testSignal = data;
+    //console.log(data)
+    //answer the offer
+    socket.broadcast.emit('peer answer', data);
+  });
+
+  socket.on('get peer', function (data) {
+    testSignal = data;
+    console.log(data)
   });
 
   // // To listen for a client's disconnection from server and intimate other clients about the same
   socket.on('disconnect', function (data) {
 
     removeFromUsers(socket.id, null);
-
-    // socket.broadcast.emit('disconnected', onlineUsers[id]);
-    // delete onlineUsers[id];
-    // var index = onlineUsers.indexOf(s)
-    // console.log(Object.keys(onlineUsers));
-    //socket.broadcast.emit('onlineUsers', onlineUsers);
-    // socket.broadcast.emit('onlineUsers', Object.keys(onlineUsers).length);
-    // var index = findWithAttr(onlineUsers, 'id', socket.id);
-    // onlineUsers.splice(index, 1);
-    // console.log(index); 
-    // socket.broadcast.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
   });
 });
 
@@ -134,7 +103,7 @@ function removeFromUsers(id, safeRole) {
     onlineUsers.splice(index, 1);
   });
 
-  //console.log(onlineUsers);
+
 }
 
 function findWithAttr(array, attr, value) {
