@@ -1,8 +1,15 @@
 $(function () {
   var socket = io();
-  console.log(socket);
+  //console.log(socket);
   var previousRole;
   var peer = new SimplePeer({ initiator: location.hash === '#1', trickle: false });
+
+
+  // //add client to other clients list
+  // socket.on('connect', function () {
+  //   socket.emit('add client', socket.id)
+  // });
+
 
   //join the room after a role is selected
   $("#roles").on('focus', function () {
@@ -23,7 +30,6 @@ $(function () {
       }
     }
   });
-
 
   peer.on('error', function (err) { console.log('error', err) })
 
@@ -91,6 +97,12 @@ $(function () {
     addMessageToLog(header, msg);
   });
 
+
+  //update chat log with recieved message
+  socket.on('test', function (text) {
+    console.log(text);
+  });
+
   //get the user roles
   socket.on('update roles', function (roles) {
     $('#roles').text = "";
@@ -101,9 +113,13 @@ $(function () {
 
   //track users online
   socket.on('onlineUsers', function (onlineUsers, count) {
-    // console.log(JSON.parse(onlineUsers));
     console.log(onlineUsers);
-    $('#users').text(count);
+    $('#clients').empty();
+    $('#clients').append($('<option>').val("None").text("None"));
+    onlineUsers.forEach(function (entry) {
+      if (entry.id !== socket.id && entry.username !== "")
+        $('#clients').append($('<option>').val(entry).text(entry.username + " : " + entry.id));
+    });
   });
 
   //add messages to log

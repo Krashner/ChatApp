@@ -60,17 +60,19 @@ io.on('connection', function (socket) {
 
   // // To subscribe the socket to a given channel
   socket.on('join', function (role) {
-
     //connect to room
     onlineUsers.push({ id: socket.id, username: role });
     console.log(onlineUsers);
     console.log("-----------------------------------------------------");
-    socket.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
+    io.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
+    //io.emit('test', "test");
   });
 
-
+  //change current user role
   socket.on('role change', function (role) {
     removeFromUsers(socket.id, role);
+    //emit user list to all users
+    io.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
   });
 
   var testSignal = "";
