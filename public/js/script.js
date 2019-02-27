@@ -73,6 +73,11 @@ $(function () {
     video.srcObject = stream;
   })
 
+  //close connection
+  peer.on('close', function () {
+    console.log("CLOSE");
+  })
+
   $('form').submit(function (e) {
     e.preventDefault(); // prevents page reloading
     //don't allow blank messages
@@ -82,6 +87,7 @@ $(function () {
     if (text.replace(/\s+/g, '') !== '' && role !== '') {
       role += " " + timeNow();
       socket.emit('chat message', role, text);
+      //peer.send(text);
       $('#m').val('');
       addMessageToLog(role, text);
     }
