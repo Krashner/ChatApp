@@ -1,15 +1,7 @@
 $(function () {
   var socket = io();
-  //console.log(socket);
   var previousRole;
   var peer = new SimplePeer({ initiator: location.hash === '#1', trickle: false });
-
-
-  // //add client to other clients list
-  // socket.on('connect', function () {
-  //   socket.emit('add client', socket.id)
-  // });
-
 
   //join the room after a role is selected
   $("#roles").on('focus', function () {
@@ -31,8 +23,10 @@ $(function () {
     }
   });
 
+  //error
   peer.on('error', function (err) { console.log('error', err) })
 
+  //peer connected
   peer.on('connect', function () {
     console.log('CONNECT')
     navigator.mediaDevices.getUserMedia({ audio: true, video: true })
@@ -52,30 +46,32 @@ $(function () {
       .catch(function (err) {
         console.log(err.name + ": " + err.message);
       });
+  });
 
-
-  })
-
+  //send signal to reciever
   peer.on('signal', function (data) {
-    console.log('SIGNAL', JSON.stringify(data))
+    console.log('SIGNAL', JSON.stringify(data));
     socket.emit('peer signal', JSON.stringify(data));
-  })
+  });
 
+  //peer answered call
+  socket.on('peer answer', function (data) {
+    console.log("RECIEVED ", data);
+    peer.signal(data);
+  });
+
+  //data channel is being used
   peer.on('data', function (data) {
-    console.log('data: ' + data)
+    console.log('data: ' + data);
   })
 
+  //streaming
   peer.on('stream', function (stream) {
     console.log("STREAM");
     var video = document.querySelector('#remoteVideo');
     // Older browsers may not have srcObject
     video.srcObject = stream;
   })
-
-  socket.on('peer answer', function (data) {
-    console.log("RECIEVED ", data);
-    peer.signal(data);
-  });
 
   $('form').submit(function (e) {
     e.preventDefault(); // prevents page reloading
@@ -95,12 +91,6 @@ $(function () {
   //update chat log with recieved message
   socket.on('chat message', function (header, msg) {
     addMessageToLog(header, msg);
-  });
-
-
-  //update chat log with recieved message
-  socket.on('test', function (text) {
-    console.log(text);
   });
 
   //get the user roles
