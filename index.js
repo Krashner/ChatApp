@@ -34,14 +34,16 @@ io.on('connection', function (socket) {
   //add socket to array
   connectedSockets.push(socket);
 
-  //connect peers
+  //add peers
   for(var i = 0; i < connectedSockets.length; i++){
     if(connectedSockets[i] != socket){
-      console.log("peer connection " + i);
+        //give target a peer connection to me
+	io.to(connectedSockets[i].id).emit('add peer', true);
+	//give me a connection to target
+	socket.emit('add peer', false);
       }
   }
 
-console.log(connectedSockets.length);
 
   console.log("Connected Sockets:" + connectedSockets);
   //send roles to clients
@@ -80,7 +82,7 @@ console.log(connectedSockets.length);
 
   
     connectedSockets = socketRemove(connectedSockets, socket)
-
+    remove
     console.log("Connected Sockets"+ connectedSockets);
   });
 });

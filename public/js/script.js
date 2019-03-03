@@ -29,7 +29,7 @@ $(function () {
   socket.on('add peer', function (init){
     var p = new SimplePeer({ initiator: init, trickle: false });
     peers.push(p);
-    console.log("Added peer");
+    console.log(peers);
   });
 
   function removePeer(){
