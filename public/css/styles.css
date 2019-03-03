@@ -53,91 +53,34 @@ form button {
 
 #chat-container {
     margin: auto;
-    width: 500px;
 }
 
-video {
-    max-width: calc(50% - 100px);
-    margin: 0 50px;
-    box-sizing: border-box;
-    border-radius: 2px;
-    padding: 0;
-    box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
+.btn{
+    outline: none !important;
+    box-shadow: none !important;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 0 !important;
+    border-color: #000 !important;
 }
 
-
-/* this is for testiing */
-@CHARSET "UTF-8";
-* {
-    margin: 0px;
-    padding: 0px;
-    box-sizing: border-box;
+.btn:active{
+  
 }
 
-a {
-    text-decoration: none;
-    color: #2b7;
-    font-weight: bold;
+#control-col{
+    border-style: solid;
+    border-width: 2px 2px 2px 0px;
+
 }
 
-a:hover {
-    color: #b15;
-    transition: 0.1s all ease-in-out;
+#control-title{
+    display: grid;
+    align-items: center;
+    width: 100%;
+    text-align: center;
 }
 
-body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    min-height: 100%;
-    height: 100%;
-    line-height: 1.5em;
-    padding: 1em;
-    color: #ddd;
-    background-color: #ffffff;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    margin: 10px 0;
-    font-family: inherit;
-    font-weight: bold;
-    line-height: 1.5em;
-    color: inherit;
-    text-rendering: optimizelegibility;
-}
-
-html {
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-}
-
-button, input {
-    font-size: 1em;
-    padding: 0.5em 1em;
-}
-
-div.message {
-    margin: 0.5em 0.5em;
-    border-radius: 0.3em;
-    padding: 0.5em 1em;
-    background-color: #eee;
-    box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
-    width: 20em;
-    color: #444;
-}
-
-div.message.from {
-    margin: 0.3em 2em;
-}
-
-body {
-    background-color: #455;
-}
-
-.main {
-    display: inline-block;
-    padding: 2em;
-    margin-bottom: 5em;
-}
 
 #wslog {
     box-shadow: inset 0 1em 2em -1em rgba(30, 50, 40, 0.5), inset 0 -1em 2em -1em rgba(30, 50, 40, 0.5);
@@ -146,4 +89,14 @@ body {
     line-height: 1em;
     overflow-y: auto;
     word-wrap: break-word;
+}
+
+
+video {
+    max-width: calc(50% - 100px);
+    margin: 0 50px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    padding: 0;
+    box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
 }

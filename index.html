@@ -18,14 +18,40 @@
   </select>
   <div id="users">0</div>
   <div class="container">
-    <div id="chat-container">
-      <div class="row" id="chat-box">
-        <ul id="messages"></ul>
+    <div class="row" id="chat-control-row">
+      <div class="col" id="chat-col">
+        <div id="chat-container">
+          <div class="row" id="chat-box">
+            <ul id="messages"></ul>
+          </div>
+          <form class="row" action="">
+            <input id="m" class="col-9" autocomplete="off" />
+            <button class="col-3">Send</button>
+          </form>
+        </div>
       </div>
-      <form class="row" action="">
-        <input id="m" class="col-9" autocomplete="off" />
-        <button class="col-3">Send</button>
-      </form>
+      <div class="col-4 d-flex flex-column" id="control-col">
+	  <div class ="row chat-button-row flex-grow-1">
+	    <span class "col text-center align-middle" id="control-title">Internal Trailer Chat</span>
+	  </div>	
+	  <div class ="row chat-button-row flex-grow-1">
+	    <button type="button" class="col-6 btn btn-secondary">AIR</button>
+	    <button type="button" class="col-6 btn btn-secondary">Ground</button>
+	  </div>
+	  <div class ="row chat-button-row flex-grow-1">
+	    <button type="button" class="col-6 btn btn-secondary">CUL</button>
+	    <button type="button" class="col-6 btn btn-secondary">MSA</button>
+	  </div>
+	  <div class ="row chat-button-row flex-grow-1">
+	    <button type="button" class="col-6 btn btn-secondary">HF</button>
+	    <button type="button" class="col-6 btn btn-secondary">AUX</button>
+	  </div>
+	  <div class ="row chat-button-row flex-grow-1">
+	    <button type="button" class="col btn btn-secondary">All Call</button>
+	  </div>
+	  <div class ="row chat-button-row flex-grow-1">
+	    <button type="button" class="col btn btn-danger">Push-To-Talk</button>
+	  </div>
     </div>
   </div>
   <video id="localVideo" autoplay muted></video>
