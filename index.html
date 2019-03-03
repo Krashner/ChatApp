@@ -1,82 +1,78 @@
 <!doctype html>
 <html>
-
-<head>
-  <title>Socket.IO chat</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
-</head>
-
-<body>
-  <select id="roles">
-    <option value="None">None</option>>
-  </select>
-  <select id="clients">
-    <option value="None">None</option>>
-  </select>
-  <div id="users">0</div>
-  <div class="container">
-    <div class="row" id="chat-control-row">
-      <div class="col" id="chat-col">
-        <div id="chat-container">
-          <div class="row" id="chat-box">
-            <ul id="messages"></ul>
-          </div>
-          <form class="row" action="">
-            <input id="m" class="col-9" autocomplete="off" />
-            <button class="col-3">Send</button>
-          </form>
-        </div>
+   <head>
+      <title>Socket.IO chat</title>
+      <link rel="stylesheet" href="/css/styles.css">
+      <link rel="stylesheet" href="/css/bootstrap.min.css">
+   </head>
+   <body>
+      <select id="roles">
+         <option value="None">None</option>
+         >
+      </select>
+      <select id="clients">
+         <option value="None">None</option>
+         >
+      </select>
+      <div id="users">0</div>
+      <div class="container">
+      <div class="row" id="chat-control-row">
+         <div class="col" id="chat-col">
+            <div id="chat-container">
+               <div class="row" id="chat-box">
+                  <ul id="messages"></ul>
+               </div>
+               <form class="row" action="">
+                  <input id="m" class="col-9" autocomplete="off" />
+                  <button class="col-3">Send</button>
+               </form>
+            </div>
+         </div>
+         <div class="col-4 d-flex flex-column" id="control-col">
+            <div class="row chat-button-row flex-grow-1">
+               <span class "col text-center align-middle" id="control-title">Internal Trailer Chat</span>
+            </div>
+            <div class="row btn-group btn-group-toggle chat-button-row flex-grow-1" data-toggle="buttons">
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target1" class="hidden-radio-btn">
+                  <div class ="chat-target-text">AIR</div>
+               </label>
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target2" class="hidden-radio-btn">
+                  <div class ="chat-target-text">GRND</div>
+               </label>
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target3" class="hidden-radio-btn">
+                  <div class ="chat-target-text">CUL</div>
+               </label>
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target4" class="hidden-radio-btn">
+                  <div class ="chat-target-text">MSA</div>
+               </label>
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target5" class="hidden-radio-btn">
+                  <div class ="chat-target-text">HF</div>
+               </label>
+               <label class="col-6 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target6" class="hidden-radio-btn">
+                  <div class ="chat-target-text">AUX</div>
+               </label>
+               <label class="col-12 btn btn-secondary chat-target-btn">
+                  <input type="radio" name="targets" id="target7" class="hidden-radio-btn">
+                  <div class ="chat-target-text">All Call</div>
+               </label>
+            </div>
+            <div class="row chat-button-row flex-grow-1">
+               <button type="button" class="col btn btn-danger">Push-To-Talk</button>
+            </div>
+         </div>
       </div>
-      <div class="col-4 d-flex flex-column" id="control-col">
-	  <div class ="row chat-button-row flex-grow-1">
-	    <span class "col text-center align-middle" id="control-title">Internal Trailer Chat</span>
-	  </div>
-  	  <div class ="row chat-button-row flex-grow-1">
-		  <div class ="btn-group btn-group-toggle chat-button-row flex-grow-1" data-toggle="buttons">
-			<div class ="row chat-button-row ">
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target1">AIR
-			  </label>
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target2">GRND
-			  </label>
-	  		</div>
-	
-			<div class ="row chat-button-row ">
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target3">CUL
-			  </label>
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target4">MSA
-			  </label>
-	  		</div>
-	
-			<div class ="row chat-button-row ">
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target5">HF
-			  </label>
-			  <label class="btn btn-secondary">
-			    <input type="radio" name="targets" id="target6">AUX
-			  </label>
-	  		</div>
-	     </div>
-	  </div>
-	  <div class ="row chat-button-row flex-grow-1">
-	    <button type="button" class="col btn btn-secondary">All Call</button>
-	  </div>
-	  <div class ="row chat-button-row flex-grow-1">
-	    <button type="button" class="col btn btn-danger">Push-To-Talk</button>
-	  </div>
-    </div>
-  </div>
-  <video id="localVideo" autoplay muted></video>
-  <video id="remoteVideo" autoplay></video>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/simple-peer/simplepeer.min.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script src="/js/bootstrap.min.js" type="text/javascript"></script>
-  <script src="/js/script.js" type="text/javascript"></script>
-</body>
-
+      <video id="localVideo" autoplay muted></video>
+      <video id="remoteVideo" autoplay></video>
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="/simple-peer/simplepeer.min.js"></script>
+      <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+      <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+      <script src="/js/script.js" type="text/javascript"></script>
+   </body>
 </html>

@@ -3,6 +3,9 @@ $(function () {
   var previousRole;
   var peer = new SimplePeer({ initiator: location.hash === '#1', trickle: false });
 
+
+  var peers=[];
+
   //join the room after a role is selected
   $("#roles").on('focus', function () {
     // Store the current value on focus and on change
@@ -22,6 +25,16 @@ $(function () {
       }
     }
   });
+
+  socket.on('add peer', function (init){
+    var p = new SimplePeer({ initiator: init, trickle: false });
+    peers.push(p);
+    console.log("Added peer");
+  });
+
+  function removePeer(){
+
+  }
 
   //error
   peer.on('error', function (err) { console.log('error', err) })
@@ -94,6 +107,7 @@ $(function () {
     return false;
   });
 
+
   //update chat log with recieved message
   socket.on('chat message', function (header, msg) {
     addMessageToLog(header, msg);
@@ -101,7 +115,8 @@ $(function () {
 
   //get the user roles
   socket.on('update roles', function (roles) {
-    $('#roles').text = "";
+    $('#roles').empty();
+    $('#roles').append($('<option>').val("None").text("None"));
     roles.forEach(function (entry) {
       $('#roles').append($('<option>').val(entry).text(entry));
     });

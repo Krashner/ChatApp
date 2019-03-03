@@ -7,6 +7,8 @@ var path = require('path');
 
 var roles = [];
 var onlineUsers = [];
+var connectedSockets = [];
+
 
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -29,6 +31,19 @@ fs.readFile('admin.json', 'utf8', function (err, contents) {
 //on socket connection
 io.on('connection', function (socket) {
 
+  //add socket to array
+  connectedSockets.push(socket);
+
+  //connect peers
+  for(var i = 0; i < connectedSockets.length; i++){
+    if(connectedSockets[i] != socket){
+      console.log("peer connection " + i);
+      }
+  }
+
+console.log(connectedSockets.length);
+
+  console.log("Connected Sockets:" + connectedSockets);
   //send roles to clients
   socket.emit('update roles', roles);
 
@@ -50,6 +65,8 @@ io.on('connection', function (socket) {
     removeFromUsers(socket.id, role);
     //emit user list to all users
     io.emit('onlineUsers', onlineUsers, Object.keys(onlineUsers).length);
+    console.log(onlineUsers.indexOf({ id: socket.id, username: role }));
+    findIndex(onlineUsers,socket.id,role);
   });
 
   //answer the offer
@@ -59,10 +76,20 @@ io.on('connection', function (socket) {
 
   // // To listen for a client's disconnection from server and intimate other clients about the same
   socket.on('disconnect', function (data) {
-
     removeFromUsers(socket.id, null);
+
+  
+    connectedSockets = socketRemove(connectedSockets, socket)
+
+    console.log("Connected Sockets"+ connectedSockets);
   });
 });
+
+function socketRemove(arr, value){
+  return arr.filter(function(ele){
+    return ele != value;
+  });
+}
 
 function removeFromUsers(id, safeRole) {
   var result = onlineUsers.filter(obj => {
@@ -73,8 +100,17 @@ function removeFromUsers(id, safeRole) {
     var index = onlineUsers.indexOf(element);
     onlineUsers.splice(index, 1);
   });
+}
 
+function findIndex(array, id, role){
+  var result = array.filter(obj => {
+    return obj.id === id && obj.role !== role
+  })
 
+  result.forEach(element => {
+    var index = onlineUsers.indexOf(element);
+    console.log(index);
+  }); 
 }
 
 function findWithAttr(array, attr, value) {
