@@ -35,13 +35,12 @@ io.on('connection', function(socket) {
     connectedSockets.push(socket);
 
     //add peers
-    for (var i = 0; i < connectedSockets.length; i++) {
-        if (connectedSockets[i] != socket) {
-            //give target a peer connection to me
-            io.to(connectedSockets[i].id).emit('add peer', true);
-            //give me a connection to target
-            socket.emit('add peer', false);
-        }
+    //give every potential peer a connection to me
+    socket.broadcast.emit('add peer', true);
+    
+    //give this socket a peer for every connected socket except one
+    for (var i = 0; i < connectedSockets.length-1; i++) {
+        socket.emit('add peer', false);
     }
 
 
@@ -78,8 +77,8 @@ io.on('connection', function(socket) {
     });
 
     //answer the offer
-    socket.on('peer signal', function(sender, type, data) {
-        socket.broadcast.emit('peer answer',sender, type, data);
+    socket.on('peer signal', function(data) {
+        socket.broadcast.emit('peer answer', data);
     });
 
     // // To listen for a client's disconnection from server and intimate other clients about the same

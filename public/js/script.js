@@ -23,9 +23,9 @@ $(function() {
         }
     });
 
-    socket.on('add peer', function(init) {
+    socket.on('add peer', function(isInitiator) {
         var p = new SimplePeer({
-            initiator: init,
+            initiator: isInitiator,
             trickle: false
         });
         peers.push(p);
@@ -71,7 +71,7 @@ $(function() {
         //send signal to reciever
         peer.on('signal', function(data) {
             console.log('SIGNAL', JSON.stringify(data));
-            socket.emit('peer signal', peer._id, data.type, JSON.stringify(data));
+            socket.emit('peer signal', JSON.stringify(data));
         });
 
         //data channel is being used
@@ -97,16 +97,14 @@ $(function() {
 
 
     //peer answered call
-    socket.on('peer answer', function(sender, type, data) {
-        //console.log("RECIEVED ", data);
-
-	peers.forEach(element =>{
-		if(element.connected === false){
-		  element.signal(data);
-		  return;
-		}
-	});
-        //peer.signal(data);
+    socket.on('peer answer', function(data) {
+        console.log("RECIEVED ", data);
+        peers.forEach(element => {
+            if (element.connected === false) {
+                element.signal(data);
+                return;
+            }
+        });
     });
 
 
