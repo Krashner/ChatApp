@@ -23,12 +23,14 @@ $(function() {
         }
     });
 
+    //create a new peer connection
     socket.on('add peer', function(isInitiator, socketToConnectID) {
 	var peer = createPeer(isInitiator);
         peers.push();
         console.log(peers);
     });
 
+    //remove closed peer connection
     function removePeer() {
 
     }
@@ -168,6 +170,7 @@ $(function() {
         $('#messages').append($('<li class="header">').text(header));
         $('#messages').append($('<li>').text(msg));
     }
+    
     //get a timestamp
     function timeNow() {
         var d = new Date(),
