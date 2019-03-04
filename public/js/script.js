@@ -23,9 +23,9 @@ $(function() {
         }
     });
 
-    socket.on('add peer', function(isInitiator) {
+    socket.on('add peer', function(isInitiator, socketToConnectID) {
 	var peer = createPeer(isInitiator);
-        peers.push(peer);
+        peers.push();
         console.log(peers);
     });
 
@@ -90,7 +90,6 @@ $(function() {
 
     }
 
-
     //peer answered call
     socket.on('peer answer', function(peer, type, data) {
         console.log("RECIEVED ", data);
@@ -99,12 +98,12 @@ $(function() {
             console.log("offer");
 	    var peer = createPeer(false);
 	    peer.signal(data);
-            peers.push(peer);
+            //peers.push({});
 	}else if(type==="answer"){
 	    var originalPeer = JSON.parse(peer);
 	    console.log(originalPeer._id);
 	    peers.forEach(element => {
-		if(element._id === originalPeer._id){
+		if(element.Peer._id === originalPeer._id){
 		    element.signal(data);
 		    return;
 		}

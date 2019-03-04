@@ -42,10 +42,10 @@ io.on('connection', function(socket) {
 
     //give this socket a peer for every connected socket except one
     for (var i = 0; i < connectedSockets.length-1; i++) {
-        socket.emit('add peer', true);
+        socket.emit('add peer', true, connectedSockets[i].id);
     }
 
-    //answer the offer
+    //broadcast the signal to sockets
     socket.on('peer signal', function(peer, type, data) {
         socket.broadcast.emit('peer answer',peer, type, data);
     });
