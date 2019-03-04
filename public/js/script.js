@@ -24,12 +24,8 @@ $(function() {
     });
 
     socket.on('add peer', function(isInitiator) {
-        var p = new SimplePeer({
-            initiator: isInitiator,
-            trickle: false
-        });
-        peers.push(p);
-        setPeerListeners(p);
+	var peer = createPeer(isInitiator);
+        peers.push(peer);
         console.log(peers);
     });
 
@@ -71,7 +67,7 @@ $(function() {
         //send signal to reciever
         peer.on('signal', function(data) {
             console.log('SIGNAL', JSON.stringify(data));
-            socket.emit('peer signal', JSON.stringify(data));
+            socket.emit('peer signal', JSON.stringify(peer), data.type, JSON.stringify(data));
         });
 
         //data channel is being used
@@ -95,19 +91,36 @@ $(function() {
     }
 
 
-
     //peer answered call
-    socket.on('peer answer', function(data) {
+    socket.on('peer answer', function(peer, type, data) {
         console.log("RECIEVED ", data);
-        peers.forEach(element => {
-            if (element.connected === false) {
-                element.signal(data);
-                return;
-            }
-        });
+
+	if(type==="offer"){
+            console.log("offer");
+	    var peer = createPeer(false);
+	    peer.signal(data);
+            peers.push(peer);
+	}else if(type==="answer"){
+	    var originalPeer = JSON.parse(peer);
+	    console.log(originalPeer._id);
+	    peers.forEach(element => {
+		if(element._id === originalPeer._id){
+		    element.signal(data);
+		    return;
+		}
+            });
+        }
+
     });
 
-
+    function createPeer(isInitiator){
+        var p = new SimplePeer({
+            initiator: isInitiator,
+            trickle: false
+        });
+        setPeerListeners(p);
+	return p;
+    }
 
     $('form').submit(function(e) {
         e.preventDefault(); // prevents page reloading

@@ -36,12 +36,19 @@ io.on('connection', function(socket) {
 
     //add peers
     //give every potential peer a connection to me
-    socket.broadcast.emit('add peer', true);
-    
+    //socket.broadcast.emit('add peer', true);
+//    if(connectedSockets.length > 1)
+  //      socket.emit('add peer', true);
+
     //give this socket a peer for every connected socket except one
     for (var i = 0; i < connectedSockets.length-1; i++) {
-        socket.emit('add peer', false);
+        socket.emit('add peer', true);
     }
+
+    //answer the offer
+    socket.on('peer signal', function(peer, type, data) {
+        socket.broadcast.emit('peer answer',peer, type, data);
+    });
 
 
     console.log("Connected Sockets:" + connectedSockets);
@@ -74,11 +81,6 @@ io.on('connection', function(socket) {
             username: role
         }));
         findIndex(onlineUsers, socket.id, role);
-    });
-
-    //answer the offer
-    socket.on('peer signal', function(data) {
-        socket.broadcast.emit('peer answer', data);
     });
 
     // // To listen for a client's disconnection from server and intimate other clients about the same
