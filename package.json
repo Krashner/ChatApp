@@ -1,12 +1,14 @@
 {
-  "name": "socket-chat-example",
+  "name": "chat-app",
   "version": "0.0.1",
-  "description": "my first socket.io app",
+  "description": "Simple chat app",
   "dependencies": {
     "bootstrap": "^4.3.1",
     "express": "^4.16.4",
     "jquery": "^1.9.1",
+    "simple-peer": "^9.2.1",
     "socket.io": "^2.2.0",
-    "webrtc-adapter": "^7.2.0"
+    "webrtc-adapter": "^7.2.0",
+    "wrtc": "^0.3.5"
   }
 }
