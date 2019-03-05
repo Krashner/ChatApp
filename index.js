@@ -36,22 +36,26 @@ io.on('connection', function(socket) {
     //add socket to array
     connectedSockets.push(socket);
 
-    //add peers
-    //give every potential peer a connection to me
-    //socket.broadcast.emit('add peer', true);
-//    if(connectedSockets.length > 1)
-  //      socket.emit('add peer', true);
-
-    //give this socket a peer for every connected socket except one
-    for (var i = 0; i < connectedSockets.length-1; i++) {
-        socket.emit('add peer', true, connectedSockets[i].id);
+    //add a new non-initiator peer to every other client with this ID
+    //socket.broadcast.emit('add peer', false, socket.id);
+    //console.log(socket.id);
+    
+    //give this socket a initiator peer for every connected socket except one with their ID
+    for (var i = 0; i < connectedSockets.length; i++) {
+        if(socket.id!=connectedSockets[i].id){
+            socket.emit('add peer', true, connectedSockets[i].id);
+        }
     }
 
     //broadcast the signal to sockets
-    socket.on('peer signal', function(peer, type, data) {
-        socket.broadcast.emit('peer answer',peer, type, data);
-    });
+    //socket.on('peer signal', function(peer, type, data) {
+        //socket.broadcast.emit('peer answer',peer, type, data);
+    //});
 
+    //broadcast the signal to specific socket
+    socket.on('peer call', function(initiatorID, targetID, peerID, data) {
+        io.to(targetID).emit('peer response',initiatorID, targetID, peerID, data);
+    });
 
     console.log("Connected Sockets:" + connectedSockets);
     //send roles to clients
@@ -90,6 +94,8 @@ io.on('connection', function(socket) {
         removeFromUsers(socket.id, null);
         connectedSockets = socketRemove(connectedSockets, socket);
         console.log("Connected Sockets" + connectedSockets);
+        //remove peer for this socket from every client
+        //socket.broadcast.emit('remove peer', socket.id);
     });
 });
 

@@ -23,11 +23,31 @@ $(function() {
         }
     });
 
+    var sendSignalTo;
+    var signalOriginator;
+    var sendingPeerID;
+    
     //create a new peer connection
-    socket.on('add peer', function(isInitiator, socketToConnectID) {
-	var peer = createPeer(isInitiator);
-        peers.push();
-        console.log(peers);
+    socket.on('add peer', function(isInitiator, targetSocketID) {
+	console.log("create peer");
+	//this method will not work when trying to connect to more than one at a time, needs a fix
+	
+	var p = new SimplePeer({
+		initiator: isInitiator,
+		trickle: false,
+		//config: {"iceServers":[]}
+	    });
+	    
+	    sendSignalTo = targetSocketID;
+	    signalOriginator = socket.id;
+	    sendingPeerID = p._id;
+	    
+	    setPeerListeners(p);
+	
+	
+	//var peer = createPeer(isInitiator);
+        peers.push(p);
+        //console.log(peers);
     });
 
     //remove closed peer connection
@@ -36,10 +56,15 @@ $(function() {
     }
 
     function setPeerListeners(peer) {
-        //error
-        peer.on('error', function(err) {
-            console.log('error', err)
-        })
+	
+	//send signal to reciever
+        peer.on('signal', function(data) {
+            console.log('SIGNAL', JSON.stringify(data));
+	    
+	    console.log("Signal Sent:   Originator: " + signalOriginator + " Target "+ sendSignalTo + " PeerID: " + sendingPeerID);
+	    socket.emit('peer call', signalOriginator, sendSignalTo, sendingPeerID, JSON.stringify(data));
+            //socket.emit('peer signal', JSON.stringify(peer), data.type, JSON.stringify(data));
+        });
 
         //peer connected
         peer.on('connect', function() {
@@ -66,12 +91,6 @@ $(function() {
                 });
         });
 
-        //send signal to reciever
-        peer.on('signal', function(data) {
-            console.log('SIGNAL', JSON.stringify(data));
-            socket.emit('peer signal', JSON.stringify(peer), data.type, JSON.stringify(data));
-        });
-
         //data channel is being used
         peer.on('data', function(data) {
             console.log('data: ' + data);
@@ -89,38 +108,82 @@ $(function() {
         peer.on('close', function() {
             console.log("CLOSE");
         })
+	
+        //error
+        peer.on('error', function(err) {
+            console.log('error', err)
+        })
 
     }
 
+    //peer response to signal
+    socket.on('peer response', function(initiatorID, targetID, peerID, data) {
+	signalOriginator = initiatorID;
+	sendingPeerID = peerID;
+	var d = JSON.parse(data);
+	console.log(d);
+	console.log(peers);
+	//if an offer is recieved, create a non-iniator peer and respond
+	if(d.type ==="offer"){
+	    sendSignalTo = initiatorID;
+	    signalOriginator = targetID;
+	    console.log("Offer Recieved:   Originator: " + signalOriginator + " Target "+ sendSignalTo + " PeerID: " + peerID);
+	    console.log("create peer 2");
+	    //create a non-initiating peer
+	    var p = new SimplePeer({
+		initiator: false,
+		trickle: false,
+		//config: {"iceServers":[]}
+	    });
+	    setPeerListeners(p);
+	    p.signal(data);
+	    peers.push(p);
+	}else{
+	    sendSignalTo = targetID;
+	    signalOriginator = socket.id;
+	    console.log("Answer Recieved:   Originator: " + signalOriginator + " Target "+ sendSignalTo + " PeerID: " + peerID);
+	    //if an answer is recieved, give data to original peer
+	    console.log("got an answer"); 
+	    //peers[0].signal(data);
+
+	    for(var i = 0; i< peers.length; i++){
+		if(peers[i]._id === peerID){
+		    console.log("connecting call");
+		    peers[i].signal(data);
+		}
+	    }
+	}   
+    });
+	
     //peer answered call
     socket.on('peer answer', function(peer, type, data) {
         console.log("RECIEVED ", data);
 
-	if(type==="offer"){
-            console.log("offer");
-	    var peer = createPeer(false);
-	    peer.signal(data);
-            //peers.push({});
-	}else if(type==="answer"){
-	    var originalPeer = JSON.parse(peer);
-	    console.log(originalPeer._id);
-	    peers.forEach(element => {
-		if(element.Peer._id === originalPeer._id){
-		    element.signal(data);
-		    return;
-		}
-            });
-        }
+	//if(type==="offer"){
+            //console.log("offer");
+	    //var peer = createPeer(false);
+	    //peer.signal(data);
+            ////peers.push({});
+	//}else if(type==="answer"){
+	    //var originalPeer = JSON.parse(peer);
+	    //console.log(originalPeer._id);
+	    //peers.forEach(element => {
+		//if(element.Peer._id === originalPeer._id){
+		    //element.signal(data);
+		    //return;
+		//}
+            //});
+        //}
 
     });
 
     function createPeer(isInitiator){
-        var p = new SimplePeer({
-            initiator: isInitiator,
-            trickle: false
-        });
-        setPeerListeners(p);
-	return p;
+        //var p = new SimplePeer({
+          //  initiator: isInitiator,
+         //   trickle: false
+        //});
+        //setPeerListeners(p);
+	//return p;
     }
 
     $('form').submit(function(e) {
