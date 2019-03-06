@@ -17,7 +17,7 @@ app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 //bootstrap js
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
 //jquery
-app.use('/js', express.static(__dirname + '/node_modules/jquery'));
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 //simple peer
 app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'));
 
