@@ -55,7 +55,7 @@ form button {
     margin: auto;
 }
 
-.btn{
+.btn {
     outline: none !important;
     box-shadow: none !important;
     border-width: 2px;
@@ -64,32 +64,27 @@ form button {
     border-color: #000 !important;
 }
 
-.btn:active{
-  
-}
-
-#control-col{
+#control-col {
     border-style: solid;
     border-width: 2px 2px 2px 0px;
-
 }
 
-#control-title{
+#control-title {
     display: grid;
     align-items: center;
     width: 100%;
     text-align: center;
 }
 
-.hidden-radio-btn{
-    display:none;
+.hidden-radio-btn {
+    display: none;
 }
 
-.chat-target-btn{
-    margin:0 !important;
+.chat-target-btn {
+    margin: 0 !important;
 }
 
-.chat-target-text{  
+.chat-target-text {
     margin: auto;
     display: grid;
     align-content: center;
@@ -105,7 +100,6 @@ form button {
     overflow-y: auto;
     word-wrap: break-word;
 }
-
 
 video {
     max-width: calc(50% - 100px);
