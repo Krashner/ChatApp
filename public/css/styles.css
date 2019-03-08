@@ -2,31 +2,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color:#212121;
-    border-color: #424242;
+
+    border-color: #474a4f;
     color: #FFFFFF;
 }
 
 body {
     font: 13px Helvetica, Arial;
 
-}
-
-form {
-    background: #000;
-    padding: 0px;
-    border-style: solid;
-    border-width: 2px;
-}
-
-form input {
-    border: 0;
-    padding: 10px;
-}
-
-form button {
-    background: rgb(130, 224, 255);
-    border: none;
 }
 
 #messages {
@@ -37,12 +20,14 @@ form button {
 
 #messages li {
     padding: 5px 10px;
+    color: #dcddde;
 }
 
 .header {
     border-style: solid;
     border-width: 2px 0px 0px 0px;
     font-weight: bold;
+    color: #ffffff33;
 }
 
 #send-button{
@@ -52,7 +37,7 @@ form button {
 /* #messages li:nth-child(odd) { background: #eee; } */
 
 #chat-box {
-    height: 90vh;
+    height: 95vh;
     overflow: auto;
     flex-direction: column-reverse;
     display: flex;
@@ -61,11 +46,34 @@ form button {
     border-width: 2px 2px 0px 2px;
 */
 }
+#chat-col{
+    background-color:#36393f;
+}
 
 #chat-input{
-    height: 10vh;
+    background-color: #484c52;
     border-style: solid;
     border-width: 2px 0px 1px 0px;
+    border-radius: 15px;
+    padding: 5px;
+}
+
+form {
+    padding: 0px;
+    border-style: solid;
+    border-width: 2px;
+}
+
+form input {
+    border: 0;
+    padding: 10px;
+    background-color: #484c52;
+    color: #ffffffb3;
+}
+
+form button {
+    background: rgb(130, 224, 255);
+    border: none;
 }
 
 .container-fluid{
@@ -77,7 +85,6 @@ form button {
     box-shadow: none !important;
     border-width: 2px;
     border-style: solid;
-    border-radius: 0 !important;
 }
 
 input{
@@ -85,12 +92,10 @@ input{
     box-shadow: none !important;
     border-width: 2px;
     border-style: solid;
-    border-radius: 0 !important;
 }
 
 #control-col {
-    border-style: solid;
-    border-width: 0px 0px 0px 2px;
+    background-color: #2f3136;
 }
 
 #control-title {
@@ -104,12 +109,6 @@ input{
     display: none;
 }
 
-.chat-target-btn {
-    margin: 0 !important;
-    border-style: solid;
-    border-width: 2px;
-    border-color: #424242 !important;
-}
 
 .chat-target-text {
     margin: auto;
