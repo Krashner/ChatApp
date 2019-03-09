@@ -189,14 +189,14 @@ $(function () {
   $('form').submit(function (e) {
     e.preventDefault(); // prevents page reloading
     //don't allow blank messages
-    var text = $('#m').val();
+    var text = $('#chat-input').val();
     var role = $('#roles').val();
     //send message, clear message box and add message to local chat
     if (text.replace(/\s+/g, '') !== '' && role !== '') {
       role += " " + timeNow();
       socket.emit('chat message', role, text);
       //peer.send(text);
-      $('#m').val('');
+      $('#chat-input').val('');
       addMessageToLog(role, text);
     }
     return false;

@@ -37,7 +37,7 @@ body {
 /* #messages li:nth-child(odd) { background: #eee; } */
 
 #chat-box {
-    height: 95vh;
+    height: 92vh;
     overflow: auto;
     flex-direction: column-reverse;
     display: flex;
@@ -50,25 +50,26 @@ body {
     background-color:#36393f;
 }
 
-#chat-input{
+#chat-input-container{
     background-color: #484c52;
     border-style: solid;
     border-width: 2px 0px 1px 0px;
-    border-radius: 15px;
     padding: 5px;
+    border-radius: 15px;
+    height: 6vh;
+    margin: 1vh 1vw 1vh 1vw;
+}
+
+#chat-input{
+    border: 0;
+    background-color: #484c52;
+    color: #ffffffb3;
 }
 
 form {
     padding: 0px;
     border-style: solid;
     border-width: 2px;
-}
-
-form input {
-    border: 0;
-    padding: 10px;
-    background-color: #484c52;
-    color: #ffffffb3;
 }
 
 form button {
