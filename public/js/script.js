@@ -22,6 +22,13 @@ $(function () {
       }
     }
   });
+  
+    
+    $(".chat-target-btn").click(function () {
+	$(".chat-target-btn").removeClass("active");
+	$(this).addClass("active");
+    });
+    
 
   var sendSignalTo;
   var signalOriginator;
