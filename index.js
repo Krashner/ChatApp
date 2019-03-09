@@ -53,8 +53,9 @@ io.on('connection', function (socket) {
     //});
 
     //broadcast the signal to specific socket
-    socket.on('peer call', function (initiatorID, targetID, peerID, data) {
-        io.to(targetID).emit('peer response', initiatorID, targetID, peerID, data);
+    socket.on('peer call', function (data) {
+        var d = JSON.parse(data);
+        io.to(d.sendSignalTo).emit('peer response', data);
     });
 
     console.log("Connected Sockets:" + connectedSockets);

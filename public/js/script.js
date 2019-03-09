@@ -30,9 +30,9 @@ $(function () {
     });
     
 
-  var sendSignalTo;
-  var signalOriginator;
-  var sendingPeerID;
+  //~ var sendSignalTo;
+  //~ var signalOriginator;
+  //~ var sendingPeerID;
 
   //create a new peer connection
   socket.on('add peer', function (isInitiator, targetSocketID) {
@@ -44,13 +44,14 @@ $(function () {
       trickle: false,
       //config: {"iceServers":[]}
     });
-
-    sendSignalTo = targetSocketID;
-    signalOriginator = socket.id;
-    sendingPeerID = p._id;
-
+    
+    //~ sendSignalTo = targetSocketID;
+	p.sendSignalTo = targetSocketID;
+    //~ signalOriginator = socket.id;
+  p.signalOriginator = socket.id;
+    //~ sendingPeerID = p._id;
+	p.sendingPeerID = p._id;
     setPeerListeners(p);
-
 
     //var peer = createPeer(isInitiator);
     peers.push(p);
@@ -66,10 +67,14 @@ $(function () {
 
     //send signal to reciever
     peer.on('signal', function (data) {
+    	data.sendSignalTo = peer.sendSignalTo;
+      //~ signalOriginator = socket.id;
+      data.signalOriginator = peer.signalOriginator;
+      //~ sendingPeerID = p._id;
+      data.sendingPeerID =	peer.sendingPeerID;
       console.log('SIGNAL', JSON.stringify(data));
-
-      console.log("Signal Sent:   Originator: " + signalOriginator + " Target " + sendSignalTo + " PeerID: " + sendingPeerID);
-      socket.emit('peer call', signalOriginator, sendSignalTo, sendingPeerID, JSON.stringify(data));
+      //~ console.log("Signal Sent:   Originator: " + signalOriginator + " Target " + sendSignalTo + " PeerID: " + sendingPeerID);
+      socket.emit('peer call', JSON.stringify(data));
       //socket.emit('peer signal', JSON.stringify(peer), data.type, JSON.stringify(data));
     });
 
@@ -124,17 +129,17 @@ $(function () {
   }
 
   //peer response to signal
-  socket.on('peer response', function (initiatorID, targetID, peerID, data) {
-    signalOriginator = initiatorID;
-    sendingPeerID = peerID;
+  socket.on('peer response', function (data) {
     var d = JSON.parse(data);
+    //~ var signalOriginator = initiatorID;
+    //~ var sendingPeerID = peerID;
     console.log(d);
     console.log(peers);
     //if an offer is recieved, create a non-iniator peer and respond
     if (d.type === "offer") {
-      sendSignalTo = initiatorID;
-      signalOriginator = targetID;
-      console.log("Offer Recieved:   Originator: " + signalOriginator + " Target " + sendSignalTo + " PeerID: " + peerID);
+      //~ sendSignalTo = initiatorID;
+      //~ signalOriginator = targetID;
+       
       console.log("create peer 2");
       //create a non-initiating peer
       var p = new SimplePeer({
@@ -142,19 +147,25 @@ $(function () {
         trickle: false,
         //config: {"iceServers":[]}
       });
+      p.sendSignalTo = d.signalOriginator;
+      p.signalOriginator = d.sendSignalTo;
+      p.sendingPeerID = d.sendingPeerID;
+      console.log("Offer Recieved:   Originator: " + p.signalOriginator + " Target " + p.sendSignalTo + " PeerID: " + d.sendingPeerID);
       setPeerListeners(p);
       p.signal(data);
       peers.push(p);
     } else {
-      sendSignalTo = targetID;
-      signalOriginator = socket.id;
-      console.log("Answer Recieved:   Originator: " + signalOriginator + " Target " + sendSignalTo + " PeerID: " + peerID);
+      //~ sendSignalTo = targetID;
+      //~ signalOriginator = socket.id;
+      //~ d.sendSignalTo = p.sendSignalTo;
+      //~ d.signalOriginator = p.signalOriginator;
+      console.log("Answer Recieved:   Originator: " + d.signalOriginator + " Target " + d.sendSignalTo + " PeerID: " + d.sendingPeerID);
       //if an answer is recieved, give data to original peer
       console.log("got an answer");
       //peers[0].signal(data);
 
       for (var i = 0; i < peers.length; i++) {
-        if (peers[i]._id === peerID) {
+        if (peers[i]._id === d.sendingPeerID) {
           console.log("connecting call");
           peers[i].signal(data);
         }
