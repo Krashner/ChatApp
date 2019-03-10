@@ -50,6 +50,8 @@ body {
     padding:0px;
     border-top-right-radius: 8px!important;
     border-bottom-right-radius: 8px!important;
+    border-style: solid;
+    border-width: 0px 0px 0px 2px !important;
 }
 
 /* #messages li:nth-child(odd) { background: #eee; } */

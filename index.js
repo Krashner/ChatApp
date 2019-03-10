@@ -20,6 +20,8 @@ app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 //simple peer
 app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'));
+//font awesome
+app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
