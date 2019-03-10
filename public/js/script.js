@@ -138,7 +138,7 @@ $(function() {
         var text = $('#chat-input').val();
 	var role = currentRole;
         //send message, clear message box and add message to local chat
-        if (text.replace(/\s+/g, '') !== '' && role !== undefined) {
+        if (text.replace(/\s+/g, '') !== '' && role !== undefined && role !== "None") {
             role += " " + timeNow();
             socket.emit('chat message', currentRole, text);
             //peer.send(text);
