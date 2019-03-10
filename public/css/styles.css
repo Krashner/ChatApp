@@ -4,6 +4,9 @@
     box-sizing: border-box;
     border-color: #474a4f;
     color: #FFFFFF;
+/*
+    background-color: #36393f;
+*/
 }
 
 body {
@@ -37,6 +40,7 @@ body {
 #messages li {
     padding: 5px 10px;
     color: #dcddde;
+    word-break: break-word;
 }
 
 .header {
@@ -111,6 +115,8 @@ body {
     border: 0;
     background-color: #484c52;
     color: #ffffffb3;
+    resize: none;
+    outline:none!important;
 }
 
 
@@ -195,6 +201,11 @@ input{
 }
 */
 
+.chat-target-text{
+    margin-left: 1.75rem;
+    margin-right: 1.75rem;
+}
+    
 #chat-target-row{
     justify-content: center;
     z-index: 0;
