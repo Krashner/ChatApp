@@ -179,6 +179,12 @@ input{
 */
 }
 
+.disabled-btn{
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
 .chat-target-btn{
     color: #FFFFFF !important;
 /*
