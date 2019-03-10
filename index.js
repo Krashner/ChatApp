@@ -12,10 +12,8 @@ var connectedSockets = [];
 
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
-//bootstrap css
-app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 //bootstrap js
-app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap'));
 //jquery
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 //simple peer

@@ -2,9 +2,9 @@
 <html>
    <head>
       <title>Socket.IO chat</title>
-      <link rel="stylesheet" href="/css/styles.css">
-      <link rel="stylesheet" href="/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
       <link rel="stylesheet" href="/font-awesome/css/all.min.css">
+      <link rel="stylesheet" href="/css/styles.css">
    </head>
    <body>
 <!--
@@ -31,14 +31,21 @@
             </form>
          </div>
          <div class="col-4 d-flex flex-column" id="control-col">
-                        
+<!--
+            <div class="row btn-group" id="role-container">
+               <button class="btn btn-outline-dark chat-target-btn dropdown-toggle" data-toggle="dropdown">Roles</button>
+               <div class="dropdown-menu row" id="roles">
+                  <a class="dropdown-item" href="">None</a>
+               </div>
+            </div>
+-->
             <div id="chat-title-row" class="row flex-grow-1">
                <div class = "col text-center align-middle" id="control-title">Internal Trailer Chat</div>
             </div>
             <div id="chat-target-row" class="row btn-group flex-grow-1" role="group">
                <button type="button" class="col-sm-12 col-md-5 btn btn-outline-dark chat-target-btn">
-                     <div class ="status-light"></div>
-                     <div class ="chat-target-text">AIR</div>
+                  <div class ="status-light"></div>
+                  <div class ="chat-target-text">AIR</div>
                </button>
                <button type="button" class="col-sm-12 col-md-5 btn btn-outline-dark chat-target-btn">
                   <div class ="status-light"></div>
@@ -74,10 +81,10 @@
       <video id="localVideo" autoplay muted></video>
       <video id="remoteVideo" autoplay></video>
 -->
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="/simple-peer/simplepeer.min.js"></script>
-      <script src="/jquery/jquery.min.js"></script>
-      <script src="/js/bootstrap.min.js" type="text/javascript"></script>
-      <script src="/js/script.js" type="text/javascript"></script>
+      <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+      <script type="text/javascript" src="/simple-peer/simplepeer.min.js"></script>
+      <script type="text/javascript" src="/jquery/jquery.min.js"></script>
+      <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+      <script type="text/javascript" src="/js/script.js"></script>
    </body>
 </html>

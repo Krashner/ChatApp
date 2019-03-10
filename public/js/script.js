@@ -178,9 +178,9 @@ $(function() {
     //get the user roles
     socket.on('update roles', function(roles) {
         $('#roles').empty();
-        $('#roles').append($('<option>').val("None").text("None"));
+        $('#roles').append($('<button class="dropdown-item">').text("None"));
         roles.forEach(function(entry) {
-            $('#roles').append($('<option>').val(entry).text(entry));
+            $('#roles').append($('<button class="dropdown-item">').text(entry));
         });
     });
 

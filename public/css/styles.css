@@ -47,12 +47,31 @@ body {
 }
 
 #send-button{
-    padding:0px;
+    opacity: 0.5;
     border-top-right-radius: 8px!important;
     border-bottom-right-radius: 8px!important;
     border-style: solid;
     border-width: 0px 0px 0px 2px !important;
 }
+
+#roles{
+    color: #FFFFFFF!important;
+}
+
+.dropdown-menu
+{
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+    border-top: 0;
+    margin-top:0;
+    background-color: #36393f;
+    text-align: center;
+}
+
+.dropdown-item{
+    color : #FFFFFF;
+}
+
 
 /* #messages li:nth-child(odd) { background: #eee; } */
 
@@ -149,6 +168,7 @@ input{
 }
 
 .chat-target-btn{
+    color: #FFFFFF !important;
 /*
     outline: none!important;
     background-color:none!important;
