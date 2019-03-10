@@ -2,28 +2,8 @@ $(function() {
     var socket = io();
     var previousRole;
     var peers = [];
-
-    //join the room after a role is selected
-    $("#roles").on('focus', function() {
-        // Store the current value on focus and on change
-        previousRole = this.value;
-    }).change(function() {
-        var role = this.value;
-        if (this.value === 'None') {
-            socket.emit('role change', null);
-        } else {
-            if (previousRole != role) {
-                socket.emit('role change', role);
-                if (role !== null) {
-                    socket.emit('join', role);
-                    console.log("joining");
-                    previous = this.value;
-                }
-            }
-        }
-    });
-
-
+    var currentRole;
+    
     $(".chat-target-btn").click(function() {
         $(".chat-target-btn").removeClass("active");
         $(this).addClass("active");
@@ -156,11 +136,11 @@ $(function() {
         e.preventDefault(); // prevents page reloading
         //don't allow blank messages
         var text = $('#chat-input').val();
-        var role = $('#roles').val();
+	var role = currentRole;
         //send message, clear message box and add message to local chat
-        if (text.replace(/\s+/g, '') !== '' && role !== '') {
+        if (text.replace(/\s+/g, '') !== '' && role !== undefined) {
             role += " " + timeNow();
-            socket.emit('chat message', role, text);
+            socket.emit('chat message', currentRole, text);
             //peer.send(text);
             $('#chat-input').val('');
             addMessageToLog(role, text);
@@ -168,7 +148,11 @@ $(function() {
         $('#chat-input').focus();
         return false;
     });
-
+    
+    
+    $('#roles-dropdown').on('click', '.dropdown-item', function(e){
+	currentRole = this.id;
+    });
 
     //update chat log with recieved message
     socket.on('chat message', function(header, msg) {
@@ -177,10 +161,10 @@ $(function() {
 
     //get the user roles
     socket.on('update roles', function(roles) {
-        $('#roles').empty();
-        $('#roles').append($('<button class="dropdown-item">').text("None"));
+        $('#roles-dropdown').empty();
+        $('#roles-dropdown').append($('<button id="' + "None"+ '"class="dropdown-item">').text("None"));
         roles.forEach(function(entry) {
-            $('#roles').append($('<button class="dropdown-item">').text(entry));
+	    $('#roles-dropdown').append($('<button id="' + entry + '"class="dropdown-item">').text(entry));
         });
     });
 
