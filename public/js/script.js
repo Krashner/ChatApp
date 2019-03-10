@@ -164,8 +164,8 @@ $(function() {
             //peer.send(text);
             $('#chat-input').val('');
             addMessageToLog(role, text);
-            $('#chat-input').focus();
         }
+        $('#chat-input').focus();
         return false;
     });
 
