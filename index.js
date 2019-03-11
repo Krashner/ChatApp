@@ -36,21 +36,12 @@ io.on('connection', function(socket) {
     //add socket to array
     connectedSockets.push(socket);
 
-    //add a new non-initiator peer to every other client with this ID
-    //socket.broadcast.emit('add peer', false, socket.id);
-    //console.log(socket.id);
-
     //give this socket a initiator peer for every connected socket except one with their ID
     for (var i = 0; i < connectedSockets.length; i++) {
         if (socket.id != connectedSockets[i].id) {
             socket.emit('add peer', true, connectedSockets[i].id);
         }
     }
-
-    //broadcast the signal to sockets
-    //socket.on('peer signal', function(peer, type, data) {
-    //socket.broadcast.emit('peer answer',peer, type, data);
-    //});
 
     //broadcast the signal to specific socket
     socket.on('peer call', function(data) {

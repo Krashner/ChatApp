@@ -3,12 +3,6 @@ $(function() {
     var previousRole;
     var peers = [];
     var currentRole;
-    
-    $(".chat-target-btn").click(function() {
-        $(".chat-target-btn").removeClass("active");
-        $(this).addClass("active");
-    });
-
 
     //create a new peer connection
     socket.on('add peer', function(isInitiator, targetSocketID) {
@@ -131,13 +125,11 @@ $(function() {
         }
     });
 
-
+    //send message, clear message box and add message to local chat
     $('form').submit(function(e) {
-        e.preventDefault(); // prevents page reloading
-        //don't allow blank messages
+        e.preventDefault();
         var text = $('#chat-input').val();
-	var role = currentRole;
-        //send message, clear message box and add message to local chat
+        var role = currentRole;
         if (text.replace(/\s+/g, '') !== '' && role !== undefined && role !== "None") {
             role += " " + timeNow();
             socket.emit('chat message', currentRole, text);
@@ -148,20 +140,23 @@ $(function() {
         $('#chat-input').focus();
         return false;
     });
-    
-    //get the selected role
+        
+    //toggle chat target buttons on and off
+    $(".chat-target-btn").click(function() {
+        $(".chat-target-btn").removeClass("active");
+        $(this).addClass("active");
+    });
+
+    //get the selected role, turn th new role's light green and the old red
     $('#roles-dropdown').on('click', '.dropdown-item', function(e){
-	//enable the old button and a red light
-	if(currentRole !== this.id){
-	    $("#" + currentRole +"-Selector").removeClass("disabled-btn");
-        $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545');
-	}
-	currentRole = this.id;
-	$("#roles-dropdown-button").text(currentRole);
-	//disable the new button and turn the light green
-	$("#" + currentRole +"-Selector").addClass("disabled-btn");
-    console.log($("#" + currentRole +"-Selector > status-light" ));
-    $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581');
+        if(currentRole !== this.id){
+            $("#" + currentRole +"-Selector").removeClass("disabled-btn");
+            $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545');
+        }
+        currentRole = this.id;
+        $("#roles-dropdown-button").text(currentRole);
+        $("#" + currentRole +"-Selector").addClass("disabled-btn");
+        $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581');
     });
     
     //update chat log with recieved message
@@ -174,17 +169,6 @@ $(function() {
         $('#roles-dropdown').empty();
         roles.forEach(function(entry) {
 	    $('#roles-dropdown').append($('<button id="' + entry + '"class="dropdown-item btn btn-outline-dark">').text(entry));
-        });
-    });
-
-    //track users online
-    socket.on('onlineUsers', function(onlineUsers, count) {
-        console.log(onlineUsers);
-        $('#clients').empty();
-        $('#clients').append($('<option>').val("None").text("None"));
-        onlineUsers.forEach(function(entry) {
-            if (entry.id !== socket.id && entry.username !== "")
-                $('#clients').append($('<option>').val(entry).text(entry.username + " : " + entry.id));
         });
     });
 
