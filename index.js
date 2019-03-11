@@ -45,6 +45,7 @@ io.on('connection', function(socket) {
     //broadcast the signal to specific socket
     socket.on('peer call', function(data) {
         var d = JSON.parse(data);
+        console.log(d.sendSignalTo);
         io.to(d.sendSignalTo).emit('peer response', data);
     });
 

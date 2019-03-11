@@ -7,11 +7,8 @@ $(function() {
     //create a new peer connection
     socket.on('add peer', function(isInitiator, targetSocketID) {
         console.log("create peer");
-        var p = createPeer(isInitiator);
-        p.sendSignalTo = targetSocketID;
-        p.signalOriginator = socket.id;
-        p.sendingPeerID = p._id;
-        setPeerListeners(p);
+        var p = createPeer(isInitiator, socket.id, targetSocketID, null);
+         console.log(p);       
         peers.push(p);
     });
 
@@ -91,13 +88,12 @@ $(function() {
         //if an offer is recieved, create a non-iniator peer and respond
         if (d.type === "offer") {
             console.log("create peer 2");
-            //create a non-initiating peer
-            var p = createPeer(false);
-            p.sendSignalTo = d.signalOriginator;
-            p.signalOriginator = d.sendSignalTo;
-            p.sendingPeerID = d.sendingPeerID;
+            //create a non-initiating peer and return to sender
+            var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
+            //~ p.signalOriginator = d.sendSignalTo;
+            //~ p.sendSignalTo = d.signalOriginator;
+            //~ p.sendingPeerID = d.sendingPeerID;
             console.log("Offer Recieved:   Originator: " + p.signalOriginator + " Target " + p.sendSignalTo + " PeerID: " + d.sendingPeerID);
-            setPeerListeners(p);
             p.signal(data);
             peers.push(p);
         } else {
@@ -175,12 +171,20 @@ $(function() {
         return h + ':' + m + ': ';
     }
     
-    function createPeer(var initiator){
+    function createPeer(initiator, originatorID, sendToID, peerID){
         var p = new SimplePeer({
                 initiator: initiator,
                 trickle: false,
                 //config: {"iceServers":[]}
             });
+            p.signalOriginator = originatorID;
+            p.sendSignalTo = sendToID;
+            p.sendingPeerID = peerID;
+            
+            if(p.sendingPeerID === null)
+                p.sendingPeerID = p._id;
+                
+            setPeerListeners(p);
             return p;
     }
 
