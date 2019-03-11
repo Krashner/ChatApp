@@ -7,14 +7,7 @@ $(function() {
     //create a new peer connection
     socket.on('add peer', function(isInitiator, targetSocketID) {
         console.log("create peer");
-        //this method will not work when trying to connect to more than one at a time, needs a fix
-
-        var p = new SimplePeer({
-            initiator: isInitiator,
-            trickle: false,
-            //config: {"iceServers":[]}
-        });
-
+        var p = createPeer(isInitiator);
         p.sendSignalTo = targetSocketID;
         p.signalOriginator = socket.id;
         p.sendingPeerID = p._id;
@@ -99,11 +92,7 @@ $(function() {
         if (d.type === "offer") {
             console.log("create peer 2");
             //create a non-initiating peer
-            var p = new SimplePeer({
-                initiator: false,
-                trickle: false,
-                //config: {"iceServers":[]}
-            });
+            var p = createPeer(false);
             p.sendSignalTo = d.signalOriginator;
             p.signalOriginator = d.sendSignalTo;
             p.sendingPeerID = d.sendingPeerID;
@@ -184,6 +173,15 @@ $(function() {
             h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
             m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         return h + ':' + m + ': ';
+    }
+    
+    function createPeer(var initiator){
+        var p = new SimplePeer({
+                initiator: initiator,
+                trickle: false,
+                //config: {"iceServers":[]}
+            });
+            return p;
     }
 
 });
