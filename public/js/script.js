@@ -171,6 +171,7 @@ $(function() {
         return h + ':' + m + ': ';
     }
     
+    //create a peer object and return it
     function createPeer(initiator, originatorID, sendToID, peerID){
         var p = new SimplePeer({
                 initiator: initiator,

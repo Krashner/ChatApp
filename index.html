@@ -21,8 +21,8 @@
 -->
       <div class="container-fluid">
       <div class="row" id="chat-control-row">
-         <div class="col" id="chat-col">
-            <div class="row" id="chat-box">
+         <div class="col d-flex flex-column" id="chat-col">
+            <div class="row flex-grow-1" id="chat-box">
                <ul id="messages"></ul>
             </div>
             <form class="row" id="chat-input-container" action="">
@@ -32,8 +32,8 @@
          </div>
          <div class="col-4 d-flex flex-column" id="control-col">
             <div class="row btn-group" id="role-container">
-               <button id="roles-dropdown-button" class="col btn btn-outline-dark chat-target-btn dropdown-toggle" data-toggle="dropdown">Roles</button>
-               <div class="col dropdown-menu dropdown-menu-center" id="roles-dropdown">
+               <button id="roles-dropdown-button" class="row btn btn-outline-dark chat-target-btn dropdown-toggle" data-toggle="dropdown">Roles</button>
+               <div class="row dropdown-menu dropdown-menu-center" id="roles-dropdown">
                   <button class="btn btn-outline-dark dropdown-item">None</button>
                </div>
             </div>

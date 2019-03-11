@@ -63,17 +63,22 @@ body {
     color: #FFFFFFF!important;
 }
 
+#roles-dropdown-button{
+    background-color: #2f3136;
+}
+
 .dropdown-menu-center
 {
+    background-color: #36393f;
     border-top-right-radius:0;
     border-top-left-radius:0;
     border-top: 0;
     margin-top:0;
     background-color: #36393f;
     text-align: center;
-    transform: translateX(-50%)!important;
-    -webkit-transform: translateX(-50%)!important;
-    -o-transform: translateX(-50%)!important;
+    transform: translate(-50%, 15%)!important;
+    -webkit-transform: translate(-50%, 15%)!important;
+    -o-transform: translate(-50%, 15%)!important;
     right: auto!important;
     left: 50%!important;
 }
@@ -94,6 +99,7 @@ body {
     min-height: 230px;
     border-style: solid;
     border-width: 0px 0px 1px 0px;
+    width:100%;
 }
 
 #chat-col{
