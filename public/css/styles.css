@@ -67,6 +67,11 @@ body {
     background-color: #2f3136;
 }
 
+#role-container{
+     box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.06);
+     z-index: 2;
+}
+
 .dropdown-menu-center
 {
     background-color: #36393f;
@@ -84,9 +89,29 @@ body {
 }
 
 .dropdown-item{
-    color : #FFFFFF;
+    color : #FFFFFF !important;
 }
 
+.dropdown-item:hover{
+    background-color: #484c52 !important;
+}
+
+.dropdown-item:active, .dropdown-item:focus{
+    background-color: #36393f !important;;
+}
+
+.dropdown-toggle{
+    color : #FFFFFF !important;
+    background-color: #2f3136!important;
+}
+.dropdown-toggle:hover{
+    background-color: #343a40!important;
+}
+
+.dropdown-toggle:focus,.dropdown-toggle:active{
+    color : #FFFFFF !important;
+    background-color: #343a40!important;
+}
 
 /* #messages li:nth-child(odd) { background: #eee; } */
 
@@ -117,9 +142,9 @@ body {
     min-height: 34px;
 }
 
-#chat-input{
+#chat-input, :focus{
     border: 0;
-    background-color: #484c52;
+    background-color: #484c52!important;
     color: #ffffffb3;
     resize: none;
     outline:none!important;
@@ -192,6 +217,12 @@ input{
 }
 
 .chat-target-btn{
+
+
+/*
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.2),inset 2px 2px 0 rgba(0,0,0,.06),inset -1px -1px 0 rgba(0,0,0,.2),inset -2px -2px 0 rgba(0,0,0,.06) !important;
+*/
+    
     color: #FFFFFF !important;
 /*
     outline: none!important;
@@ -216,6 +247,8 @@ input{
 .chat-target-text{
     margin-left: 1.75rem;
     margin-right: 1.75rem;
+    border-color: #282b30 !important;
+    border-width: 1px !important;
 }
     
 #chat-target-row{

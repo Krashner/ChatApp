@@ -132,7 +132,7 @@ $(function() {
         $(this).addClass("active");
     });
 
-    //get the selected role, turn th new role's light green and the old red
+    //get the selected role, turn the new role's light green and the old red
     $('#roles-dropdown').on('click', '.dropdown-item', function(e){
         if(currentRole !== this.id){
             $("#" + currentRole +"-Selector").removeClass("disabled-btn");
