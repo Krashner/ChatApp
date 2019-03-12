@@ -32,15 +32,17 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 //on socket connection
 io.on('connection', function(socket) {
 
-    //add socket to array
-    connectedSockets.push(socket);
-
-    //give this socket a initiator peer for every connected socket except one with their ID
-    for (var i = 0; i < connectedSockets.length; i++) {
-        if (socket.id !== connectedSockets[i].id) {
-            socket.emit('add peer', true, connectedSockets[i].id);
+    socket.on('allow call', function(data) {
+        //add socket to array
+        connectedSockets.push(socket);
+        //give this socket a initiator peer for every connected socket except one with their ID
+        for (var i = 0; i < connectedSockets.length; i++) {
+            if (socket.id !== connectedSockets[i].id) {
+                socket.emit('add peer', true, connectedSockets[i].id);
+            }
         }
-    }
+    });
+
 
     //broadcast the signal to specific socket
     socket.on('peer call', function(data) {

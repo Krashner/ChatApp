@@ -4,11 +4,29 @@ $(function() {
     var peers = [];
     var currentRole;
 
+    var globalStream;
+
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+    .then(function(stream) {
+         globalStream=stream;
+         socket.emit('allow call');
+         var video = document.querySelector('#localVideo');
+         video.srcObject = stream;
+    })
+    .catch(function(err) {
+        console.log(err.name + ": " + err.message);
+    });
+ 
+
+
     //create a new peer connection
     socket.on('add peer', function(isInitiator, targetSocketID) {
-        console.log("create peer");
+        console.log("create peer "  +socket.id);      
         var p = createPeer(isInitiator, socket.id, targetSocketID, null);
-         console.log(p);       
+        console.log(p);       
         peers.push(p);
     });
 
@@ -33,26 +51,19 @@ $(function() {
         //peer connected
         peer.on('connect', function() {
             console.log('CONNECT')
-            navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: true
-                })
-                .then(function(stream) {
-                    var video = document.querySelector('#localVideo');
-                    // Older browsers may not have srcObject
-                    if ("srcObject" in video) {
-                        video.srcObject = stream;
-                        peer.addStream(stream);
-                        // video[0].load();
-                        // video[0].play();
-                    } else {
-                        // Avoid using this in new browsers, as it is going away.
-                        //video.src = window.URL.createObjectURL(stream);
-                    }
-                })
-                .catch(function(err) {
-                    console.log(err.name + ": " + err.message);
-                });
+            if(peer.stream==null)
+                peer.addStream(globalStream);
+            //peer.addStream(globalStream);
+            // navigator.mediaDevices.getUserMedia({
+            //     audio: true,
+            //     video: true
+            // })
+            // .then(function(stream) {
+            //     peer.addStream(stream);
+            // })
+            // .catch(function(err) {
+            //     console.log(err.name + ": " + err.message);
+            // });
         });
 
         //data channel is being used
@@ -63,12 +74,41 @@ $(function() {
         //streaming
         peer.on('stream', function(stream) {
             console.log("STREAM");
-            //var audio = document.querySelector('#remote-audio');
-            //audio.srcObject = stream;
-            //console.log(audio.srcObject);
             var video = document.querySelector('#remoteVideo');
-            //// Older browsers may not have srcObject
             video.srcObject = stream;
+            // //var audio = document.querySelector('#remote-audio');
+            // //audio.srcObject = stream;
+            // //console.log(audio.srcObject);
+            // var video = document.querySelector('#remoteVideo');
+            // //// Older browsers may not have srcObject
+            // video.srcObject = stream;
+
+
+            // navigator.mediaDevices.getUserMedia({
+            //     audio: true,
+            //     video: true
+            // })
+            // .then(function(stream) {
+            //     var video = document.querySelector('#localVideo');
+            //     // Older browsers may not have srcObject
+            //     if ("srcObject" in video) {
+            //         //video.srcObject = stream;
+            //         p.addStream(stream);
+            //         // video[0].load();
+            //         // video[0].play();
+            //     } else {
+            //         // Avoid using this in new browsers, as it is going away.
+            //         //video.src = window.URL.createObjectURL(stream);
+            //     }
+            // })
+            // .catch(function(err) {
+            //     console.log(err.name + ": " + err.message);
+            // });
+
+            //var video = document.createElement('video');
+            //video.srcObject = stream;
+            //document.body.appendChild(video);
+            //video.play();
         })
 
         //close connection
@@ -174,13 +214,16 @@ $(function() {
         return h + ':' + m + ': ';
     }
     
+
     //create a peer object and return it
     function createPeer(initiator, originatorID, sendToID, peerID){
         var p = new SimplePeer({
                 initiator: initiator,
                 trickle: false,
                 //config: {"iceServers":[]}
+                stream : globalStream
             });
+       console.log(globalStream);
             p.signalOriginator = originatorID;
             p.sendSignalTo = sendToID;
             p.sendingPeerID = peerID;

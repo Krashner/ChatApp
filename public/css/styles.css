@@ -142,7 +142,7 @@ body {
     min-height: 34px;
 }
 
-#chat-input, :focus{
+#chat-input, #chat-input:focus{
     border: 0;
     background-color: #484c52!important;
     color: #ffffffb3;
