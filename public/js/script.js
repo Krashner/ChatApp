@@ -35,21 +35,20 @@ $(function() {
             console.log('CONNECT')
             navigator.mediaDevices.getUserMedia({
                     audio: true,
-                    video: false
+                    video: true
                 })
                 .then(function(stream) {
                     var video = document.querySelector('#localVideo');
-
-                    // // Older browsers may not have srcObject
-                    // if ("srcObject" in video) {
-                    //     video.srcObject = stream;
+                    // Older browsers may not have srcObject
+                    if ("srcObject" in video) {
+                        video.srcObject = stream;
                         peer.addStream(stream);
-                    //     // video[0].load();
-                    //     // video[0].play();
-                    // } else {
-                    //     // Avoid using this in new browsers, as it is going away.
-                    //     //video.src = window.URL.createObjectURL(stream);
-                    // }
+                        // video[0].load();
+                        // video[0].play();
+                    } else {
+                        // Avoid using this in new browsers, as it is going away.
+                        //video.src = window.URL.createObjectURL(stream);
+                    }
                 })
                 .catch(function(err) {
                     console.log(err.name + ": " + err.message);
@@ -64,11 +63,12 @@ $(function() {
         //streaming
         peer.on('stream', function(stream) {
             console.log("STREAM");
-            var audio = document.querySelector('#remote-audio');
-            audio.srcObject = stream;
-            //var video = document.querySelector('#remoteVideo');
+            //var audio = document.querySelector('#remote-audio');
+            //audio.srcObject = stream;
+            //console.log(audio.srcObject);
+            var video = document.querySelector('#remoteVideo');
             //// Older browsers may not have srcObject
-            //video.srcObject = stream;
+            video.srcObject = stream;
         })
 
         //close connection

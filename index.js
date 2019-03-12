@@ -37,7 +37,7 @@ io.on('connection', function(socket) {
 
     //give this socket a initiator peer for every connected socket except one with their ID
     for (var i = 0; i < connectedSockets.length; i++) {
-        if (socket.id != connectedSockets[i].id) {
+        if (socket.id !== connectedSockets[i].id) {
             socket.emit('add peer', true, connectedSockets[i].id);
         }
     }
