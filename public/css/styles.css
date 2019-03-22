@@ -30,6 +30,10 @@ body {
     border-radius: 15px;
 }
 
+.modal-content{
+    background-color: #2f3136;
+}
+
 
 #messages {
     list-style-type: none;
