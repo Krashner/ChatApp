@@ -271,6 +271,13 @@ input{
     box-shadow: 0 1px 0 rgba(0,0,0,.2),0 2px 0 rgba(0,0,0,.06);
 }
 
+#logo{
+    height: 100%;
+    width: auto;
+    margin: auto;
+    padding: 5% 0 5% 0;
+}
+
 /*
 #chat-transmit-button{
 margin-left: auto;
