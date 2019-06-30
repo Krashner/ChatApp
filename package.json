@@ -4,14 +4,14 @@
   "description": "Simple chat app",
   "dependencies": {
     "bootstrap": "^4.3.1",
-    "express": "^4.16.4",
-    "jquery": "^3.4.0",
-    "simple-peer": "^9.2.1",
+    "express": "^4.17.1",
+    "jquery": "^3.4.1",
+    "simple-peer": "^9.4.0",
     "socket.io": "^2.2.0",
-    "webrtc-adapter": "^7.2.0",
-    "wrtc": "^0.3.5"
+    "webrtc-adapter": "^7.2.4",
+    "wrtc": "^0.4.1"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.7.2"
+    "@fortawesome/fontawesome-free": "^5.9.0"
   }
 }
