@@ -67,14 +67,20 @@ body {
     color: #FFFFFF!important;
 }
 
-#roles-dropdown-button{
+#roles-button{
     background-color: #2f3136;
+    color: #FFFFFF!important;
+}
+
+#roles-button:hover{
+    background-color: #343a40 !important;
 }
 
 #role-container{
      box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.06);
      z-index: 2;
 }
+
 
 .dropdown-menu-center
 {
@@ -93,29 +99,22 @@ body {
     left: 50%!important;
 }
 
+.selected-role-btn{
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: #484c52;
+}
+
 .dropdown-item{
     color : #FFFFFF !important;
 }
 
 .dropdown-item:hover{
-    background-color: #484c52 !important;
+    background-color: #36393f !important;
 }
 
 .dropdown-item:active, .dropdown-item:focus{
-    background-color: #36393f !important;;
-}
-
-.dropdown-toggle{
-    color : #FFFFFF !important;
-    background-color: #2f3136!important;
-}
-.dropdown-toggle:hover{
-    background-color: #343a40!important;
-}
-
-.dropdown-toggle:focus,.dropdown-toggle:active{
-    color : #FFFFFF !important;
-    background-color: #343a40!important;
+    background-color: #484c52 !important;
 }
 
 /* #messages li:nth-child(odd) { background: #eee; } */

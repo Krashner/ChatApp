@@ -31,7 +31,8 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 
 //on socket connection
 io.on('connection', function(socket) {
-
+    console.log(getTimestamp() + "client connected || " + socket.id);
+    
     socket.on('allow call', function(data) {
         //add socket to array
         connectedSockets.push(socket);
@@ -43,11 +44,10 @@ io.on('connection', function(socket) {
         }
     });
 
-
     //broadcast the signal to specific socket
     socket.on('peer call', function(data) {
         var d = JSON.parse(data);
-        console.log(d.sendSignalTo);
+        console.log(getTimestamp()+ "create peer connection || peer 1:" + socket.id + " peer 2: " + d.sendSignalTo);
         io.to(d.sendSignalTo).emit('peer response', data);
     });
 
@@ -56,7 +56,7 @@ io.on('connection', function(socket) {
 
     //send the message out
     socket.on('chat message', function(role, msg) {
-        socket.broadcast.emit('chat message', role, msg);
+        socket.broadcast.emit('chat message', role + " " + timeNow(), msg);
     });
 
     //socket has joined channel, temporarily not used
@@ -69,15 +69,16 @@ io.on('connection', function(socket) {
 
     });
 
-    // // To listen for a client's disconnection from server and intimate other clients about the same
+    //To listen for a client's disconnection from server and intimate other clients about the same
     socket.on('disconnect', function(data) {
         connectedSockets = socketRemove(connectedSockets, socket);
-        console.log("Connected Sockets" + connectedSockets);
+        console.log(getTimestamp()+ "client disconnected || " + socket.id);
         //remove peer for this socket from every client
-        //socket.broadcast.emit('remove peer', socket.id);
+        socket.broadcast.emit('remove peer', socket.id);
     });
 });
 
+//remove socket from list of connected clients
 function socketRemove(arr, value) {
     return arr.filter(function(ele) {
         return ele != value;
@@ -87,3 +88,17 @@ function socketRemove(arr, value) {
 http.listen(3000, function() {
     console.log('listening on *:3000');
 });
+
+
+function getTimestamp(){
+    return "> " + timeNow() + " ";
+}
+
+//get a timestamp
+function timeNow() {
+    var d = new Date(),
+        h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+        m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+    return h + ':' + m + ':';
+}
+

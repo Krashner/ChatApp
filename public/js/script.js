@@ -19,22 +19,12 @@ $(function() {
     .catch(function(err) {
         console.log(err.name + ": " + err.message);
     });
- 
-
-
-    //create a new peer connection
-    socket.on('add peer', function(isInitiator, targetSocketID) {
-        console.log("create peer "  +socket.id);      
-        var p = createPeer(isInitiator, socket.id, targetSocketID, null);
-        console.log(p);       
-        peers.push(p);
-    });
-
-    //remove closed peer connection
-    function removePeer() {
-
-    }
-
+    
+    
+    //******************************************************************
+    // socket functions
+    //******************************************************************
+    
     function setPeerListeners(peer) {
 
         //send signal to reciever
@@ -120,8 +110,29 @@ $(function() {
         peer.on('error', function(err) {
             console.log('error', err)
         })
-
     }
+    
+    //create a new peer connection
+    socket.on('add peer', function(isInitiator, targetSocketID) {
+        console.log("add peer " + socket.id);      
+        var p = createPeer(isInitiator, socket.id, targetSocketID, null);
+        console.log(p);       
+        peers.push(p);
+    });
+
+    
+    //remove peer closed peer connection
+    socket.on('remove peer', function(peerID) {
+	console.log("remove peer " + peerID);     
+	tempPeers = [];
+	for (var i = 0; i < peers.length; i++) {
+	    if (peers[i]._id !== peerID) {
+		tempPeers.push(peers[i]);
+	    }
+	}
+	peers = tempPeers;
+	console.log(peers);
+    })
 
     //peer response to signal
     socket.on('peer response', function(data) {
@@ -152,7 +163,46 @@ $(function() {
             }
         }
     });
+    
+    //update chat log with recieved message
+    socket.on('chat message', function(header, msg) {
+        addMessageToLog(header, msg);
+    });
 
+    //get the user roles
+    socket.on('update roles', function(roles) {
+        $('#modal-role-row').empty();
+        roles.forEach(function(entry) {
+	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="dropdown-item btn btn-outline-dark role-select-btn">').text(entry));
+	    
+        });
+    });
+    
+    //create a peer object and return it
+    function createPeer(initiator, originatorID, sendToID, peerID){
+        var p = new SimplePeer({
+                initiator: initiator,
+                trickle: false,
+                //config: {"iceServers":[]}
+                stream : globalStream
+            });
+	    console.log(globalStream);
+            p.signalOriginator = originatorID;
+            p.sendSignalTo = sendToID;
+            p.sendingPeerID = peerID;
+            
+            if(p.sendingPeerID === null)
+                p.sendingPeerID = p._id;
+                
+            setPeerListeners(p);
+            return p;
+    }
+    
+    
+    //******************************************************************
+    // chat functions
+    //******************************************************************
+    
     //send message, clear message box and add message to local chat
     $('form').submit(function(e) {
         e.preventDefault();
@@ -174,32 +224,25 @@ $(function() {
         $(".chat-target-btn").removeClass("active");
         $(this).addClass("active");
     });
-
+    
+    $(".select-role").click(function() {
+	
+    });
+    
     //get the selected role, turn the new role's light green and the old red
-    $('#roles-dropdown').on('click', '.dropdown-item', function(e){
+    $('#modal-role-row').on('click', '.role-select-btn', function(e){
         if(currentRole !== this.id){
+	    $("#" + currentRole).removeClass("selected-role-btn");
             $("#" + currentRole +"-Selector").removeClass("disabled-btn");
             $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545');
         }
         currentRole = this.id;
-        $("#roles-dropdown-button").text(currentRole);
+        $("#roles-button").text("Role: " + currentRole);
+	$("#" + currentRole).addClass("selected-role-btn");
         $("#" + currentRole +"-Selector").addClass("disabled-btn");
         $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581');
     });
     
-    //update chat log with recieved message
-    socket.on('chat message', function(header, msg) {
-        addMessageToLog(header, msg);
-    });
-
-    //get the user roles
-    socket.on('update roles', function(roles) {
-        $('#roles-dropdown').empty();
-        roles.forEach(function(entry) {
-	    $('#roles-dropdown').append($('<button id="' + entry + '"class="dropdown-item btn btn-outline-dark">').text(entry));
-        });
-    });
-
     //add messages to log
     function addMessageToLog(header, msg) {
         $('#messages').append($('<li class="header">').text(header));
@@ -213,26 +256,4 @@ $(function() {
             m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         return h + ':' + m + ': ';
     }
-    
-
-    //create a peer object and return it
-    function createPeer(initiator, originatorID, sendToID, peerID){
-        var p = new SimplePeer({
-                initiator: initiator,
-                trickle: false,
-                //config: {"iceServers":[]}
-                stream : globalStream
-            });
-       console.log(globalStream);
-            p.signalOriginator = originatorID;
-            p.sendSignalTo = sendToID;
-            p.sendingPeerID = peerID;
-            
-            if(p.sendingPeerID === null)
-                p.sendingPeerID = p._id;
-                
-            setPeerListeners(p);
-            return p;
-    }
-
 });
