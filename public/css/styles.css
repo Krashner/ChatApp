@@ -138,7 +138,7 @@ body {
 #chat-input-container{
     background-color: #484c52;
     border-style: solid;
-    border-width: 1px 0px 1px 0px;
+    border-width: 0px;
     padding-left: 5px;
     border-radius: 10px;
     height: 6vh;
@@ -148,6 +148,7 @@ body {
 
 #chat-input, #chat-input:focus{
     border: 0;
+    border-radius: 10px;
     background-color: #484c52!important;
     color: #ffffffb3;
     resize: none;
@@ -269,6 +270,10 @@ input{
     background-color:#282b30;
     z-index: 1;
     box-shadow: 0 1px 0 rgba(0,0,0,.2),0 2px 0 rgba(0,0,0,.06);
+    background-image: url("/images/background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 
 #logo{

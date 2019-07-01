@@ -3,9 +3,15 @@ $(function() {
     var previousRole;
     var peers = [];
     var currentRole;
-
+    var selectedRole;
     var globalStream;
 
+
+    
+    //******************************************************************
+    // stream functions
+    //******************************************************************
+    
     navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true
@@ -18,6 +24,7 @@ $(function() {
     })
     .catch(function(err) {
         console.log(err.name + ": " + err.message);
+	socket.emit('allow call');
     });
     
     
@@ -127,6 +134,7 @@ $(function() {
 	tempPeers = [];
 	for (var i = 0; i < peers.length; i++) {
 	    if (peers[i]._id !== peerID) {
+		//create new array without peer that's being removed
 		tempPeers.push(peers[i]);
 	    }
 	}
@@ -225,22 +233,24 @@ $(function() {
         $(this).addClass("active");
     });
     
-    $(".select-role").click(function() {
-	
-    });
-    
-    //get the selected role, turn the new role's light green and the old red
-    $('#modal-role-row').on('click', '.role-select-btn', function(e){
-        if(currentRole !== this.id){
-	    $("#" + currentRole).removeClass("selected-role-btn");
-            $("#" + currentRole +"-Selector").removeClass("disabled-btn");
-            $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545');
-        }
-        currentRole = this.id;
+    //change the current role to selection and toggle the status lights
+    $("#btn-select-role").click(function() {
+        $("#" + currentRole +"-Selector").removeClass("disabled-btn");
+	$("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545'); //red
+	currentRole = selectedRole;
         $("#roles-button").text("Role: " + currentRole);
 	$("#" + currentRole).addClass("selected-role-btn");
         $("#" + currentRole +"-Selector").addClass("disabled-btn");
-        $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581');
+	$("#" + currentRole +"-Selector").removeClass("active");
+        $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581'); //green
+    });
+    
+    //get the selected role
+    $('#modal-role-row').on('click', '.role-select-btn', function(e){
+        if(currentRole !== this.id){
+	    $("#" + currentRole).removeClass("selected-role-btn");
+	    selectedRole = this.id;
+        }
     });
     
     //add messages to log
@@ -256,4 +266,17 @@ $(function() {
             m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         return h + ':' + m + ': ';
     }
+    
 });
+
+//test function
+function fillChat(){
+    for(var i =0; i < 1000; i++)
+	addMessageToLog("test", "testing: " + i);
+}
+
+//add messages to log
+function addMessageToLog(header, msg) {
+    $('#messages').append($('<li class="header">').text(header));
+    $('#messages').append($('<li>').text(msg));
+}

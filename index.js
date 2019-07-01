@@ -7,7 +7,7 @@ var path = require('path');
 
 var roles = [];
 var connectedSockets = [];
-
+var currentLogFile;
 
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -20,8 +20,17 @@ app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'))
 //font awesome
 app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
 
+//get html
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
+});
+
+//start listenting server and check for log directory
+http.listen(3000, function() {
+    console.log('> listening on *:3000');
+    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+    if(fs.existsSync(__dirname + '/logs/') === false)
+        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
 });
 
 //get the roles from admin file
@@ -31,23 +40,25 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 
 //on socket connection
 io.on('connection', function(socket) {
-    console.log(getTimestamp() + "client connected || " + socket.id);
+    console.log(getTimestamp() + "client connected || id: " + socket.id);
     
+    //starts creating calls to all sockets, except self
     socket.on('allow call', function(data) {
         //add socket to array
         connectedSockets.push(socket);
         //give this socket a initiator peer for every connected socket except one with their ID
         for (var i = 0; i < connectedSockets.length; i++) {
             if (socket.id !== connectedSockets[i].id) {
+                console.log(getTimestamp()+ "sending request || sender: " + socket.id + " reciever: " + connectedSockets[i].id);
                 socket.emit('add peer', true, connectedSockets[i].id);
             }
         }
     });
 
-    //broadcast the signal to specific socket
+    //broadcast the response to specific socket
     socket.on('peer call', function(data) {
         var d = JSON.parse(data);
-        console.log(getTimestamp()+ "create peer connection || peer 1:" + socket.id + " peer 2: " + d.sendSignalTo);
+        console.log(getTimestamp()+ "creating peer connection || sender: " + socket.id + " reciever: " + d.sendSignalTo);
         io.to(d.sendSignalTo).emit('peer response', data);
     });
 
@@ -57,6 +68,7 @@ io.on('connection', function(socket) {
     //send the message out
     socket.on('chat message', function(role, msg) {
         socket.broadcast.emit('chat message', role + " " + timeNow(), msg);
+        writeToLog(role + " " + timeNow(), msg);
     });
 
     //socket has joined channel, temporarily not used
@@ -72,7 +84,8 @@ io.on('connection', function(socket) {
     //To listen for a client's disconnection from server and intimate other clients about the same
     socket.on('disconnect', function(data) {
         connectedSockets = socketRemove(connectedSockets, socket);
-        console.log(getTimestamp()+ "client disconnected || " + socket.id);
+        console.log(getTimestamp()+ "client disconnected || id: " + socket.id);
+        //console.log(getTimestamp()+ "close peer connection || socket 1: " + socket.id + " socket 2: " + d.sendSignalTo);
         //remove peer for this socket from every client
         socket.broadcast.emit('remove peer', socket.id);
     });
@@ -85,13 +98,21 @@ function socketRemove(arr, value) {
     });
 }
 
-http.listen(3000, function() {
-    console.log('listening on *:3000');
-});
+//write message to log file
+function writeToLog(role, msg){
+    fs.appendFile(currentLogFile, role + "\n", function(err){if(err)throw err;});
+    fs.appendFile(currentLogFile, msg + "\n", function(err){if(err)throw err;});
+}
 
-
+//return a formatted timestamp for the console
 function getTimestamp(){
     return "> " + timeNow() + " ";
+}
+
+//get a timestamp
+function dateNow() {
+    var d = new Date();
+    return d.getDate() + "-" + d.getMonth() + "-" +d.getFullYear();
 }
 
 //get a timestamp
