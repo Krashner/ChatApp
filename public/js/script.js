@@ -274,8 +274,10 @@ $(function() {
     //add messages to log
     function addMessageToLog(data) {
 	var d = JSON.parse(data);
-        $('#messages').append($('<li class="header">').text(d.header));
-        $('#messages').append($('<li>').text(d.message));
+	var message = $('<li class="message-header message-group">').text(d.header);
+	message.append($('<li class="message-content">').text(d.message));
+	$('#messages').append(message);
+	pruneMessages();
     }
 
     //get a timestamp
@@ -285,12 +287,14 @@ $(function() {
             m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         return h + ':' + m + ': ';
     }
-    
-    //remove old messages from the log
-    function removeOldMessages(){
-	
+        
+    //cap the number of loaded messages at 100 for now
+    function pruneMessages(){
+	var msgs = $('#messages').children();
+	if(msgs.length > 100)
+	    $('#messages').children().eq(0).remove();    
     }
-    
+	    
 });
 
 //test function
