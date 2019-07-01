@@ -100,8 +100,7 @@ function socketRemove(arr, value) {
 
 //write message to log file
 function writeToLog(role, msg){
-    fs.appendFile(currentLogFile, role + "\n", function(err){if(err)throw err;});
-    fs.appendFile(currentLogFile, msg + "\n", function(err){if(err)throw err;});
+    fs.appendFile(currentLogFile, role + "\n" + msg + "\n", function(err){if(err)throw err;});
 }
 
 //return a formatted timestamp for the console

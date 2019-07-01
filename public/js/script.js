@@ -219,8 +219,8 @@ $(function() {
             role += " " + timeNow();
             socket.emit('chat message', currentRole, text);
             //peer.send(text);
-            $('#chat-input').val('');
             addMessageToLog(role, text);
+	    $('#chat-input').val('');
         }
         $('#chat-input').focus();
         return false;

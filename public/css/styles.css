@@ -120,8 +120,8 @@ body {
 
 #chat-col{
     background-color:#36393f;
-    padding-left: 2%;
-    padding-right: 2%;
+    padding-left: 1%;
+    padding-right: 1%;
 }
 
 #chat-input-container{
@@ -184,7 +184,7 @@ input{
     box-shadow: none !important;
     border-width: 0 !important;
     border-radius:0 !important;
-    margin:0 !important;
+    
 }
 
 
@@ -216,10 +216,6 @@ input{
 
 /*
     box-shadow: inset 1px 1px 0 rgba(0,0,0,.2),inset 2px 2px 0 rgba(0,0,0,.06),inset -1px -1px 0 rgba(0,0,0,.2),inset -2px -2px 0 rgba(0,0,0,.06) !important;
-*/
-    
-    color: #FFFFFF !important;
-/*
     outline: none!important;
     background-color:none!important;
     border-color: #dc3545!important;
@@ -247,10 +243,12 @@ input{
 }
 
 .chat-target-btn{
-    margin: 1%!important;
-    /*margin-top: 1%!important;
-    margin-bottom: 1%!important;*/
+    color: #FFFFFF !important;
     background-color: #36393f;
+    margin: 0!important;
+    border-color: #2f3136;
+    border-width: 0.5vh !important;
+    border-radius:0 !important;
 }
     
 .chat-target-btn:hover{
@@ -277,12 +275,13 @@ input{
 
 #chat-transmit-row{
     justify-content: center;
-    margin-bottom: 1vh!important;
-
 }
 
-#chat-transmit-button{
-
+#chat-transmit-btn{
+    border-color: #2f3136;
+    border-width: 0.5vh !important;
+    border-bottom-width: 1vh !important;
+    border-radius:0 !important;
 }
 
 #chat-title-row{
@@ -293,6 +292,7 @@ input{
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+    margin-bottom: 0.5vh;
 }
 
 #logo{
@@ -303,7 +303,7 @@ input{
 }
 
 /*
-#chat-transmit-button{
+#chat-transmit-btn{
 margin-left: auto;
 margin-right: auto;
 }
@@ -339,14 +339,22 @@ video {
     }
     
     #chat-transmit-row{
-        margin-bottom: 0 !important;
+
     }
 
-    #chat-transmit-button{
-        margin-bottom: 0;
+    #chat-transmit-btn{
+        font-size: small;
     }
     
     #chat-input-container{
-        margin-bottom: 0 !important;
+        
+    }
+    
+    .chat-target-text {
+        font-size: small;
+    }
+    
+    #roles-button{
+        font-size: small;
     }
 }
