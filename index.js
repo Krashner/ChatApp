@@ -66,7 +66,7 @@ io.on('connection', function(socket) {
     socket.emit('update roles', roles);
 
     //send the message out
-    socket.on('chat message', function(data) { 
+    socket.on('chat message', function(datas) { 
         socket.broadcast.emit('chat message', data);
         writeToLog(data);
     });

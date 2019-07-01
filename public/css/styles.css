@@ -55,18 +55,24 @@ body {
     word-break: break-word;
 }
 
-#btn-jump{
-    font-size: small;
-    border-radius: 10px!important;
+
+#jump-btn-container{
     position: absolute;
-    top: 90%;
-    left: 40%;
-    width: 20%;
+    bottom: 8%;
     z-index: 1;
+    width: 100%;
+}
+
+#btn-jump{
+    font-size: 10px;
+    border-radius: 10px!important;
+    margin: auto;
+    z-index: 1;
+    display: block;
 }
 
 .hide-btn{
-    display: none;
+    display: none !important;
 }
 
 #send-button{

@@ -266,16 +266,21 @@ $(function() {
 	$("#" + currentRole).addClass("active-target");
     });
 
-    //show the jump to bottom button
-    $("#chat-box").scroll(function() {
+    //show the jump to bottom button, unless we're at the bottom
+    $("#chat-box").scroll(function(event) {
 	if(ingoreScroll === false)
 	    $("#btn-jump").removeClass("hide-btn");
 	ingoreScroll = false;
+	event.preventDefault();
+
+	if($(this).scrollTop() >= ($(this)[0].scrollHeight - $(this).outerHeight())){
+	    $("#btn-jump").addClass("hide-btn");
+	}
     });
       
-    //jump to bottom of messages
+    //jump to bottom of messages and hide the button
     $("#btn-jump").click(function() {
-	$("#chat-box").scrollTop(100000);
+	$("#chat-box").scrollTop($("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight());
 	$(this).addClass("hide-btn");
 	ingoreScroll = true;
     });
