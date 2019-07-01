@@ -55,6 +55,19 @@ body {
     word-break: break-word;
 }
 
+#btn-jump{
+    font-size: small;
+    border-radius: 10px!important;
+    position: absolute;
+    top: 90%;
+    left: 40%;
+    width: 20%;
+    z-index: 1;
+}
+
+.hide-btn{
+    display: none;
+}
 
 #send-button{
     padding: 0;

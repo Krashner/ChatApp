@@ -5,7 +5,7 @@ $(function() {
     var currentRole;
     var selectedRole;
     var globalStream;
-
+    var ingoreScroll = false;
 
     
     //******************************************************************
@@ -245,7 +245,8 @@ $(function() {
     $("#btn-select-role").click(function() {
         $("#" + currentRole +"-Selector").removeClass("disabled-btn");
 	$("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545'); //red
-	currentRole = selectedRole;
+	if(selectedRole	!== null)
+	    currentRole = selectedRole;
         $("#roles-button").text("Role: " + currentRole);
         $("#" + currentRole +"-Selector").addClass("disabled-btn");
 	$("#" + currentRole +"-Selector").removeClass("active-target");
@@ -254,21 +255,29 @@ $(function() {
     
     //get the selected role
     $('#modal-role-row').on('click', '.role-select-btn', function(e){
-        if(currentRole !== this.id){
-	    $("#" + selectedRole).removeClass("active-target");
-	    $("#" + selectedRole).removeClass("disabled-btn");
-	    $(this).addClass("active-target");
-	    $(this).addClass("disabled-btn");
-	    selectedRole = this.id;
-        }
+	$(".role-select-btn").removeClass("active-target");
+        $(this).addClass("active-target");
+	selectedRole = this.id;
     });
-    
+        
     //deselect unsaved role and select chosen role after closing modal
     $('#modal-choose-role').on('hidden.bs.modal', function(e){
-	$("#" + selectedRole).removeClass("active-target");
-	$("#" + selectedRole).removeClass("disabled-btn");
+	$(".role-select-btn").removeClass("active-target");
 	$("#" + currentRole).addClass("active-target");
-	$("#" + currentRole).addClass("disabled-btn");
+    });
+
+    //show the jump to bottom button
+    $("#chat-box").scroll(function() {
+	if(ingoreScroll === false)
+	    $("#btn-jump").removeClass("hide-btn");
+	ingoreScroll = false;
+    });
+      
+    //jump to bottom of messages
+    $("#btn-jump").click(function() {
+	$("#chat-box").scrollTop(100000);
+	$(this).addClass("hide-btn");
+	ingoreScroll = true;
     });
 
     //add messages to log
