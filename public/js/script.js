@@ -173,8 +173,8 @@ $(function() {
     });
     
     //update chat log with recieved message
-    socket.on('chat message', function(header, msg) {
-        addMessageToLog(header, msg);
+    socket.on('chat message', function(data) {
+        addMessageToLog(data);
     });
 
     //get the user roles
@@ -216,16 +216,25 @@ $(function() {
         var text = $('#chat-input').val();
         var role = currentRole;
         if (text.replace(/\s+/g, '') !== '' && role !== undefined && role !== "None") {
-            role += " " + timeNow();
-            socket.emit('chat message', currentRole, text);
-            //peer.send(text);
-            addMessageToLog(role, text);
+	    sendToServer(role, text);
 	    $('#chat-input').val('');
         }
         $('#chat-input').focus();
         return false;
     });
-        
+       
+    //format the data, convert to string and send to server
+    function sendToServer(role, msg){
+	var data = {
+	"sender" : role,
+	"header" : role + " " + timeNow(),
+	"timeStamp" : timeNow(),
+	"message" : msg
+	};
+	addMessageToLog(JSON.stringify(data));//add to local log
+	socket.emit('chat message', JSON.stringify(data));
+    }
+	
     //toggle chat target buttons on and off
     $(".chat-target-btn").click(function() {
         $(".chat-target-btn").removeClass("active-target");
@@ -263,9 +272,10 @@ $(function() {
     });
 
     //add messages to log
-    function addMessageToLog(header, msg) {
-        $('#messages').append($('<li class="header">').text(header));
-        $('#messages').append($('<li>').text(msg));
+    function addMessageToLog(data) {
+	var d = JSON.parse(data);
+        $('#messages').append($('<li class="header">').text(d.header));
+        $('#messages').append($('<li>').text(d.message));
     }
 
     //get a timestamp
@@ -274,6 +284,11 @@ $(function() {
             h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
             m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
         return h + ':' + m + ': ';
+    }
+    
+    //remove old messages from the log
+    function removeOldMessages(){
+	
     }
     
 });
@@ -286,6 +301,7 @@ function fillChat(){
 
 //add messages to log
 function addMessageToLog(header, msg) {
+    
     $('#messages').append($('<li class="header">').text(header));
     $('#messages').append($('<li>').text(msg));
 }

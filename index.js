@@ -66,9 +66,9 @@ io.on('connection', function(socket) {
     socket.emit('update roles', roles);
 
     //send the message out
-    socket.on('chat message', function(role, msg) {
-        socket.broadcast.emit('chat message', role + " " + timeNow(), msg);
-        writeToLog(role + " " + timeNow(), msg);
+    socket.on('chat message', function(data) { 
+        socket.broadcast.emit('chat message', data);
+        writeToLog(data);
     });
 
     //socket has joined channel, temporarily not used
@@ -99,8 +99,9 @@ function socketRemove(arr, value) {
 }
 
 //write message to log file
-function writeToLog(role, msg){
-    fs.appendFile(currentLogFile, role + "\n" + msg + "\n", function(err){if(err)throw err;});
+function writeToLog(data){
+    var d = JSON.parse(data)
+    fs.appendFile(currentLogFile, d.header + "\n" + d.message + "\n", function(err){if(err)throw err;});
 }
 
 //return a formatted timestamp for the console
