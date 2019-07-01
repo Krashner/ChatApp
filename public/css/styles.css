@@ -97,10 +97,7 @@ body {
 
 .role-select-item:hover{
     background-color: #36393f;
-}
-
-.role-select-item:active, .role-select-item:focus{
-    background-color: #484c52;
+    color:  #FFFFFF;
 }
 
 
@@ -202,6 +199,7 @@ input{
     width:1.5rem;
     border: solid 2px #474a4f;
     background-color:#dc3545;
+
 /*
     #43b581
 */
@@ -210,7 +208,7 @@ input{
 .disabled-btn{
     cursor: not-allowed;
     pointer-events: none;
-    opacity: 0.5;
+    background-color:#2f3136 !important;
 }
 
 .chat-target-btn{
@@ -247,11 +245,33 @@ input{
     border-color: #282b30 !important;
     border-width: 1px !important;
 }
+
+.chat-target-btn{
+    margin: 1%!important;
+    /*margin-top: 1%!important;
+    margin-bottom: 1%!important;*/
+    background-color: #36393f;
+}
     
+.chat-target-btn:hover{
+    background-color: #484c52;
+}
+
+.chat-target-btn:active{
+    background-color:#252629;
+}
+
+.active-target{
+    background-color:#252629!important;
+}
+
+.active-target:hover{
+
+}
+
 #chat-target-row{
     justify-content: center;
     z-index: 0;
-    overflow-y: scroll;
     overflow-x: hidden;
 }
 

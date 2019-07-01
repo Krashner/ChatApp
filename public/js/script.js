@@ -181,8 +181,7 @@ $(function() {
     socket.on('update roles', function(roles) {
         $('#modal-role-row').empty();
         roles.forEach(function(entry) {
-	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn btn-outline-dark role-select-btn">').text(entry));
-	    
+	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
         });
     });
     
@@ -229,29 +228,29 @@ $(function() {
         
     //toggle chat target buttons on and off
     $(".chat-target-btn").click(function() {
-        $(".chat-target-btn").removeClass("active");
-        $(this).addClass("active");
+        $(".chat-target-btn").removeClass("active-target");
+        $(this).addClass("active-target");
     });
     
     //change the current role to selection and toggle the status lights
     $("#btn-select-role").click(function() {
         $("#" + currentRole +"-Selector").removeClass("disabled-btn");
 	$("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545'); //red
-	$("#" + selectedRole).removeClass("selected-role");
 	currentRole = selectedRole;
-	$("#" + currentRole).addClass("selected-role");
         $("#roles-button").text("Role: " + currentRole);
         $("#" + currentRole +"-Selector").addClass("disabled-btn");
-	$("#" + currentRole +"-Selector").removeClass("active");
+	$("#" + currentRole +"-Selector").removeClass("active-target");
         $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581'); //green
     });
     
     //get the selected role
     $('#modal-role-row').on('click', '.role-select-btn', function(e){
         if(currentRole !== this.id){
-	    $("#" + selectedRole).removeClass("selected-role");
+	    $("#" + selectedRole).removeClass("active-target");
+	    $("#" + selectedRole).removeClass("disabled-btn");
+	    $(this).addClass("active-target");
+	    $(this).addClass("disabled-btn");
 	    selectedRole = this.id;
-	    $("#" + selectedRole).addClass("selected-role");
         }
     });
     
