@@ -70,6 +70,8 @@ body {
 #roles-button{
     background-color: #2f3136;
     color: #FFFFFF!important;
+    height: 100%;
+    width: 100%;
 }
 
 #roles-button:hover{
@@ -79,48 +81,34 @@ body {
 #role-container{
      box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.06);
      z-index: 2;
+     display: block;
 }
 
-
-.dropdown-menu-center
-{
-    width: 80%;
-    background-color: #36393f;
-    border-top-right-radius:0;
-    border-top-left-radius:0;
-    border-top: 0;
-    margin-top:0;
-    background-color: #36393f;
-    text-align: center;
-    transform: translate(-50%, 15%)!important;
-    -webkit-transform: translate(-50%, 15%)!important;
-    -o-transform: translate(-50%, 15%)!important;
-    right: auto!important;
-    left: 50%!important;
-}
-
-.selected-role-btn{
+.selected-role, selected-role:active, selected-role:focus{
     cursor: not-allowed;
     pointer-events: none;
     background-color: #484c52;
 }
 
-.dropdown-item{
-    color : #FFFFFF !important;
+
+.role-select-item{
+    color : #FFFFFF;
 }
 
-.dropdown-item:hover{
-    background-color: #36393f !important;
+.role-select-item:hover{
+    background-color: #36393f;
 }
 
-.dropdown-item:active, .dropdown-item:focus{
-    background-color: #484c52 !important;
+.role-select-item:active, .role-select-item:focus{
+    background-color: #484c52;
 }
+
 
 /* #messages li:nth-child(odd) { background: #eee; } */
 
 #chat-control-row{
     height: 100%;
+    overflow: hidden;
 }
 
 #chat-box {
@@ -135,6 +123,8 @@ body {
 
 #chat-col{
     background-color:#36393f;
+    padding-left: 2%;
+    padding-right: 2%;
 }
 
 #chat-input-container{
@@ -261,11 +251,18 @@ input{
 #chat-target-row{
     justify-content: center;
     z-index: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #chat-transmit-row{
     justify-content: center;
     margin-bottom: 1vh!important;
+
+}
+
+#chat-transmit-button{
+
 }
 
 #chat-title-row{
@@ -319,5 +316,17 @@ video {
 @media only screen and (max-width: 720px){
     #chat-title-row{
         display : none;
+    }
+    
+    #chat-transmit-row{
+        margin-bottom: 0 !important;
+    }
+
+    #chat-transmit-button{
+        margin-bottom: 0;
+    }
+    
+    #chat-input-container{
+        margin-bottom: 0 !important;
     }
 }

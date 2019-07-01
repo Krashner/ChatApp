@@ -181,7 +181,7 @@ $(function() {
     socket.on('update roles', function(roles) {
         $('#modal-role-row').empty();
         roles.forEach(function(entry) {
-	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="dropdown-item btn btn-outline-dark role-select-btn">').text(entry));
+	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn btn-outline-dark role-select-btn">').text(entry));
 	    
         });
     });
@@ -237,9 +237,10 @@ $(function() {
     $("#btn-select-role").click(function() {
         $("#" + currentRole +"-Selector").removeClass("disabled-btn");
 	$("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545'); //red
+	$("#" + selectedRole).removeClass("selected-role");
 	currentRole = selectedRole;
+	$("#" + currentRole).addClass("selected-role");
         $("#roles-button").text("Role: " + currentRole);
-	$("#" + currentRole).addClass("selected-role-btn");
         $("#" + currentRole +"-Selector").addClass("disabled-btn");
 	$("#" + currentRole +"-Selector").removeClass("active");
         $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581'); //green
@@ -248,8 +249,9 @@ $(function() {
     //get the selected role
     $('#modal-role-row').on('click', '.role-select-btn', function(e){
         if(currentRole !== this.id){
-	    $("#" + currentRole).removeClass("selected-role-btn");
+	    $("#" + selectedRole).removeClass("selected-role");
 	    selectedRole = this.id;
+	    $("#" + selectedRole).addClass("selected-role");
         }
     });
     
