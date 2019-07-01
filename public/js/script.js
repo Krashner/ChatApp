@@ -269,21 +269,32 @@ $(function() {
     //show the jump to bottom button, unless we're at the bottom
     $("#chat-box").scroll(function(event) {
 	if(ingoreScroll === false)
-	    $("#btn-jump").removeClass("hide-btn");
+	    toggleJumpButton(true);
 	ingoreScroll = false;
 	event.preventDefault();
 
 	if($(this).scrollTop() >= ($(this)[0].scrollHeight - $(this).outerHeight())){
-	    $("#btn-jump").addClass("hide-btn");
+	    toggleJumpButton(false);
 	}
     });
       
     //jump to bottom of messages and hide the button
     $("#btn-jump").click(function() {
 	$("#chat-box").scrollTop($("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight());
-	$(this).addClass("hide-btn");
+	toggleJumpButton(false);
 	ingoreScroll = true;
     });
+    
+    //toggle showing the button, true show false hide
+    function toggleJumpButton(showButton){
+	if(showButton){
+	    $("#btn-jump").removeClass("hide-btn");
+	    $("#btn-jump-arrow").removeClass("hide-btn");
+	}else{
+	    $("#btn-jump").addClass("hide-btn");
+	    $("#btn-jump-arrow").addClass("hide-btn");
+	}
+    }
 
     //add messages to log
     function addMessageToLog(data) {
