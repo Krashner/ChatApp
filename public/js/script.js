@@ -254,6 +254,14 @@ $(function() {
         }
     });
     
+    //deselect unsaved role and select chosen role after closing modal
+    $('#modal-choose-role').on('hidden.bs.modal', function(e){
+	$("#" + selectedRole).removeClass("active-target");
+	$("#" + selectedRole).removeClass("disabled-btn");
+	$("#" + currentRole).addClass("active-target");
+	$("#" + currentRole).addClass("disabled-btn");
+    });
+
     //add messages to log
     function addMessageToLog(header, msg) {
         $('#messages').append($('<li class="header">').text(header));
