@@ -11,7 +11,6 @@
 
 body {
     font: 13px Helvetica, Arial;
-
 }
 
 ::-webkit-scrollbar{
@@ -90,7 +89,9 @@ body {
     border-top-right-radius: 10px!important;
     border-bottom-right-radius: 10px!important;
     border-style: solid;
-    border-width: 0px 0px 0px 2px !important;
+    border-width: 0px 0px 0px 0.25vw !important;
+    display: block;
+    font-size: 3vh;
 }
 
 #roles{
@@ -160,9 +161,8 @@ body {
     border-width: 0px;
     padding-left: 5px;
     border-radius: 10px;
-    height: 6vh;
     margin: 1vh 0 1vh 0;
-    min-height: 34px;
+    min-height: 6vh;
 }
 
 #chat-input, #chat-input:focus{
@@ -172,6 +172,7 @@ body {
     color: #ffffffb3;
     resize: none;
     outline:none!important;
+    padding: 0 2% 0 2%;
 }
 
 
@@ -265,6 +266,15 @@ input{
 }
 */
 
+img{
+    -khtml-user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
 .chat-target-text{
     margin-left: 1.75rem;
     margin-right: 1.75rem;
@@ -312,6 +322,7 @@ input{
     border-width: 0.5vh !important;
     border-bottom-width: 1vh !important;
     border-radius:0 !important;
+    min-height: 13vh;
 }
 
 #chat-title-row{
@@ -364,27 +375,17 @@ video {
 }
 
 @media only screen and (max-width: 720px){
-    #chat-title-row{
-        display : none;
-    }
-    
-    #chat-transmit-row{
+    #chat-title-row{display : none;}
+    * {font-size: small !important;}
+}
 
+@media only screen and (max-width: 480px){    
+    .chat-target-text {margin: 0;}
+    .status-light{display: none;}
+    #chat-transmit-btn{    
+        padding: 0;
+        position: absolute;
+        bottom: 0;
     }
-
-    #chat-transmit-btn{
-        font-size: small;
-    }
-    
-    #chat-input-container{
-        
-    }
-    
-    .chat-target-text {
-        font-size: small;
-    }
-    
-    #roles-button{
-        font-size: small;
-    }
+    * {font-size: xx-small !important;}
 }

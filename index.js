@@ -19,11 +19,8 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'));
 //font awesome
 app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
-
 //get html
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/index.html');
-});
+app.get('/', function(req, res) {res.sendFile(__dirname + '/index.html');});
 
 //start listenting server and check for log directory
 http.listen(3000, function() {
@@ -98,11 +95,17 @@ function socketRemove(arr, value) {
     });
 }
 
-//write message to log file
-function writeToLog(data){
+//write message to database
+function writeToDB(data){
     var d = JSON.parse(data)
     fs.appendFile(currentLogFile, d.header + "\n" + d.message + "\n", function(err){if(err)throw err;});
 }
+
+//retrieve message from database
+function readFromDB(){
+
+}
+
 
 //return a formatted timestamp for the console
 function getTimestamp(){

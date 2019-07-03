@@ -268,12 +268,14 @@ $(function() {
 
     //show the jump to bottom button, unless we're at the bottom
     $("#chat-box").scroll(function(event) {
+	var maxScroll = ($(this)[0].scrollHeight - $(this).outerHeight());
+
 	if(ingoreScroll === false)
 	    toggleJumpButton(true);
 	ingoreScroll = false;
 	event.preventDefault();
 
-	if($(this).scrollTop() >= ($(this)[0].scrollHeight - $(this).outerHeight())){
+	if($(this).scrollTop() >= (maxScroll - maxScroll * 0.5)){
 	    toggleJumpButton(false);
 	}
     });
