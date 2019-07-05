@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+//var http = require('http').Server(app);
+var https = require('https');
+//var io = require('socket.io')(https);
 var fs = require('fs');
 var path = require('path');
 
@@ -9,8 +10,11 @@ var roles = [];
 var connectedSockets = [];
 var currentLogFile;
 
+  
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
+//socket.io js
+app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io-client/dist'));
 //bootstrap js
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap'));
 //jquery
@@ -22,13 +26,44 @@ app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/
 //get html
 app.get('/', function(req, res) {res.sendFile(__dirname + '/index.html');});
 
+
+/*
 //start listenting server and check for log directory
 http.listen(3000, function() {
     console.log('> listening on *:3000');
     currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
     if(fs.existsSync(__dirname + '/logs/') === false)
         fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+
+        console.log(    http.address());
 });
+
+*/
+
+/*
+const options = {
+    key: fs.readFileSync('certificates/chatkey.pem'),
+    cert: fs.readFileSync('certificates/chatcert.pem')
+  };
+  
+https.createServer(options, (req, res) => {
+    console.log('> listening on *:3000');
+    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+    if(fs.existsSync(__dirname + '/logs/') === false)
+        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+}).listen(3000);
+*/
+
+var server = https.createServer({
+    key: fs.readFileSync('certificates/server.key'),
+    cert: fs.readFileSync('certificates/server.cert')
+  }, app).listen(3000, () => {
+    console.log('> listening on *:3000');
+    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+    if(fs.existsSync(__dirname + '/logs/') === false)
+        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+  })
+  var io = require('socket.io').listen(server);
 
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function(err, contents) {
