@@ -49,7 +49,7 @@ $(function() {
             //if(peer.stream==null)
               // peer.addStream(localStream);
 
-              var video = document.querySelector('#localVideo');
+              //var video = document.querySelector('#localVideo');
               //video.srcObject = localStream;
 
 
@@ -99,6 +99,10 @@ $(function() {
 
             var video = document.querySelector('#remoteVideo');
             video.srcObject = stream;
+
+            var video = document.querySelector('#localVideo');
+            video.srcObject = localStream;
+
 /*
             var video = document.querySelector('#remoteVideo')
     
