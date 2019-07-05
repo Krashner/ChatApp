@@ -47,6 +47,11 @@ $(function() {
         //peer connected
         peer.on('connect', function() {
             console.log('CONNECT')
+            console.log(peer._id);
+
+
+
+
             //if(peer.stream==null)
               // peer.addStream(localStream);
 
@@ -98,12 +103,24 @@ $(function() {
         peer.on('stream', function(stream) {
             console.log("STREAM: " +stream);
 
-            var video = document.querySelector('#remoteVideo');
+           // var video = document.querySelector('#remoteVideo');
+            //video.srcObject = stream;
+
+            //var video = document.querySelector('#localVideo');
+            //video.srcObject = localStream;
+
+          //  var video = document.querySelector('#video-' + peer._id);
+           // video.srcObject = stream;
+            
+            //create a new video element on connect
+            var video = document.createElement('video');
+            video.id = "video-" + peer._id;
+            video.autoplay = true;
             video.srcObject = stream;
+            document.body.appendChild(video);
 
-            var video = document.querySelector('#localVideo');
-            video.srcObject = localStream;
 
+            //video.srcObject = stream;
 /*
             var video = document.querySelector('#remoteVideo')
     
