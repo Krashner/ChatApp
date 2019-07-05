@@ -28,16 +28,16 @@ $(function() {
     
     
     //******************************************************************
-    // socket functions
+    // peer listener functions
     //******************************************************************
     
     function setPeerListeners(peer) {
 
         //send signal to reciever
         peer.on('signal', function(data) {
-            data.sendSignalTo = peer.sendSignalTo;
+            data.sendSignalTo = peer.targetSocketID;
             //~ signalOriginator = socket.id;
-            data.signalOriginator = peer.signalOriginator;
+            data.signalOriginator = peer.localSocketID;
             //~ sendingPeerID = p._id;
             data.sendingPeerID = peer.sendingPeerID;
             console.log('SIGNAL', JSON.stringify(data));
@@ -111,14 +111,19 @@ $(function() {
 
           //  var video = document.querySelector('#video-' + peer._id);
            // video.srcObject = stream;
-            
+            /*
             //create a new video element on connect
             var video = document.createElement('video');
-            video.id = "video-" + peer._id;
+            video.id = "video-" + peer.targetSocketID;
+            video.className += ' peer-video';
             video.autoplay = true;
             video.srcObject = stream;
+            peer.video=video;
             document.body.appendChild(video);
-
+*/
+            var video = addVideoElement(peer.targetSocketID)
+            if(video!=null)
+                video.srcObject = stream;
 
             //video.srcObject = stream;
 /*
@@ -185,6 +190,16 @@ $(function() {
         //close connection
         peer.on('close', function() {
             console.log("CLOSE");
+            /*
+            var list = document.getElementsByClassName("peer-video");
+            for(var i = list.length - 1; 0 <= i; i--)
+                if(list[i] && list[i].parentElement && list[i].srcObject == null)
+                    list[i].parentElement.removeChild(list[i]);
+            */
+            //console.log(peer._id);       
+            //remove closed video element
+            //var video = document.getElementById('#video-' + peer.targetSocketID);
+            //video.parentElement.removeChild(video);
         })
 
         //error
@@ -192,28 +207,39 @@ $(function() {
             console.log('error', err)
         })
     }
+
+    //******************************************************************
+    // socket functions
+    //******************************************************************
     
     //create a new peer connection
     socket.on('add peer', function(isInitiator, targetSocketID) {
         console.log("add peer " + socket.id);      
+        addVideoElement(targetSocketID);
         var p = createPeer(isInitiator, socket.id, targetSocketID, null);
-        console.log(p);       
+        console.log(p);      
+        p.socket  = targetSocketID;
         peers.push(p);
     });
-
     
     //remove peer closed peer connection
-    socket.on('remove peer', function(peerID) {
-	console.log("remove peer " + peerID);     
-	tempPeers = [];
-	for (var i = 0; i < peers.length; i++) {
-	    if (peers[i]._id !== peerID) {
-		//create new array without peer that's being removed
-		tempPeers.push(peers[i]);
-	    }
-	}
-	peers = tempPeers;
-	console.log(peers);
+    socket.on('remove peer', function(socketID) {
+        console.log("remove peer " + socketID);     
+        tempPeers = [];
+        for (var i = 0; i < peers.length; i++) {
+            console.log(peers[i].targetSocketID + " "  + socketID)
+            if (peers[i].targetSocketID !== socketID) {
+                //create new array without peer that's being removed
+                tempPeers.push(peers[i]);
+            }else{
+                peers[i].destroy();
+            }
+        }
+        peers = tempPeers;
+        //remove video element
+        var video = document.getElementById('video-' + socketID);
+        video.parentElement.removeChild(video);
+        console.log(peers);
     })
 
     //peer response to signal
@@ -229,7 +255,7 @@ $(function() {
             //~ p.signalOriginator = d.sendSignalTo;
             //~ p.sendSignalTo = d.signalOriginator;
             //~ p.sendingPeerID = d.sendingPeerID;
-            console.log("Offer Recieved:   Originator: " + p.signalOriginator + " Target " + p.sendSignalTo + " PeerID: " + d.sendingPeerID);
+            console.log("Offer Recieved:   Originator: " + p.localSocketID + " Target " + p.targetSocketID + " PeerID: " + d.sendingPeerID);
             p.signal(data);
             peers.push(p);
         } else {
@@ -258,6 +284,19 @@ $(function() {
 	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
         });
     });
+
+    //check for a video element for socket, create one if it doesn't exist
+    function addVideoElement(socketID){
+        var video = document.getElementById('video-' + socketID);
+        if(video == null){
+            video = document.createElement('video');
+            video.id = "video-" + socketID;
+            video.className += ' peer-video';
+            video.autoplay = true;
+            document.body.appendChild(video);
+        }
+        return video;
+    }
     
     //create a peer object and return it
     function createPeer(initiator, originatorID, sendToID, peerID){
@@ -268,8 +307,8 @@ $(function() {
                 stream : localStream
             });
 	        console.log(localStream);
-            p.signalOriginator = originatorID;
-            p.sendSignalTo = sendToID;
+            p.localSocketID = originatorID;
+            p.targetSocketID = sendToID;
             p.sendingPeerID = peerID;
             
             if(p.sendingPeerID === null)
