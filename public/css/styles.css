@@ -288,6 +288,7 @@ img{
     margin: 0!important;
     border-color: #2f3136;
     border-width: 0.5vh !important;
+    border-width: 0.5vh 0.5vw 0.5vh 0.5vw;
     border-radius:0 !important;
 }
     

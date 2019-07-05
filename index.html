@@ -7,7 +7,7 @@
       <link rel="stylesheet" href="/css/styles.css">
    </head>
    <body>
-<!--
+   <!--
       <select id="roles">
          <option value="None">None</option>
          >
@@ -20,8 +20,12 @@
       <div id="users">0</div>
 
       <audio id="remote-audio" controls></audio>
-      -->
-      
+   
+      local
+      <audio id="local-audio" controls></audio>
+      remote
+      <audio id="remote-audio" controls autoplay></audio>
+   -->
       <div class="modal" id="modal-choose-role" tabindex="-1" role="dialog">
          <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -105,8 +109,8 @@
          </div>
       </div>
 
-      <!-- <video id="localVideo" autoplay muted></video>
-      <video id="remoteVideo" autoplay></video> -->
+      <video id="localVideo" autoplay muted></video>
+      <video id="remoteVideo" autoplay></video> 
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
       <script type="text/javascript" src="/simple-peer/simplepeer.min.js"></script>
       <script type="text/javascript" src="/jquery/jquery.min.js"></script>

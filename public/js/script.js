@@ -1,10 +1,9 @@
 $(function() {
     var socket = io();
-    var previousRole;
     var peers = [];
     var currentRole;
     var selectedRole;
-    var globalStream;
+    var localStream;
     var ingoreScroll = false;
 
     
@@ -17,14 +16,13 @@ $(function() {
         video: true
     })
     .then(function(stream) {
-         globalStream=stream;
+         localStream=stream;
          socket.emit('allow call');
-         var video = document.querySelector('#localVideo');
-         video.srcObject = stream;
+         //var video = document.querySelector('#localVideo');
+         //video.srcObject = stream;
     })
     .catch(function(err) {
         console.log(err.name + ": " + err.message);
-	socket.emit('allow call');
     });
     
     
@@ -48,8 +46,13 @@ $(function() {
         //peer connected
         peer.on('connect', function() {
             console.log('CONNECT')
-            if(peer.stream==null)
-                peer.addStream(globalStream);
+            //if(peer.stream==null)
+              // peer.addStream(localStream);
+
+              var video = document.querySelector('#localVideo');
+              //video.srcObject = localStream;
+
+
             //peer.addStream(globalStream);
             // navigator.mediaDevices.getUserMedia({
             //     audio: true,
@@ -61,6 +64,28 @@ $(function() {
             // .catch(function(err) {
             //     console.log(err.name + ": " + err.message);
             // });
+
+            /*
+            navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: true
+            })
+            .then(function(stream) {
+                var video = document.querySelector('#localVideo');
+                // Older browsers may not have srcObject
+                if ("srcObject" in video) {
+                    video.srcObject = stream;
+                    peer.addStream(stream);
+                    // video[0].load();
+                    // video[0].play();
+                } else {
+                    // Avoid using this in new browsers, as it is going away.
+                    //video.src = window.URL.createObjectURL(stream);
+                }
+            })
+            .catch(function(err) {
+                console.log(err.name + ": " + err.message);
+            });*/
         });
 
         //data channel is being used
@@ -70,9 +95,36 @@ $(function() {
 
         //streaming
         peer.on('stream', function(stream) {
-            console.log("STREAM");
+            console.log("STREAM: " +stream);
+
             var video = document.querySelector('#remoteVideo');
             video.srcObject = stream;
+/*
+            var video = document.querySelector('#remoteVideo')
+    
+            if ('srcObject' in video) {
+              video.srcObject = stream
+            } else {
+              video.src = window.URL.createObjectURL(stream) // for older browsers
+            }
+            video.srcObject = stream
+            video.play()
+*/
+
+
+
+            // var video = document.createElement('video');
+            // video.srcObject = stream;
+            // document.body.appendChild(video);
+            // video.play()
+
+
+
+
+            // var video = document.querySelector('#remoteVideo');
+            // video.srcObject = stream;
+
+
             // //var audio = document.querySelector('#remote-audio');
             // //audio.srcObject = stream;
             // //console.log(audio.srcObject);
@@ -102,10 +154,10 @@ $(function() {
             //     console.log(err.name + ": " + err.message);
             // });
 
-            //var video = document.createElement('video');
-            //video.srcObject = stream;
-            //document.body.appendChild(video);
-            //video.play();
+            // var video = document.createElement('video');
+            // video.srcObject = stream;
+            // document.body.appendChild(video);
+            // video.play();
         })
 
         //close connection
@@ -191,9 +243,9 @@ $(function() {
                 initiator: initiator,
                 trickle: false,
                 //config: {"iceServers":[]}
-                stream : globalStream
+                stream : localStream
             });
-	    console.log(globalStream);
+	        console.log(localStream);
             p.signalOriginator = originatorID;
             p.sendSignalTo = sendToID;
             p.sendingPeerID = peerID;

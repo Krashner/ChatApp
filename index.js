@@ -65,7 +65,7 @@ io.on('connection', function(socket) {
     //send the message out
     socket.on('chat message', function(data) { 
         socket.broadcast.emit('chat message', data);
-        writeToLog(data);
+        writeToDB(data);
     });
 
     //socket has joined channel, temporarily not used
