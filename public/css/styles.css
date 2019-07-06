@@ -105,7 +105,19 @@ body {
     width: 100%;
 }
 
-#roles-button:hover{
+.top-row-button:hover{
+    background-color: #343a40 !important;
+}
+
+
+.top-row-button{
+    background-color: #2f3136;
+    color: #FFFFFF!important;
+    height: 100%;
+    width: 100%;
+}
+
+.top-row-button:hover{
     background-color: #343a40 !important;
 }
 
@@ -373,6 +385,10 @@ video {
     border-radius: 2px;
     padding: 0;
     box-shadow: rgba(156, 172, 172, 0.2) 0px 2px 2px, rgba(156, 172, 172, 0.2) 0px 4px 4px, rgba(156, 172, 172, 0.2) 0px 8px 8px, rgba(156, 172, 172, 0.2) 0px 16px 16px, rgba(156, 172, 172, 0.2) 0px 32px 32px, rgba(156, 172, 172, 0.2) 0px 64px 64px;
+}
+
+@media only screen and (max-width: 1024px){
+    .config-btns-text{display : none;}
 }
 
 @media only screen and (max-width: 720px){

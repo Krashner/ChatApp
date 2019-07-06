@@ -34,9 +34,7 @@ $(function () {
 		//send signal to reciever
 		peer.on('signal', function (data) {
 			data.sendSignalTo = peer.targetSocketID;
-			//~ signalOriginator = socket.id;
 			data.signalOriginator = peer.localSocketID;
-			//~ sendingPeerID = p._id;
 			data.sendingPeerID = peer.sendingPeerID;
 			console.log('SIGNAL', JSON.stringify(data));
 			socket.emit('peer call', JSON.stringify(data));
@@ -93,15 +91,14 @@ $(function () {
 		for (var i = 0; i < peers.length; i++) {
 			console.log(peers[i].targetSocketID + " " + socketID)
 			if (peers[i].targetSocketID !== socketID) {
-				//create new array without peer that's being removed
+				//create new array without specific peer
 				tempPeers.push(peers[i]);
 			} else {
 				peers[i].destroy();
 			}
 		}
-		peers = tempPeers;
 		//remove video element
-        removeVideoElement(socketID);
+		removeVideoElement(socketID);
 		console.log(peers);
 	})
 

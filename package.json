@@ -9,9 +9,10 @@
     "simple-peer": "^9.4.0",
     "socket.io": "^2.2.0",
     "webrtc-adapter": "^7.2.4",
-    "wrtc": "^0.4.1"
+    "wrtc": "^0.4.1",
+    "@fortawesome/fontawesome-free": "^5.9.0"
   },
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.9.0"
+    
   }
 }

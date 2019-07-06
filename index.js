@@ -1,15 +1,12 @@
 var express = require('express');
 var app = express();
-//var http = require('http').Server(app);
 var https = require('https');
-//var io = require('socket.io')(https);
 var fs = require('fs');
 var path = require('path');
 
 var roles = [];
 var connectedSockets = [];
 var currentLogFile;
-
   
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -25,34 +22,6 @@ app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'))
 app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
 //get html
 app.get('/', function(req, res) {res.sendFile(__dirname + '/index.html');});
-
-
-/*
-//start listenting server and check for log directory
-http.listen(3000, function() {
-    console.log('> listening on *:3000');
-    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
-    if(fs.existsSync(__dirname + '/logs/') === false)
-        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
-
-        console.log(    http.address());
-});
-
-*/
-
-/*
-const options = {
-    key: fs.readFileSync('certificates/chatkey.pem'),
-    cert: fs.readFileSync('certificates/chatcert.pem')
-  };
-  
-https.createServer(options, (req, res) => {
-    console.log('> listening on *:3000');
-    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
-    if(fs.existsSync(__dirname + '/logs/') === false)
-        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
-}).listen(3000);
-*/
 
 var server = https.createServer({
     key: fs.readFileSync('certificates/server.key'),
@@ -117,7 +86,6 @@ io.on('connection', function(socket) {
     socket.on('disconnect', function(data) {
         connectedSockets = socketRemove(connectedSockets, socket);
         console.log(getTimestamp()+ "client disconnected || id: " + socket.id);
-        //console.log(getTimestamp()+ "close peer connection || socket 1: " + socket.id + " socket 2: " + d.sendSignalTo);
         //remove peer for this socket from every client
         socket.broadcast.emit('remove peer', socket.id);
     });
