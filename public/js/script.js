@@ -1,117 +1,115 @@
-$(function() {
-    var socket = io();
-    //var socket = io.connect('https://localhost:3000', {secure: true});
-    var peers = [];
-    var currentRole;
-    var selectedRole;
-    var localStream;
-    var ingoreScroll = false;
-
-    
-    //******************************************************************
-    // stream functions
-    //******************************************************************
-    
-    navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-    .then(function(stream) {
-         localStream=stream;
-         socket.emit('allow call');
-         //var video = document.querySelector('#localVideo');
-         //video.srcObject = stream;
-    })
-    .catch(function(err) {
-        console.log(err.name + ": " + err.message);
-    });
-    
-    
-    //******************************************************************
-    // peer listener functions
-    //******************************************************************
-    
-    function setPeerListeners(peer) {
-
-        //send signal to reciever
-        peer.on('signal', function(data) {
-            data.sendSignalTo = peer.targetSocketID;
-            //~ signalOriginator = socket.id;
-            data.signalOriginator = peer.localSocketID;
-            //~ sendingPeerID = p._id;
-            data.sendingPeerID = peer.sendingPeerID;
-            console.log('SIGNAL', JSON.stringify(data));
-            socket.emit('peer call', JSON.stringify(data));
-        });
-
-        //peer connected
-        peer.on('connect', function() {
-            console.log('CONNECT')
-            console.log(peer._id);
+$(function () {
+	var socket = io();
+	//var socket = io.connect('https://localhost:3000', {secure: true});
+	var peers = [];
+	var currentRole;
+	var selectedRole;
+	var localStream;
+	var ingoreScroll = false;
 
 
+	//******************************************************************
+	// stream functions
+	//******************************************************************
+
+	navigator.mediaDevices.getUserMedia({
+			audio: true,
+			video: true
+		})
+		.then(function (stream) {
+			localStream = stream;
+			socket.emit('allow call');
+			//var video = document.querySelector('#localVideo');
+			//video.srcObject = stream;
+		})
+		.catch(function (err) {
+			console.log(err.name + ": " + err.message);
+		});
 
 
-            //if(peer.stream==null)
-              // peer.addStream(localStream);
+	//******************************************************************
+	// peer listener functions
+	//******************************************************************
 
-              //var video = document.querySelector('#localVideo');
-              //video.srcObject = localStream;
+	function setPeerListeners(peer) {
+
+		//send signal to reciever
+		peer.on('signal', function (data) {
+			data.sendSignalTo = peer.targetSocketID;
+			//~ signalOriginator = socket.id;
+			data.signalOriginator = peer.localSocketID;
+			//~ sendingPeerID = p._id;
+			data.sendingPeerID = peer.sendingPeerID;
+			console.log('SIGNAL', JSON.stringify(data));
+			socket.emit('peer call', JSON.stringify(data));
+		});
+
+		//peer connected
+		peer.on('connect', function () {
+			console.log('CONNECT')
+			console.log(peer._id);
 
 
-            //peer.addStream(globalStream);
-            // navigator.mediaDevices.getUserMedia({
-            //     audio: true,
-            //     video: true
-            // })
-            // .then(function(stream) {
-            //     peer.addStream(stream);
-            // })
-            // .catch(function(err) {
-            //     console.log(err.name + ": " + err.message);
-            // });
+			//if(peer.stream==null)
+			// peer.addStream(localStream);
 
-            /*
-            navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: true
-            })
-            .then(function(stream) {
-                var video = document.querySelector('#localVideo');
-                // Older browsers may not have srcObject
-                if ("srcObject" in video) {
-                    video.srcObject = stream;
-                    peer.addStream(stream);
-                    // video[0].load();
-                    // video[0].play();
-                } else {
-                    // Avoid using this in new browsers, as it is going away.
-                    //video.src = window.URL.createObjectURL(stream);
-                }
-            })
-            .catch(function(err) {
-                console.log(err.name + ": " + err.message);
-            });*/
-        });
+			//var video = document.querySelector('#localVideo');
+			//video.srcObject = localStream;
 
-        //data channel is being used
-        peer.on('data', function(data) {
-            console.log('data: ' + data);
-        })
 
-        //streaming
-        peer.on('stream', function(stream) {
-            console.log("STREAM: " +stream);
+			//peer.addStream(globalStream);
+			// navigator.mediaDevices.getUserMedia({
+			//     audio: true,
+			//     video: true
+			// })
+			// .then(function(stream) {
+			//     peer.addStream(stream);
+			// })
+			// .catch(function(err) {
+			//     console.log(err.name + ": " + err.message);
+			// });
 
-           // var video = document.querySelector('#remoteVideo');
-            //video.srcObject = stream;
+			/*
+			navigator.mediaDevices.getUserMedia({
+			    audio: true,
+			    video: true
+			})
+			.then(function(stream) {
+			    var video = document.querySelector('#localVideo');
+			    // Older browsers may not have srcObject
+			    if ("srcObject" in video) {
+			        video.srcObject = stream;
+			        peer.addStream(stream);
+			        // video[0].load();
+			        // video[0].play();
+			    } else {
+			        // Avoid using this in new browsers, as it is going away.
+			        //video.src = window.URL.createObjectURL(stream);
+			    }
+			})
+			.catch(function(err) {
+			    console.log(err.name + ": " + err.message);
+			});*/
+		});
 
-            //var video = document.querySelector('#localVideo');
-            //video.srcObject = localStream;
+		//data channel is being used
+		peer.on('data', function (data) {
+			console.log('data: ' + data);
+		})
 
-          //  var video = document.querySelector('#video-' + peer._id);
-           // video.srcObject = stream;
-            /*
+		//streaming
+		peer.on('stream', function (stream) {
+			console.log("STREAM: " + stream);
+
+			// var video = document.querySelector('#remoteVideo');
+			//video.srcObject = stream;
+
+			//var video = document.querySelector('#localVideo');
+			//video.srcObject = localStream;
+
+			//  var video = document.querySelector('#video-' + peer._id);
+			// video.srcObject = stream;
+			/*
             //create a new video element on connect
             var video = document.createElement('video');
             video.id = "video-" + peer.targetSocketID;
@@ -121,331 +119,328 @@ $(function() {
             peer.video=video;
             document.body.appendChild(video);
 */
-            var video = addVideoElement(peer.targetSocketID)
-            if(video!=null)
-                video.srcObject = stream;
+			var video = addVideoElement(peer.targetSocketID)
+			if (video != null)
+				video.srcObject = stream;
 
-            //video.srcObject = stream;
-/*
-            var video = document.querySelector('#remoteVideo')
-    
-            if ('srcObject' in video) {
-              video.srcObject = stream
-            } else {
-              video.src = window.URL.createObjectURL(stream) // for older browsers
-            }
-            video.srcObject = stream
-            video.play()
-*/
-
-
-
-            // var video = document.createElement('video');
-            // video.srcObject = stream;
-            // document.body.appendChild(video);
-            // video.play()
+			//video.srcObject = stream;
+			/*
+			            var video = document.querySelector('#remoteVideo')
+			    
+			            if ('srcObject' in video) {
+			              video.srcObject = stream
+			            } else {
+			              video.src = window.URL.createObjectURL(stream) // for older browsers
+			            }
+			            video.srcObject = stream
+			            video.play()
+			*/
 
 
+			// var video = document.createElement('video');
+			// video.srcObject = stream;
+			// document.body.appendChild(video);
+			// video.play()
 
 
-            // var video = document.querySelector('#remoteVideo');
-            // video.srcObject = stream;
+			// var video = document.querySelector('#remoteVideo');
+			// video.srcObject = stream;
 
 
-            // //var audio = document.querySelector('#remote-audio');
-            // //audio.srcObject = stream;
-            // //console.log(audio.srcObject);
-            // var video = document.querySelector('#remoteVideo');
-            // //// Older browsers may not have srcObject
-            // video.srcObject = stream;
+			// //var audio = document.querySelector('#remote-audio');
+			// //audio.srcObject = stream;
+			// //console.log(audio.srcObject);
+			// var video = document.querySelector('#remoteVideo');
+			// //// Older browsers may not have srcObject
+			// video.srcObject = stream;
 
 
-            // navigator.mediaDevices.getUserMedia({
-            //     audio: true,
-            //     video: true
-            // })
-            // .then(function(stream) {
-            //     var video = document.querySelector('#localVideo');
-            //     // Older browsers may not have srcObject
-            //     if ("srcObject" in video) {
-            //         //video.srcObject = stream;
-            //         p.addStream(stream);
-            //         // video[0].load();
-            //         // video[0].play();
-            //     } else {
-            //         // Avoid using this in new browsers, as it is going away.
-            //         //video.src = window.URL.createObjectURL(stream);
-            //     }
-            // })
-            // .catch(function(err) {
-            //     console.log(err.name + ": " + err.message);
-            // });
+			// navigator.mediaDevices.getUserMedia({
+			//     audio: true,
+			//     video: true
+			// })
+			// .then(function(stream) {
+			//     var video = document.querySelector('#localVideo');
+			//     // Older browsers may not have srcObject
+			//     if ("srcObject" in video) {
+			//         //video.srcObject = stream;
+			//         p.addStream(stream);
+			//         // video[0].load();
+			//         // video[0].play();
+			//     } else {
+			//         // Avoid using this in new browsers, as it is going away.
+			//         //video.src = window.URL.createObjectURL(stream);
+			//     }
+			// })
+			// .catch(function(err) {
+			//     console.log(err.name + ": " + err.message);
+			// });
 
-            // var video = document.createElement('video');
-            // video.srcObject = stream;
-            // document.body.appendChild(video);
-            // video.play();
-        })
+			// var video = document.createElement('video');
+			// video.srcObject = stream;
+			// document.body.appendChild(video);
+			// video.play();
+		})
 
-        //close connection
-        peer.on('close', function() {
-            console.log("CLOSE");
-            /*
-            var list = document.getElementsByClassName("peer-video");
-            for(var i = list.length - 1; 0 <= i; i--)
-                if(list[i] && list[i].parentElement && list[i].srcObject == null)
-                    list[i].parentElement.removeChild(list[i]);
-            */
-            //console.log(peer._id);       
-            //remove closed video element
-            //var video = document.getElementById('#video-' + peer.targetSocketID);
-            //video.parentElement.removeChild(video);
-        })
+		//close connection
+		peer.on('close', function () {
+			console.log("CLOSE");
+			/*
+			var list = document.getElementsByClassName("peer-video");
+			for(var i = list.length - 1; 0 <= i; i--)
+			    if(list[i] && list[i].parentElement && list[i].srcObject == null)
+			        list[i].parentElement.removeChild(list[i]);
+			*/
+			//console.log(peer._id);       
+			//remove closed video element
+			//var video = document.getElementById('#video-' + peer.targetSocketID);
+			//video.parentElement.removeChild(video);
+		})
 
-        //error
-        peer.on('error', function(err) {
-            console.log('error', err)
-        })
-    }
-
-    //******************************************************************
-    // socket functions
-    //******************************************************************
-    
-    //create a new peer connection
-    socket.on('add peer', function(isInitiator, targetSocketID) {
-        console.log("add peer " + socket.id);      
-        addVideoElement(targetSocketID);
-        var p = createPeer(isInitiator, socket.id, targetSocketID, null);
-        console.log(p);      
-        p.socket  = targetSocketID;
-        peers.push(p);
-    });
-    
-    //remove peer closed peer connection
-    socket.on('remove peer', function(socketID) {
-        console.log("remove peer " + socketID);     
-        tempPeers = [];
-        for (var i = 0; i < peers.length; i++) {
-            console.log(peers[i].targetSocketID + " "  + socketID)
-            if (peers[i].targetSocketID !== socketID) {
-                //create new array without peer that's being removed
-                tempPeers.push(peers[i]);
-            }else{
-                peers[i].destroy();
-            }
-        }
-        peers = tempPeers;
-        //remove video element
-        var video = document.getElementById('video-' + socketID);
-        video.parentElement.removeChild(video);
-        console.log(peers);
-    })
-
-    //peer response to signal
-    socket.on('peer response', function(data) {
-        var d = JSON.parse(data);
-        console.log(d);
-        console.log(peers);
-        //if an offer is recieved, create a non-iniator peer and respond
-        if (d.type === "offer") {
-            console.log("create peer 2");
-            //create a non-initiating peer and return to sender
-            var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
-            //~ p.signalOriginator = d.sendSignalTo;
-            //~ p.sendSignalTo = d.signalOriginator;
-            //~ p.sendingPeerID = d.sendingPeerID;
-            console.log("Offer Recieved:   Originator: " + p.localSocketID + " Target " + p.targetSocketID + " PeerID: " + d.sendingPeerID);
-            p.signal(data);
-            peers.push(p);
-        } else {
-            console.log("Answer Recieved:   Originator: " + d.signalOriginator + " Target " + d.sendSignalTo + " PeerID: " + d.sendingPeerID);
-            //if an answer is recieved, give data to original peer
-            console.log("got an answer");
-
-            for (var i = 0; i < peers.length; i++) {
-                if (peers[i]._id === d.sendingPeerID) {
-                    console.log("connecting call");
-                    peers[i].signal(data);
-                }
-            }
-        }
-    });
-    
-    //update chat log with recieved message
-    socket.on('chat message', function(data) {
-        addMessageToLog(data);
-    });
-
-    //get the user roles
-    socket.on('update roles', function(roles) {
-        $('#modal-role-row').empty();
-        roles.forEach(function(entry) {
-	    $('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
-        });
-    });
-
-    //check for a video element for socket, create one if it doesn't exist
-    function addVideoElement(socketID){
-        var video = document.getElementById('video-' + socketID);
-        if(video == null){
-            video = document.createElement('video');
-            video.id = "video-" + socketID;
-            video.className += ' peer-video';
-            video.autoplay = true;
-            document.body.appendChild(video);
-        }
-        return video;
-    }
-    
-    //create a peer object and return it
-    function createPeer(initiator, originatorID, sendToID, peerID){
-        var p = new SimplePeer({
-                initiator: initiator,
-                trickle: false,
-                //config: {"iceServers":[]}
-                stream : localStream
-            });
-	        console.log(localStream);
-            p.localSocketID = originatorID;
-            p.targetSocketID = sendToID;
-            p.sendingPeerID = peerID;
-            
-            if(p.sendingPeerID === null)
-                p.sendingPeerID = p._id;
-                
-            setPeerListeners(p);
-            return p;
-    }
-    
-    
-    //******************************************************************
-    // chat functions
-    //******************************************************************
-    
-    //send message, clear message box and add message to local chat
-    $('form').submit(function(e) {
-        e.preventDefault();
-        var text = $('#chat-input').val();
-        var role = currentRole;
-        if (text.replace(/\s+/g, '') !== '' && role !== undefined && role !== "None") {
-	    sendToServer(role, text);
-	    $('#chat-input').val('');
-        }
-        $('#chat-input').focus();
-        return false;
-    });
-       
-    //format the data, convert to string and send to server
-    function sendToServer(role, msg){
-	var data = {
-	"sender" : role,
-	"header" : role + " " + timeNow(),
-	"timeStamp" : timeNow(),
-	"message" : msg
-	};
-	addMessageToLog(JSON.stringify(data));//add to local log
-	socket.emit('chat message', JSON.stringify(data));
-    }
-	
-    //toggle chat target buttons on and off
-    $(".chat-target-btn").click(function() {
-        $(".chat-target-btn").removeClass("active-target");
-        $(this).addClass("active-target");
-    });
-    
-    //change the current role to selection and toggle the status lights
-    $("#btn-select-role").click(function() {
-        $("#" + currentRole +"-Selector").removeClass("disabled-btn");
-	$("#" + currentRole +"-Selector > .status-light" ).css('background-color','#dc3545'); //red
-	if(selectedRole	!== null)
-	    currentRole = selectedRole;
-        $("#roles-button").text("Role: " + currentRole);
-        $("#" + currentRole +"-Selector").addClass("disabled-btn");
-	$("#" + currentRole +"-Selector").removeClass("active-target");
-        $("#" + currentRole +"-Selector > .status-light" ).css('background-color','#43b581'); //green
-    });
-    
-    //get the selected role
-    $('#modal-role-row').on('click', '.role-select-btn', function(e){
-	$(".role-select-btn").removeClass("active-target");
-        $(this).addClass("active-target");
-	selectedRole = this.id;
-    });
-        
-    //deselect unsaved role and select chosen role after closing modal
-    $('#modal-choose-role').on('hidden.bs.modal', function(e){
-	$(".role-select-btn").removeClass("active-target");
-	$("#" + currentRole).addClass("active-target");
-    });
-
-    //show the jump to bottom button, unless we're at the bottom
-    $("#chat-box").scroll(function(event) {
-	var maxScroll = ($(this)[0].scrollHeight - $(this).outerHeight());
-
-	if(ingoreScroll === false)
-	    toggleJumpButton(true);
-	ingoreScroll = false;
-	event.preventDefault();
-
-	if($(this).scrollTop() >= (maxScroll - maxScroll * 0.5)){
-	    toggleJumpButton(false);
+		//error
+		peer.on('error', function (err) {
+			console.log('error', err)
+		})
 	}
-    });
-      
-    //jump to bottom of messages and hide the button
-    $("#btn-jump").click(function() {
-	$("#chat-box").scrollTop($("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight());
-	toggleJumpButton(false);
-	ingoreScroll = true;
-    });
-    
-    //toggle showing the button, true show false hide
-    function toggleJumpButton(showButton){
-	if(showButton){
-	    $("#btn-jump").removeClass("hide-btn");
-	    $("#btn-jump-arrow").removeClass("hide-btn");
-	}else{
-	    $("#btn-jump").addClass("hide-btn");
-	    $("#btn-jump-arrow").addClass("hide-btn");
+
+	//******************************************************************
+	// socket functions
+	//******************************************************************
+
+	//create a new peer connection
+	socket.on('add peer', function (isInitiator, targetSocketID) {
+		console.log("add peer " + socket.id);
+		addVideoElement(targetSocketID);
+		var p = createPeer(isInitiator, socket.id, targetSocketID, null);
+		console.log(p);
+		p.socket = targetSocketID;
+		peers.push(p);
+	});
+
+	//remove peer closed peer connection
+	socket.on('remove peer', function (socketID) {
+		console.log("remove peer " + socketID);
+		tempPeers = [];
+		for (var i = 0; i < peers.length; i++) {
+			console.log(peers[i].targetSocketID + " " + socketID)
+			if (peers[i].targetSocketID !== socketID) {
+				//create new array without peer that's being removed
+				tempPeers.push(peers[i]);
+			} else {
+				peers[i].destroy();
+			}
+		}
+		peers = tempPeers;
+		//remove video element
+		var video = document.getElementById('video-' + socketID);
+		video.parentElement.removeChild(video);
+		console.log(peers);
+	})
+
+	//peer response to signal
+	socket.on('peer response', function (data) {
+		var d = JSON.parse(data);
+		console.log(d);
+		console.log(peers);
+		//if an offer is recieved, create a non-iniator peer and respond
+		if (d.type === "offer") {
+			console.log("create peer 2");
+			//create a non-initiating peer and return to sender
+			var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
+			//~ p.signalOriginator = d.sendSignalTo;
+			//~ p.sendSignalTo = d.signalOriginator;
+			//~ p.sendingPeerID = d.sendingPeerID;
+			console.log("Offer Recieved:   Originator: " + p.localSocketID + " Target " + p.targetSocketID + " PeerID: " + d.sendingPeerID);
+			p.signal(data);
+			peers.push(p);
+		} else {
+			console.log("Answer Recieved:   Originator: " + d.signalOriginator + " Target " + d.sendSignalTo + " PeerID: " + d.sendingPeerID);
+			//if an answer is recieved, give data to original peer
+			console.log("got an answer");
+
+			for (var i = 0; i < peers.length; i++) {
+				if (peers[i]._id === d.sendingPeerID) {
+					console.log("connecting call");
+					peers[i].signal(data);
+				}
+			}
+		}
+	});
+
+	//update chat log with recieved message
+	socket.on('chat message', function (data) {
+		addMessageToLog(data);
+	});
+
+	//get the user roles
+	socket.on('update roles', function (roles) {
+		$('#modal-role-row').empty();
+		roles.forEach(function (entry) {
+			$('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
+		});
+	});
+
+	//check for a video element for socket, create one if it doesn't exist
+	function addVideoElement(socketID) {
+		var video = document.getElementById('video-' + socketID);
+		if (video == null) {
+			video = document.createElement('video');
+			video.id = "video-" + socketID;
+			video.className += ' peer-video';
+			video.autoplay = true;
+			document.body.appendChild(video);
+		}
+		return video;
 	}
-    }
 
-    //add messages to log
-    function addMessageToLog(data) {
-	var d = JSON.parse(data);
-	var message = $('<li class="message-header message-group">').text(d.header);
-	message.append($('<li class="message-content">').text(d.message));
-	$('#messages').append(message);
-	pruneMessages();
-    }
+	//create a peer object and return it
+	function createPeer(initiator, originatorID, sendToID, peerID) {
+		var p = new SimplePeer({
+			initiator: initiator,
+			trickle: false,
+			//config: {"iceServers":[]}
+			stream: localStream
+		});
+		console.log(localStream);
+		p.localSocketID = originatorID;
+		p.targetSocketID = sendToID;
+		p.sendingPeerID = peerID;
 
-    //get a timestamp
-    function timeNow() {
-        var d = new Date(),
-            h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
-            m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
-        return h + ':' + m + ': ';
-    }
-        
-    //cap the number of loaded messages at 100 for now
-    function pruneMessages(){
-	var msgs = $('#messages').children();
-	if(msgs.length > 100)
-	    $('#messages').children().eq(0).remove();    
-    }
-	    
+		if (p.sendingPeerID === null)
+			p.sendingPeerID = p._id;
+
+		setPeerListeners(p);
+		return p;
+	}
+
+
+	//******************************************************************
+	// chat functions
+	//******************************************************************
+
+	//send message, clear message box and add message to local chat
+	$('form').submit(function (e) {
+		e.preventDefault();
+		var text = $('#chat-input').val();
+		var role = currentRole;
+		if (text.replace(/\s+/g, '') !== '' && role !== undefined && role !== "None") {
+			sendToServer(role, text);
+			$('#chat-input').val('');
+		}
+		$('#chat-input').focus();
+		return false;
+	});
+
+	//format the data, convert to string and send to server
+	function sendToServer(role, msg) {
+		var data = {
+			"sender": role,
+			"header": role + " " + timeNow(),
+			"timeStamp": timeNow(),
+			"message": msg
+		};
+		addMessageToLog(JSON.stringify(data)); //add to local log
+		socket.emit('chat message', JSON.stringify(data));
+	}
+
+	//toggle chat target buttons on and off
+	$(".chat-target-btn").click(function () {
+		$(".chat-target-btn").removeClass("active-target");
+		$(this).addClass("active-target");
+	});
+
+	//change the current role to selection and toggle the status lights
+	$("#btn-select-role").click(function () {
+		$("#" + currentRole + "-Selector").removeClass("disabled-btn");
+		$("#" + currentRole + "-Selector > .status-light").css('background-color', '#dc3545'); //red
+		if (selectedRole !== null)
+			currentRole = selectedRole;
+		$("#roles-button").text("Role: " + currentRole);
+		$("#" + currentRole + "-Selector").addClass("disabled-btn");
+		$("#" + currentRole + "-Selector").removeClass("active-target");
+		$("#" + currentRole + "-Selector > .status-light").css('background-color', '#43b581'); //green
+	});
+
+	//get the selected role
+	$('#modal-role-row').on('click', '.role-select-btn', function (e) {
+		$(".role-select-btn").removeClass("active-target");
+		$(this).addClass("active-target");
+		selectedRole = this.id;
+	});
+
+	//deselect unsaved role and select chosen role after closing modal
+	$('#modal-choose-role').on('hidden.bs.modal', function (e) {
+		$(".role-select-btn").removeClass("active-target");
+		$("#" + currentRole).addClass("active-target");
+	});
+
+	//show the jump to bottom button, unless we're at the bottom
+	$("#chat-box").scroll(function (event) {
+		var maxScroll = ($(this)[0].scrollHeight - $(this).outerHeight());
+
+		if (ingoreScroll === false)
+			toggleJumpButton(true);
+		ingoreScroll = false;
+		event.preventDefault();
+
+		if ($(this).scrollTop() >= (maxScroll - maxScroll * 0.5)) {
+			toggleJumpButton(false);
+		}
+	});
+
+	//jump to bottom of messages and hide the button
+	$("#btn-jump").click(function () {
+		$("#chat-box").scrollTop($("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight());
+		toggleJumpButton(false);
+		ingoreScroll = true;
+	});
+
+	//toggle showing the button, true show false hide
+	function toggleJumpButton(showButton) {
+		if (showButton) {
+			$("#btn-jump").removeClass("hide-btn");
+			$("#btn-jump-arrow").removeClass("hide-btn");
+		} else {
+			$("#btn-jump").addClass("hide-btn");
+			$("#btn-jump-arrow").addClass("hide-btn");
+		}
+	}
+
+	//add messages to log
+	function addMessageToLog(data) {
+		var d = JSON.parse(data);
+		var message = $('<li class="message-header message-group">').text(d.header);
+		message.append($('<li class="message-content">').text(d.message));
+		$('#messages').append(message);
+		pruneMessages();
+	}
+
+	//get a timestamp
+	function timeNow() {
+		var d = new Date(),
+			h = (d.getHours() < 10 ? '0' : '') + d.getHours(),
+			m = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+		return h + ':' + m + ': ';
+	}
+
+	//cap the number of loaded messages at 100 for now
+	function pruneMessages() {
+		var msgs = $('#messages').children();
+		if (msgs.length > 100)
+			$('#messages').children().eq(0).remove();
+	}
+
 });
 
 //test function
-function fillChat(){
-    for(var i =0; i < 1000; i++)
-	addMessageToLog("test", "testing: " + i);
+function fillChat() {
+	for (var i = 0; i < 1000; i++)
+		addMessageToLog("test", "testing: " + i);
 }
 
 //add messages to log
 function addMessageToLog(header, msg) {
-    
-    $('#messages').append($('<li class="header">').text(header));
-    $('#messages').append($('<li>').text(msg));
+
+	$('#messages').append($('<li class="header">').text(header));
+	$('#messages').append($('<li>').text(msg));
 }
