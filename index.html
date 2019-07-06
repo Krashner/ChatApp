@@ -7,43 +7,20 @@
       <link rel="stylesheet" href="/css/styles.css">
    </head>
    <body>
-   <!--
-         <video id="localVideo" autoplay muted></video>
-         <video id="remoteVideo" autoplay></video> 
-
-
-      <select id="roles">
-         <option value="None">None</option>
-         >
-      </select>
-      <select id="clients">
-         <option value="None">None</option>
-         >
-      </select>
-
-      <div id="users">0</div>
-
-      <audio id="remote-audio" controls></audio>
-   
-      local
-      <audio id="local-audio" controls></audio>
-      remote
-      <audio id="remote-audio" controls autoplay></audio>
-   -->
       <div class="modal" id="modal-choose-role" tabindex="-1" role="dialog">
          <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                <div class="modal-header">
                   <h5 class="modal-title">Select a Role</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true">&times;</span>
+                  <span aria-hidden="true">&times;</span>
                   </button>
                </div>
                <div class="modal-body">
                   <div class="container text-center">
                      <div id="modal-role-row" class="row btn-group flex-grow-1" role="group">
                      </div>
-                  </div> 
+                  </div>
                </div>
                <div class="modal-footer">
                   <button type="button" id="btn-select-role" class="btn btn-primary" data-dismiss="modal">Save changes</button>
@@ -52,67 +29,67 @@
             </div>
          </div>
       </div>
-         
       <div class="container-fluid">
-      <div class="row" id="chat-control-row">
-         <div class="col d-flex flex-column" id="chat-col">
-            <div class="row flex-grow-1" id="chat-box">
-               <ul id="messages"></ul>
-            </div>
-            <div id="jump-btn-container">
-               <button type="button" id="btn-jump" class="btn btn-secondary btn-jump hide-btn">Jump To Bottom</button>
-               <div id="btn-jump-arrow" class="down-arrow hide-btn"></div>
-            </div>
-            <form class="row" id="chat-input-container" action="">
-               <input id="chat-input" class="col-10" autocomplete="off" />
-               <button type="submit" id="send-button" class="col-2 btn btn-outline-dark"><i class="fas fa-paper-plane"></i></button>
-            </form>
-         </div>
-         <div class="col-3 d-flex flex-column" id="control-col">
-            <div class="row text-center" id="role-container">
-               <button id="roles-button" class="row btn btn-outline-dark" data-toggle="modal" data-target="#modal-choose-role">Role: None</button>
-            </div>
-            <div id="chat-title-row" class="row flex-grow-1">
-               <div class = "col text-center align-middle" id="control-title">
-                  <img id="logo" class = "text-center" draggable="false" src="/images/seal.png" alt="Internal Trailer Chat">
+         <div class="row" id="chat-control-row">
+            <div class="col d-flex flex-column" id="chat-col">
+               <div class="row flex-grow-1" id="chat-box">
+                  <ul id="messages"></ul>
                </div>
+               <div id="jump-btn-container">
+                  <button type="button" id="btn-jump" class="btn btn-secondary btn-jump hide-btn">Jump To Bottom</button>
+                  <div id="btn-jump-arrow" class="down-arrow hide-btn"></div>
+               </div>
+               <form class="row" id="chat-input-container" action="">
+                  <input id="chat-input" class="col-10" autocomplete="off" />
+                  <button type="submit" id="send-button" class="col-2 btn btn-outline-dark"><i class="fas fa-paper-plane"></i></button>
+               </form>
             </div>
-            <div id="chat-target-row" class="row btn-group flex-grow-1" role="group">
-               <button type="button" id="AIR-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">AIR</div>
-               </button>
-               <button type="button" id="GRND-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">GRND</div>
-               </button>
-               <button type="button" id="CUL-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">CUL</div>
-               </button>
-               <button type="button" id="MSA-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">MSA</div>
-               </button>
-               <button type="button" id="HF-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">HF</div>
-               </button>
-               <button type="button" id="AUX-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                  <div class ="status-light"></div>
-                  <div class ="chat-target-text">AUX</div>
-               </button>
-               <button type="button" id="All-Selector" class="col-sm-12 col-md-10 btn chat-target-btn">
-                  <input type="radio" name="targets" id="chat-target7" class="hidden-radio-btn">
-                  <div class ="chat-target-text">All Call</div>
-               </button>
-            </div>
-            <div id="chat-transmit-row" class="row flex-grow-1">
-               <button type="button" id="chat-transmit-btn" class="col-sm-12 col-md-10 btn btn-danger">Push-To-Talk</button>
+            <div class="col-3 d-flex flex-column" id="control-col">
+               <div class="row text-center" id="role-container">
+                  <button id="roles-button" class="row btn btn-outline-dark" data-toggle="modal" data-target="#modal-choose-role">Role: None</button>
+               </div>
+               <div id="chat-title-row" class="row flex-grow-1">
+                  <div class = "col text-center align-middle" id="control-title">
+                     <img id="logo" class = "text-center" draggable="false" src="/images/seal.png" alt="Internal Trailer Chat">
+                  </div>
+               </div>
+               <div id="chat-target-row" class="row btn-group flex-grow-1" role="group">
+                  <button type="button" id="AIR-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">AIR</div>
+                  </button>
+                  <button type="button" id="GRND-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">GRND</div>
+                  </button>
+                  <button type="button" id="CUL-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">CUL</div>
+                  </button>
+                  <button type="button" id="MSA-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">MSA</div>
+                  </button>
+                  <button type="button" id="HF-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">HF</div>
+                  </button>
+                  <button type="button" id="AUX-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                     <div class ="status-light"></div>
+                     <div class ="chat-target-text">AUX</div>
+                  </button>
+                  <button type="button" id="All-Selector" class="col-sm-12 col-md-10 btn chat-target-btn">
+                     <input type="radio" name="targets" id="chat-target7" class="hidden-radio-btn">
+                     <div class ="chat-target-text">All Call</div>
+                  </button>
+               </div>
+               <div id="chat-transmit-row" class="row flex-grow-1">
+                  <button type="button" id="chat-transmit-btn" class="col-sm-12 col-md-10 btn btn-danger">Push-To-Talk</button>
+               </div>
             </div>
          </div>
       </div>
-
+      <div id="audio-container"></div>
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
       <script type="text/javascript" src="/simple-peer/simplepeer.min.js"></script>
       <script type="text/javascript" src="/jquery/jquery.min.js"></script>

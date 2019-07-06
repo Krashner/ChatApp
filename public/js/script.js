@@ -19,8 +19,6 @@ $(function () {
 		.then(function (stream) {
 			localStream = stream;
 			socket.emit('allow call');
-			//var video = document.querySelector('#localVideo');
-			//video.srcObject = stream;
 		})
 		.catch(function (err) {
 			console.log(err.name + ": " + err.message);
@@ -47,49 +45,6 @@ $(function () {
 		//peer connected
 		peer.on('connect', function () {
 			console.log('CONNECT')
-			console.log(peer._id);
-
-
-			//if(peer.stream==null)
-			// peer.addStream(localStream);
-
-			//var video = document.querySelector('#localVideo');
-			//video.srcObject = localStream;
-
-
-			//peer.addStream(globalStream);
-			// navigator.mediaDevices.getUserMedia({
-			//     audio: true,
-			//     video: true
-			// })
-			// .then(function(stream) {
-			//     peer.addStream(stream);
-			// })
-			// .catch(function(err) {
-			//     console.log(err.name + ": " + err.message);
-			// });
-
-			/*
-			navigator.mediaDevices.getUserMedia({
-			    audio: true,
-			    video: true
-			})
-			.then(function(stream) {
-			    var video = document.querySelector('#localVideo');
-			    // Older browsers may not have srcObject
-			    if ("srcObject" in video) {
-			        video.srcObject = stream;
-			        peer.addStream(stream);
-			        // video[0].load();
-			        // video[0].play();
-			    } else {
-			        // Avoid using this in new browsers, as it is going away.
-			        //video.src = window.URL.createObjectURL(stream);
-			    }
-			})
-			.catch(function(err) {
-			    console.log(err.name + ": " + err.message);
-			});*/
 		});
 
 		//data channel is being used
@@ -101,100 +56,14 @@ $(function () {
 		peer.on('stream', function (stream) {
 			console.log("STREAM: " + stream);
 
-			// var video = document.querySelector('#remoteVideo');
-			//video.srcObject = stream;
-
-			//var video = document.querySelector('#localVideo');
-			//video.srcObject = localStream;
-
-			//  var video = document.querySelector('#video-' + peer._id);
-			// video.srcObject = stream;
-			/*
-            //create a new video element on connect
-            var video = document.createElement('video');
-            video.id = "video-" + peer.targetSocketID;
-            video.className += ' peer-video';
-            video.autoplay = true;
-            video.srcObject = stream;
-            peer.video=video;
-            document.body.appendChild(video);
-*/
 			var video = addVideoElement(peer.targetSocketID)
 			if (video != null)
 				video.srcObject = stream;
-
-			//video.srcObject = stream;
-			/*
-			            var video = document.querySelector('#remoteVideo')
-			    
-			            if ('srcObject' in video) {
-			              video.srcObject = stream
-			            } else {
-			              video.src = window.URL.createObjectURL(stream) // for older browsers
-			            }
-			            video.srcObject = stream
-			            video.play()
-			*/
-
-
-			// var video = document.createElement('video');
-			// video.srcObject = stream;
-			// document.body.appendChild(video);
-			// video.play()
-
-
-			// var video = document.querySelector('#remoteVideo');
-			// video.srcObject = stream;
-
-
-			// //var audio = document.querySelector('#remote-audio');
-			// //audio.srcObject = stream;
-			// //console.log(audio.srcObject);
-			// var video = document.querySelector('#remoteVideo');
-			// //// Older browsers may not have srcObject
-			// video.srcObject = stream;
-
-
-			// navigator.mediaDevices.getUserMedia({
-			//     audio: true,
-			//     video: true
-			// })
-			// .then(function(stream) {
-			//     var video = document.querySelector('#localVideo');
-			//     // Older browsers may not have srcObject
-			//     if ("srcObject" in video) {
-			//         //video.srcObject = stream;
-			//         p.addStream(stream);
-			//         // video[0].load();
-			//         // video[0].play();
-			//     } else {
-			//         // Avoid using this in new browsers, as it is going away.
-			//         //video.src = window.URL.createObjectURL(stream);
-			//     }
-			// })
-			// .catch(function(err) {
-			//     console.log(err.name + ": " + err.message);
-			// });
-
-			// var video = document.createElement('video');
-			// video.srcObject = stream;
-			// document.body.appendChild(video);
-			// video.play();
 		})
 
 		//close connection
 		peer.on('close', function () {
 			console.log("CLOSE");
-			/*
-			var list = document.getElementsByClassName("peer-video");
-			for(var i = list.length - 1; 0 <= i; i--)
-			    if(list[i] && list[i].parentElement && list[i].srcObject == null)
-			        list[i].parentElement.removeChild(list[i]);
-			*/
-			//console.log(peer._id);       
-			//remove closed video element
-			//var video = document.getElementById('#video-' + peer.targetSocketID);
-			//video.parentElement.removeChild(video);
 		})
 
 		//error
@@ -232,8 +101,7 @@ $(function () {
 		}
 		peers = tempPeers;
 		//remove video element
-		var video = document.getElementById('video-' + socketID);
-		video.parentElement.removeChild(video);
+        removeVideoElement(socketID);
 		console.log(peers);
 	})
 
@@ -247,9 +115,6 @@ $(function () {
 			console.log("create peer 2");
 			//create a non-initiating peer and return to sender
 			var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
-			//~ p.signalOriginator = d.sendSignalTo;
-			//~ p.sendSignalTo = d.signalOriginator;
-			//~ p.sendingPeerID = d.sendingPeerID;
 			console.log("Offer Recieved:   Originator: " + p.localSocketID + " Target " + p.targetSocketID + " PeerID: " + d.sendingPeerID);
 			p.signal(data);
 			peers.push(p);
@@ -288,10 +153,16 @@ $(function () {
 			video.id = "video-" + socketID;
 			video.className += ' peer-video';
 			video.autoplay = true;
-			document.body.appendChild(video);
+			document.getElementById('audio-container').appendChild(video);
 		}
 		return video;
-	}
+    }
+    
+    //remove video element
+    function removeVideoElement(socketID){
+        var video = document.getElementById('video-' + socketID);
+		video.parentElement.removeChild(video);
+    }
 
 	//create a peer object and return it
 	function createPeer(initiator, originatorID, sendToID, peerID) {
