@@ -1,6 +1,5 @@
 $(function () {
 	var socket = io();
-	//var socket = io.connect('https://localhost:3000', {secure: true});
 	var peers = [];
 	var currentRole;
 	var selectedRole;
@@ -177,6 +176,11 @@ $(function () {
 		}
 		return video;
     }
+    
+    
+    //******************************************************************
+    // audio functions
+    //******************************************************************
     
     //remove video element
     function removeVideoElement(socketID){

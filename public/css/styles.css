@@ -107,7 +107,7 @@ body {
     background-color: #36393f;
     color: #FFFFFF;
     height: 100%;
-    width: 100%;
+    max-width: 33.33%;
     border-color: #2f3136;
     border-width: 0.25vh 0.25vw 0.25vh 0.25vw;
     border-radius: 0;
@@ -117,11 +117,6 @@ body {
     background-color: #484c52;
 }
 
-#role-container{
-    box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 2px 0 rgba(0,0,0,.06);
-    z-index: 2;
-    display: block;
-}
 
 .selected-role, selected-role:active, selected-role:focus{
     cursor: not-allowed;
@@ -315,6 +310,11 @@ img{
     box-shadow: none;
 }
 
+.target-btn-row{
+    width: 100%;
+    margin: 0;
+}
+
 .user-row{
     padding: 4%;
 }
@@ -409,11 +409,13 @@ video {
 @media only screen and (max-width: 720px){
     #chat-title-row{display : none;}
     * {font-size: small !important;}
+
 }
 
 @media only screen and (max-width: 480px){    
     .chat-target-text {margin: 0;}
     .status-light{display: none;}
+    .user-row{padding: 2%;}
     /*
     #chat-transmit-row{    
         padding: 0;
