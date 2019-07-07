@@ -11,18 +11,40 @@ $(function () {
 	//******************************************************************
 	// stream functions
 	//******************************************************************
+	
+	//attempt to get the audio device
+	getAudio();
+	
+	//manually retry on button press
+	$('#reconnect-button').click(function (e) { 
+	    console.log("Attempting to get audio device.");
+	    getAudio(); 
+	});
 
-	navigator.mediaDevices.getUserMedia({
-			audio: true,
-			video: true
-		})
-		.then(function (stream) {
-			localStream = stream;
-			socket.emit('allow call');
-		})
-		.catch(function (err) {
-			console.log(err.name + ": " + err.message);
-		});
+	//toggle the connection icon on button
+	function togglePhoneIcon(connected){
+	    if(connected)
+		$('#connection-icon').attr('class', 'fas fa-phone');
+	    else
+		$('#connection-icon').attr('class', 'fas fa-phone-slash');
+	}
+
+	//get the audio and connect to peers
+	function getAudio(){
+	    navigator.mediaDevices.getUserMedia({
+		    audio: true,
+		    video: true
+	    })
+	    .then(function (stream) {
+		    localStream = stream;
+		    socket.emit('allow call');
+		    togglePhoneIcon(true);
+	    })
+	    .catch(function (err) {
+		    console.log(err.name + ": " + err.message);
+		    togglePhoneIcon(false);
+	    });
+	}
 
 
 	//******************************************************************
@@ -140,6 +162,7 @@ $(function () {
 		roles.forEach(function (entry) {
 			$('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
 		});
+		addTargets(roles);
 	});
 
 	//check for a video element for socket, create one if it doesn't exist
@@ -158,7 +181,8 @@ $(function () {
     //remove video element
     function removeVideoElement(socketID){
         var video = document.getElementById('video-' + socketID);
-		video.parentElement.removeChild(video);
+	if(video!==null)
+	    video.parentElement.removeChild(video);
     }
 
 	//create a peer object and return it
@@ -185,7 +209,31 @@ $(function () {
 	//******************************************************************
 	// chat functions
 	//******************************************************************
-
+	
+	//adds the roles from the admin.json role list to the target container
+	function addTargets(roles){
+	    var container = $('#chat-target-container');
+	    var template = $('#target-template');
+	    for(var i=0; i < roles.length; i++){
+		if(roles[i] =='None')
+		    continue;
+		var newTarget = template.clone();
+		newTarget.attr('id',roles[i]+'-Selector')
+		.find('.chat-target-text').html(roles[i]);	
+		newTarget.find('.status-light').attr('id',roles[i]+'-status');	
+		newTarget.find('.mute-container').attr('id',roles[i]+'-mute');
+		newTarget.appendTo(container).show();
+	    } 
+	    
+	    //create a button for all call, remove status light and mute
+	    var newTarget = template.clone();
+		newTarget.attr('id','AllCall-Selector')
+		.find('.chat-target-text').html('All Call');
+		newTarget.find('.status-container').empty();
+		newTarget.find('.mute-container').empty();
+		newTarget.appendTo(container).show();   
+	}
+	
 	//send message, clear message box and add message to local chat
 	$('form').submit(function (e) {
 		e.preventDefault();
@@ -212,7 +260,7 @@ $(function () {
 	}
 
 	//toggle chat target buttons on and off
-	$(".chat-target-btn").click(function () {
+	$("#chat-target-container").on('click', '.chat-target-btn', function () {
 		$(".chat-target-btn").removeClass("active-target");
 		$(this).addClass("active-target");
 	});
@@ -220,13 +268,12 @@ $(function () {
 	//change the current role to selection and toggle the status lights
 	$("#btn-select-role").click(function () {
 		$("#" + currentRole + "-Selector").removeClass("disabled-btn");
-		$("#" + currentRole + "-Selector > .status-light").css('background-color', '#dc3545'); //red
+		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#dc3545'); //red
 		if (selectedRole !== null)
 			currentRole = selectedRole;
-		$("#roles-button").text("Role: " + currentRole);
 		$("#" + currentRole + "-Selector").addClass("disabled-btn");
 		$("#" + currentRole + "-Selector").removeClass("active-target");
-		$("#" + currentRole + "-Selector > .status-light").css('background-color', '#43b581'); //green
+		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#43b581'); //green
 	});
 
 	//get the selected role
@@ -297,7 +344,6 @@ $(function () {
 		if (msgs.length > 100)
 			$('#messages').children().eq(0).remove();
 	}
-
 });
 
 //test function

@@ -73,18 +73,21 @@
                      <img id="logo" class = "text-center" draggable="false" src="/images/seal.png" alt="Internal Trailer Chat">
                   </div>
                </div>
-               <div id="chat-target-row" class="row btn-group flex-grow-1" role="group">
-                  
-                  <button type="button" id="AIR-Selector" class="col-sm-12 btn chat-target-btn">
-                     <div class="row user-row">
-                        <div class ="col-sm-3">
-                           <div class="status-light"></div>
+               <div id="chat-target-row" class="row flex-grow-1">
+                  <div id="chat-target-container" ><!--class="btn-group" role="group"-->
+                     
+                  </div>
+                     <!--
+                     <button type="button" id="AIR-Selector" class="col-sm-12 btn chat-target-btn">
+                        <div class="row user-row">
+                           <div class ="col-sm-3">
+                              <div class="status-light"></div>
+                           </div>
+                           <div class ="col-sm chat-target-text">AIR</div>
+                           <div id="mute-AIR" class="col-sm-3"><i class="mute-user fas fa-headphones"></i></div>
                         </div>
-                        <div class ="col-sm chat-target-text">AIR</div>
-                        <div id="mute-AIR" class="col-sm-3"><i class="mute-user fas fa-headphones"></i></div>
-                     </div>
-                  </button>
-                  
+                     </button>
+
                   <!--
                   
                   
@@ -117,17 +120,28 @@
                   -->
                </div>
                <div class="row text-center" id="row role-container">
-                  <button id="roles-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-choose-role"><i class="fas fa-list"></i><div class="config-btns-text">Roles</div></button>
-                  <button id="reconnect-button" class="col btn btn-outline-dark top-row-button"><i class="fas fa-phone"></i><div class="config-btns-text">Reconnect</div></button>
-                  <button id="settings-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-settings"><i class="fas fa-cog"></i><div class="config-btns-text">Settings</div></button>
+                  <button id="roles-button" class="col btn btn-outline-dark config-button" data-toggle="modal" data-target="#modal-choose-role"><i class="fas fa-list"></i><div class="config-btns-text">Roles</div></button>
+                  <button id="reconnect-button" class="col btn btn-outline-dark config-button"><i id="connection-icon" class="fas fa-phone"></i><div class="config-btns-text">Reconnect</div></button>
+                  <button id="settings-button" class="col btn btn-outline-dark config-button" data-toggle="modal" data-target="#modal-settings"><i class="fas fa-cog"></i><div class="config-btns-text">Settings</div></button>
                </div>
-               <div id="chat-transmit-row" class="row flex-grow-1">
-                  <button type="button" id="chat-transmit-btn" class="col-sm-12 btn btn-danger">Push-To-Talk</button>
+               <div class="chat-transmit-container">
+                  <div id="chat-transmit-row" class="row flex-grow-1">
+                     <button type="button" id="chat-transmit-btn" class="col-sm-12 btn btn-danger">Push-To-Talk</button>
+                  </div>
                </div>
             </div>
          </div>
       </div>
       <div id="audio-container"></div>
+      <button type="button" id="target-template" class="col-sm-12 btn chat-target-btn" style='display:none'>
+         <div class="row user-row">
+            <div class ="status-container col-sm-3">
+               <div id="status" class="status-light"></div>
+            </div>
+            <div class ="col-sm chat-target-text">AIR</div>
+            <div id="mute" class="mute-container col-sm-3"><i class="mute-user fas fa-headphones"></i></div>
+         </div>
+      </button>
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
       <script type="text/javascript" src="/simple-peer/simplepeer.min.js"></script>
       <script type="text/javascript" src="/jquery/jquery.min.js"></script>
