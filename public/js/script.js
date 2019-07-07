@@ -284,11 +284,13 @@ $(function () {
 	$("#btn-select-role").click(function () {
 		$("#" + currentRole + "-Selector").removeClass("disabled-btn");
 		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#dc3545'); //red
+		$("#" + currentRole + "-Selector").find('.mute-user').show();
 		if (selectedRole !== null)
 			currentRole = selectedRole;
 		$("#" + currentRole + "-Selector").addClass("disabled-btn");
 		$("#" + currentRole + "-Selector").removeClass("active-target");
 		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#43b581'); //green
+		$("#" + currentRole + "-Selector").find('.mute-user').hide();
 	});
 
 	//get the selected role
