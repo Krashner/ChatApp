@@ -237,15 +237,19 @@ input{
 
 .status-light{
     border-radius: 50%;
-    position:absolute;
     height:1.5rem;
     width:1.5rem;
     border: solid 2px #474a4f;
     background-color:#dc3545;
+    margin: auto;
 
 /*
     #43b581
 */
+}
+
+.mute-user{
+    margin: auto 0 auto 0;
 }
 
 .disabled-btn{
@@ -288,8 +292,6 @@ img{
 }
 
 .chat-target-text{
-    margin-left: 1.75rem;
-    margin-right: 1.75rem;
     border-color: #282b30 !important;
     border-width: 1px !important;
 }

@@ -68,48 +68,61 @@
                </form>
             </div>
             <div class="col-3 d-flex flex-column" id="control-col">
-               <div class="row text-center" id="row role-container">
-                  <button id="roles-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-choose-role"><i class="fas fa-list"></i><div class="config-btns-text">Roles</div></button>
-                  <button id="reconnect-button" class="col btn btn-outline-dark top-row-button"><i class="fas fa-phone"></i><div class="config-btns-text">Reconnect</div></button>
-                  <button id="settings-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-settings"><i class="fas fa-cog"></i><div class="config-btns-text">Settings</div></button>
-               </div>
                <div id="chat-title-row" class="row flex-grow-1">
                   <div class = "col text-center align-middle" id="control-title">
                      <img id="logo" class = "text-center" draggable="false" src="/images/seal.png" alt="Internal Trailer Chat">
                   </div>
                </div>
                <div id="chat-target-row" class="row btn-group flex-grow-1" role="group">
-                  <button type="button" id="AIR-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                     <div class ="status-light"></div>
-                     <div class ="chat-target-text">AIR</div>
+                  
+                  <button type="button" id="AIR-Selector" class="col-sm-12 btn chat-target-btn">
+                     <div class="row user-row">
+                        <div class ="col-sm-3">
+                           <div class="status-light"></div>
+                        </div>
+                        <div class ="col-sm chat-target-text">AIR</div>
+                        <div id="mute-AIR" class="col-sm-3"><i class="mute-user fas fa-headphones"></i></div>
+                     </div>
                   </button>
-                  <button type="button" id="GRND-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
-                     <div class ="status-light"></div>
-                     <div class ="chat-target-text">GRND</div>
+                  
+                  <!--
+                  
+                  
+                  <button type="button" id="GRND-Selector" class="col-sm-12 btn chat-target-btn">
+                     <div class="row user-row">
+                        <div class ="col-sm-8 chat-target-text"><div class="status-light"></div>GRND</div>
+                        <i class="col-sm-4 mute-user fas fa-headphones"></i>
+                     </div>
                   </button>
-                  <button type="button" id="CUL-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                  <button type="button" id="CUL-Selector" class="col-sm-12 btn chat-target-btn">
                      <div class ="status-light"></div>
                      <div class ="chat-target-text">CUL</div>
                   </button>
-                  <button type="button" id="MSA-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                  <button type="button" id="MSA-Selector" class="col-sm-12 btn chat-target-btn">
                      <div class ="status-light"></div>
                      <div class ="chat-target-text">MSA</div>
                   </button>
-                  <button type="button" id="HF-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                  <button type="button" id="HF-Selector" class="col-sm-12 btn chat-target-btn">
                      <div class ="status-light"></div>
                      <div class ="chat-target-text">HF</div>
                   </button>
-                  <button type="button" id="AUX-Selector" class="col-sm-12 col-md-5 btn chat-target-btn">
+                  <button type="button" id="AUX-Selector" class="col-sm-12 btn chat-target-btn">
                      <div class ="status-light"></div>
                      <div class ="chat-target-text">AUX</div>
                   </button>
-                  <button type="button" id="All-Selector" class="col-sm-12 col-md-10 btn chat-target-btn">
+                  <button type="button" id="All-Selector" class="col-sm-12 btn chat-target-btn">
                      <input type="radio" name="targets" id="chat-target7" class="hidden-radio-btn">
                      <div class ="chat-target-text">All Call</div>
                   </button>
+                  -->
+               </div>
+               <div class="row text-center" id="row role-container">
+                  <button id="roles-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-choose-role"><i class="fas fa-list"></i><div class="config-btns-text">Roles</div></button>
+                  <button id="reconnect-button" class="col btn btn-outline-dark top-row-button"><i class="fas fa-phone"></i><div class="config-btns-text">Reconnect</div></button>
+                  <button id="settings-button" class="col btn btn-outline-dark top-row-button" data-toggle="modal" data-target="#modal-settings"><i class="fas fa-cog"></i><div class="config-btns-text">Settings</div></button>
                </div>
                <div id="chat-transmit-row" class="row flex-grow-1">
-                  <button type="button" id="chat-transmit-btn" class="col-sm-12 col-md-10 btn btn-danger">Push-To-Talk</button>
+                  <button type="button" id="chat-transmit-btn" class="col-sm-12 btn btn-danger">Push-To-Talk</button>
                </div>
             </div>
          </div>
