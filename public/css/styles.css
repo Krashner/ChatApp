@@ -306,13 +306,17 @@ img{
     border-color: #2f3136;
     border-width: 0.25vh 0.25vw 0.25vh 0.25vw;
     border-radius:0;
-    padding: 4.5%
+    padding: 0;
 }
     
 .chat-target-btn:hover{
     background-color: #484c52;
     outline: none;
     box-shadow: none;
+}
+
+.user-row{
+    padding: 4%;
 }
 
 .chat-target-btn:active{

@@ -230,7 +230,9 @@ $(function () {
 		newTarget.attr('id','AllCall-Selector')
 		.find('.chat-target-text').html('All Call');
 		newTarget.find('.status-container').empty();
-		newTarget.find('.mute-container').empty();
+		var mute = newTarget.find('.mute-container');
+		mute.empty();
+		mute.removeClass('mute-container');
 		newTarget.appendTo(container).show();   
 	}
 	
@@ -265,6 +267,19 @@ $(function () {
 		$(this).addClass("active-target");
 	});
 
+	//toggle mute for target
+	$("#chat-target-container").on('click', '.mute-container', function () {
+		$(this).empty();
+		
+		if($(this).hasClass('mute')){
+		     $(this).html('<i class="mute-user fas fa-headphones">')
+		     $(this).removeClass('mute');
+		}else{
+		    $(this).html('<i class="mute-user fas fa-volume-mute">');
+		    $(this).addClass('mute');
+		}
+	});
+	
 	//change the current role to selection and toggle the status lights
 	$("#btn-select-role").click(function () {
 		$("#" + currentRole + "-Selector").removeClass("disabled-btn");
