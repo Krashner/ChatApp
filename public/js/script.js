@@ -329,11 +329,13 @@ $(function () {
 		if($(this).hasClass('mute')){
 		     $(this).html('<i class="mute-user fas fa-headphones">')
 		     $(this).removeClass('mute');
-		     $("#audio-"+socketID).muted = false;
+			 //$("#audio-"+socketID).muted = false;
+			 $("#audio-"+socketID).prop("muted",false);
 		}else{
 		    $(this).html('<i class="mute-user fas fa-volume-mute">');
 		    $(this).addClass('mute');
-		    $("#audio-"+socketID).muted = true;
+			//$("#audio-"+socketID).muted = true;
+			$("#audio-"+socketID).prop("muted",true);
 		}
 	});
 	
