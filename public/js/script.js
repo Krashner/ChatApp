@@ -42,6 +42,7 @@ $(function () {
 	    .catch(function (err) {
 		    console.log(err.name + ": " + err.message);
 		    togglePhoneIcon(false);
+		    socket.emit('allow call');
 	    });
 	}
 
@@ -64,6 +65,7 @@ $(function () {
 		//peer connected
 		peer.on('connect', function () {
 			console.log('CONNECT')
+			addUser(peer.targetSocketID, "None");
 		});
 
 		//data channel is being used
@@ -83,6 +85,7 @@ $(function () {
 		//close connection
 		peer.on('close', function () {
 			console.log("CLOSE");
+			removeUser(peer.targetSocketID);
 		})
 
 		//error
@@ -98,11 +101,12 @@ $(function () {
 	//create a new peer connection
 	socket.on('add peer', function (isInitiator, targetSocketID) {
 		console.log("add peer " + socket.id);
-		addVideoElement(targetSocketID);
+		//addVideoElement(targetSocketID);
 		var p = createPeer(isInitiator, socket.id, targetSocketID, null);
 		console.log(p);
 		p.socket = targetSocketID;
 		peers.push(p);
+		//(targetSocketID, "None");
 	});
 
 	//remove peer closed peer connection
@@ -161,7 +165,7 @@ $(function () {
 		roles.forEach(function (entry) {
 			$('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
 		});
-		addTargets(roles);
+		//addTargets(roles);
 	});
 
 	//check for a video element for socket, create one if it doesn't exist
@@ -240,6 +244,23 @@ $(function () {
 		newTarget.appendTo(container).show();   
 	}
 	
+	function addUser(socketID, role){
+	    var container = $('#chat-target-container');
+	    var template = $('#target-template');
+	    var newTarget = template.clone();
+	    newTarget.attr('id','selector-' + socketID)
+	    .find('.chat-target-text').html(socketID);	
+	    newTarget.find('.status-light').attr('id','status-' + socketID);	
+	    newTarget.find('.mute-container').attr('id','mute-' + socketID);
+	    newTarget.appendTo(container).show();
+	}
+	
+	function removeUser(socketID){
+	    var user = document.getElementById('selector-' + socketID);
+	    if(user!==null)
+		user.parentElement.removeChild(user);
+	}
+	
 	//send message, clear message box and add message to local chat
 	$('form').submit(function (e) {
 		e.preventDefault();
@@ -273,8 +294,6 @@ $(function () {
 
 	//toggle mute for target
 	$("#chat-target-container").on('click', '.mute-container', function () {
-		$(this).empty();
-		
 		if($(this).hasClass('mute')){
 		     $(this).html('<i class="mute-user fas fa-headphones">')
 		     $(this).removeClass('mute');
@@ -283,20 +302,20 @@ $(function () {
 		    $(this).addClass('mute');
 		}
 	});
-	
+	/*
 	//change the current role to selection and toggle the status lights
 	$("#btn-select-role").click(function () {
-		$("#" + currentRole + "-Selector").removeClass("disabled-btn");
-		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#dc3545'); //red
-		$("#" + currentRole + "-Selector").find('.mute-user').show();
+		$("#" + currentRole + "-selector").removeClass("disabled-btn");
+		$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#dc3545'); //red
+		$("#" + currentRole + "-selector").find('.mute-user').show();
 		if (selectedRole !== null)
 			currentRole = selectedRole;
-		$("#" + currentRole + "-Selector").addClass("disabled-btn");
-		$("#" + currentRole + "-Selector").removeClass("active-target");
-		$("#" + currentRole + "-Selector").find('.status-light').css('background-color', '#43b581'); //green
-		$("#" + currentRole + "-Selector").find('.mute-user').hide();
+		$("#" + currentRole + "-selector").addClass("disabled-btn");
+		$("#" + currentRole + "-selector").removeClass("active-target");
+		$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#43b581'); //green
+		$("#" + currentRole + "-selector").find('.mute-user').hide();
 	});
-
+	*/
 	//get the selected role
 	$('#modal-role-row').on('click', '.role-select-btn', function (e) {
 		$(".role-select-btn").removeClass("active-target");
@@ -366,7 +385,7 @@ $(function () {
 			$('#messages').children().eq(0).remove();
 	}
 });
-
+/*
 //test function
 function fillChat() {
 	for (var i = 0; i < 1000; i++)
@@ -379,3 +398,4 @@ function addMessageToLog(header, msg) {
 	$('#messages').append($('<li class="header">').text(header));
 	$('#messages').append($('<li>').text(msg));
 }
+*/

@@ -317,6 +317,7 @@ img{
 
 .user-row{
     padding: 4%;
+    overflow: hidden;
 }
 
 .chat-target-btn:active{
