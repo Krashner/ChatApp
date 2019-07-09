@@ -32,7 +32,7 @@ $(function () {
 	function getAudio(){
 	    navigator.mediaDevices.getUserMedia({
 		    audio: true,
-		    video: true
+		    video: false
 	    })
 	    .then(function (stream) {
 		    localStream = stream;
@@ -77,9 +77,9 @@ $(function () {
 		peer.on('stream', function (stream) {
 			console.log("STREAM: " + stream);
 
-			var video = addVideoElement(peer.targetSocketID)
-			if (video != null)
-				video.srcObject = stream;
+			var audio = addAudioElement(peer.targetSocketID)
+			if (audio != null)
+				audio.srcObject = stream;
 		})
 
 		//close connection
@@ -101,7 +101,7 @@ $(function () {
 	//create a new peer connection
 	socket.on('add peer', function (isInitiator, targetSocketID) {
 		console.log("add peer " + socket.id);
-		addVideoElement(targetSocketID);
+		addAudioElement(targetSocketID);
 		var p = createPeer(isInitiator, socket.id, targetSocketID, null);
 		console.log(p);
 		p.socket = targetSocketID;
@@ -121,8 +121,8 @@ $(function () {
 				peers[i].destroy();
 			}
 		}
-		//remove video element
-		removeVideoElement(socketID);
+		//remove audio element
+		removeAudioElement(socketID);
 		console.log(peers);
 	})
 
@@ -171,17 +171,17 @@ $(function () {
 		});
 	});
 
-	//check for a video element for socket, create one if it doesn't exist
-	function addVideoElement(socketID) {
-		var video = document.getElementById('video-' + socketID);
-		if (video == null) {
-			video = document.createElement('video');
-			video.id = "video-" + socketID;
-			video.className += ' peer-video';
-			video.autoplay = true;
-			document.getElementById('audio-container').appendChild(video);
+	//check for a audio element for socket, create one if it doesn't exist
+	function addAudioElement(socketID) {
+		var audio = document.getElementById('audio-' + socketID);
+		if (audio == null) {
+			audio = document.createElement('audio');
+			audio.id = "audio-" + socketID;
+			audio.className += ' peer-audio';
+			audio.autoplay = true;
+			document.getElementById('audio-container').appendChild(audio);
 		}
-		return video;
+		return audio;
     }
     
     
@@ -189,11 +189,11 @@ $(function () {
     // audio functions
     //******************************************************************
     
-    //remove video element
-    function removeVideoElement(socketID){
-        var video = document.getElementById('video-' + socketID);
-	if(video!==null)
-	    video.parentElement.removeChild(video);
+    //remove audio element
+    function removeAudioElement(socketID){
+        var audio = document.getElementById('audio-' + socketID);
+	if(audio!==null)
+	    audio.parentElement.removeChild(audio);
     }
 
 	//create a peer object and return it
@@ -252,7 +252,7 @@ $(function () {
 	    var template = $('#target-template');
 	    var newTarget = template.clone();
 	    newTarget.attr('id','selector-' + socketID)
-	    .find('.chat-target-text').html(socketID);	
+	    .find('.chat-target-text').html(role);	
 	    newTarget.find('.status-light').attr('id','status-' + socketID);	
 	    newTarget.find('.mute-container').attr('id','mute-' + socketID);
 	    newTarget.appendTo(container).show();
@@ -289,7 +289,7 @@ $(function () {
 		socket.emit('chat message', JSON.stringify(data));
 	}
 
-	//toggle chat target buttons on and off
+	//get the current target to transmit to
 	$("#chat-target-container").on('click', '.chat-target-btn', function () {
 		$(".chat-target-btn").removeClass("active-target");
 		$(this).addClass("active-target");
