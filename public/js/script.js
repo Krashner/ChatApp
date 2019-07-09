@@ -6,7 +6,6 @@ $(function () {
 	var localStream;
 	var ingoreScroll = false;
 
-
 	//******************************************************************
 	// stream functions
 	//******************************************************************
@@ -157,10 +156,39 @@ $(function () {
 	socket.on('chat message', function (data) {
 		addMessageToLog(data);
 	});
+	
+	//signal that audio is being transmitted
+	$("#chat-transmit-btn").mousedown(function () {
+	    console.log("sending to: " + getTransmitTarget() + " " + "green");
+	    socket.emit('transmit light', socket.id, getTransmitTarget(), true);
+	});
+
+	//signal that audio is not being transmitted
+	$("#chat-transmit-btn").mouseup(function () {
+	    console.log("sending to: " + getTransmitTarget() + " " + "red");
+	    socket.emit('transmit light', socket.id, getTransmitTarget(), false);
+	});
+	
+	
+	function getTransmitTarget(){
+	    console.log($('.active-target'));
+	    var targetID = $('.active-target').attr('id').slice(9);
+	    return targetID;
+	}
+	
+	//toggle to status light green/red for users transmitting
+	socket.on('change light', function (socketID, isOn) {
+	    console.log("recieving from: " + socketID);
+	    if(isOn == true){
+		$("#selector-"+socketID).find('.status-light').css('background-color', '#43b581');//green
+	    }else{
+		$("#selector-"+socketID).find('.status-light').css('background-color', '#dc3545'); //red
+	    }		
+	});
 
 	//update user role when server says they change it
 	socket.on('role change', function (socketID, role) {
-	    $('#selector-' + socketID).find('.chat-target-text').html(role);
+	    $('#selector-' + socketID).find('.chat-target-text').text(role);
 	});
 
 	//get the user roles
@@ -215,7 +243,6 @@ $(function () {
 		setPeerListeners(p);
 		return p;
 	}
-
 
 	//******************************************************************
 	// chat functions

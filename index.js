@@ -81,6 +81,16 @@ io.on('connection', function(socket) {
     socket.on('role change', function(socketID, role) {
         socket.broadcast.emit('role change', socketID, role);
     });
+    
+    //toggle transmit light
+    socket.on('transmit light', function(sentFromSocketID, sendToSocketID, isOn) {   
+        //socket.broadcast.emit('change light', sentFromSocketID, isOn);
+        for (var i = 0; i < connectedSockets.length; i++) {
+            if (sendToSocketID === connectedSockets[i].id) {
+                connectedSockets[i].emit('change light', sentFromSocketID, isOn);
+            }
+        }
+    });
 
     //To listen for a client's disconnection from server and intimate other clients about the same
     socket.on('disconnect', function(data) {
