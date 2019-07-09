@@ -78,8 +78,8 @@ io.on('connection', function(socket) {
     });
 
     //change current user role
-    socket.on('role change', function(role) {
-
+    socket.on('role change', function(socketID, role) {
+        socket.broadcast.emit('role change', socketID, role);
     });
 
     //To listen for a client's disconnection from server and intimate other clients about the same

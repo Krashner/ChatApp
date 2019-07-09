@@ -101,12 +101,11 @@ $(function () {
 	//create a new peer connection
 	socket.on('add peer', function (isInitiator, targetSocketID) {
 		console.log("add peer " + socket.id);
-		//addVideoElement(targetSocketID);
+		addVideoElement(targetSocketID);
 		var p = createPeer(isInitiator, socket.id, targetSocketID, null);
 		console.log(p);
 		p.socket = targetSocketID;
 		peers.push(p);
-		//(targetSocketID, "None");
 	});
 
 	//remove peer closed peer connection
@@ -127,7 +126,7 @@ $(function () {
 		console.log(peers);
 	})
 
-	//peer response to signal
+	//peer response to signalt
 	socket.on('peer response', function (data) {
 		var d = JSON.parse(data);
 		console.log(d);
@@ -159,13 +158,17 @@ $(function () {
 		addMessageToLog(data);
 	});
 
+	//update user role when server says they change it
+	socket.on('role change', function (socketID, role) {
+	    $('#selector-' + socketID).find('.chat-target-text').html(role);
+	});
+
 	//get the user roles
 	socket.on('update roles', function (roles) {
 		$('#modal-role-row').empty();
 		roles.forEach(function (entry) {
 			$('#modal-role-row').append($('<button type="button" id="' + entry + '"class="role-select-item btn role-select-btn">').text(entry));
 		});
-		//addTargets(roles);
 	});
 
 	//check for a video element for socket, create one if it doesn't exist
@@ -294,28 +297,33 @@ $(function () {
 
 	//toggle mute for target
 	$("#chat-target-container").on('click', '.mute-container', function () {
+		//get the socketid that follows after mute- of continer id
+		var socketID = $(this).attr('id').slice(5);
 		if($(this).hasClass('mute')){
 		     $(this).html('<i class="mute-user fas fa-headphones">')
 		     $(this).removeClass('mute');
+		     $("#audio-"+socketID).muted = false;
 		}else{
 		    $(this).html('<i class="mute-user fas fa-volume-mute">');
 		    $(this).addClass('mute');
+		    $("#audio-"+socketID).muted = true;
 		}
 	});
-	/*
+	
 	//change the current role to selection and toggle the status lights
 	$("#btn-select-role").click(function () {
-		$("#" + currentRole + "-selector").removeClass("disabled-btn");
-		$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#dc3545'); //red
-		$("#" + currentRole + "-selector").find('.mute-user').show();
+		//$("#" + currentRole + "-selector").removeClass("disabled-btn");
+		//$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#dc3545'); //red
+		//$("#" + currentRole + "-selector").find('.mute-user').show();
 		if (selectedRole !== null)
 			currentRole = selectedRole;
-		$("#" + currentRole + "-selector").addClass("disabled-btn");
-		$("#" + currentRole + "-selector").removeClass("active-target");
-		$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#43b581'); //green
-		$("#" + currentRole + "-selector").find('.mute-user').hide();
+		//$("#" + currentRole + "-selector").addClass("disabled-btn");
+		//$("#" + currentRole + "-selector").removeClass("active-target");
+		//$("#" + currentRole + "-selector").find('.status-light').css('background-color', '#43b581'); //green
+		//$("#" + currentRole + "-selector").find('.mute-user').hide();
+		socket.emit('role change', socket.id, currentRole);
 	});
-	*/
+
 	//get the selected role
 	$('#modal-role-row').on('click', '.role-select-btn', function (e) {
 		$(".role-select-btn").removeClass("active-target");
