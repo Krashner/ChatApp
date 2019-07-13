@@ -52,7 +52,7 @@ $(function() {
 
 	function setPeerListeners(peer) {
 		//send signal to reciever
-		peer.on("signal", function(data) {
+		peer.on("SIGNAL", function(data) {
 			data.sendSignalTo = peer.targetSocketID;
 			data.signalOriginator = peer.localSocketID;
 			data.sendingPeerID = peer.sendingPeerID;
@@ -71,16 +71,16 @@ $(function() {
 
 		//data channel is being used
 		peer.on("data", function(data) {
-			console.log("data: " + data);
+			console.log("DATA", data);
 		});
 
 		//streaming
 		peer.on("stream", function(stream) {
-			console.log("STREAM: " + stream);
+			console.log("STREAM", stream);
 
 			var audio = addAudioElement(peer.targetSocketID);
 			if (audio != null) audio.srcObject = stream;
-			togglePeerTrack(peer, false);
+			//togglePeerTrack(peer, false);
 		});
 
 		//close connection
@@ -91,7 +91,7 @@ $(function() {
 
 		//error
 		peer.on("error", function(err) {
-			console.log("error", err);
+			console.log("ERROR", err);
 		});
 	}
 
@@ -179,16 +179,14 @@ $(function() {
 
 	//signal that audio is being transmitted
 	$("#chat-transmit-btn").mousedown(function() {
-		console.log("sending to: " + getTransmitTarget() + " " + "green");
 		socket.emit("transmit light", socket.id, getTransmitTarget(), true);
-		transmitAudio(true);
+		//transmitAudio(true);
 	});
 
 	//signal that audio is not being transmitted
 	$("#chat-transmit-btn").mouseup(function() {
-		console.log("sending to: " + getTransmitTarget() + " " + "red");
 		socket.emit("transmit light", socket.id, getTransmitTarget(), false);
-		transmitAudio(false);
+		//transmitAudio(false);
 	});
 
 	//get the target to send audio to
@@ -229,7 +227,6 @@ $(function() {
 
 	//toggle to status light green/red for users transmitting
 	socket.on("change light", function(socketID, isOn) {
-		console.log("recieving from: " + socketID);
 		if (isOn == true) {
 			$("#selector-" + socketID)
 				.find(".status-light")
