@@ -15,8 +15,10 @@ $(function() {
 
 	//manually retry on button press
 	$("#reconnect-button").click(function(e) {
-		console.log("Attempting to get audio device.");
-		getAudio();
+		if($("#connection-icon").hasClass("fas fa-phone-slash")){
+			console.log("Attempting to get audio device.");
+			getAudio();
+		}
 	});
 
 	//toggle the connection icon on button
@@ -62,6 +64,9 @@ $(function() {
 		peer.on("connect", function() {
 			console.log("CONNECT");
 			addUser(peer.targetSocketID, "None");
+
+			//addAudioElement(peer.targetSocketID);
+			//if (audio != null) audio.srcObject = stream;
 		});
 
 		//data channel is being used
@@ -75,6 +80,7 @@ $(function() {
 
 			var audio = addAudioElement(peer.targetSocketID);
 			if (audio != null) audio.srcObject = stream;
+			togglePeerTrack(peer, false);
 		});
 
 		//close connection
@@ -175,20 +181,50 @@ $(function() {
 	$("#chat-transmit-btn").mousedown(function() {
 		console.log("sending to: " + getTransmitTarget() + " " + "green");
 		socket.emit("transmit light", socket.id, getTransmitTarget(), true);
+		transmitAudio(true);
 	});
 
 	//signal that audio is not being transmitted
 	$("#chat-transmit-btn").mouseup(function() {
 		console.log("sending to: " + getTransmitTarget() + " " + "red");
 		socket.emit("transmit light", socket.id, getTransmitTarget(), false);
+		transmitAudio(false);
 	});
 
+	//get the target to send audio to
 	function getTransmitTarget() {
 		console.log($(".active-target"));
 		var targetID = $(".active-target");
 		if(targetID.length == 0)
 			return;
 		return targetID.attr("id").slice(9);;
+	}
+
+	//gets the target socket to find the peer and toggles their stream track
+	function transmitAudio(transmit){
+		var socket = getTransmitTarget();
+		var peer =findPeerBySocketID(socket);
+		if(peer != null){
+			togglePeerTrack(peer, transmit);
+		}
+	}
+
+	//toggles the stream track on and off
+	function togglePeerTrack(peer, status){
+		peer.streams.forEach(function(stream) {
+			stream.getTracks().forEach(function(track) {
+				track.enabled = status;
+			});
+		});
+	}
+
+	//find the peer from the array based on the socket id
+	function findPeerBySocketID(socketID){
+		for (var i = 0; i < peers.length; i++) {
+			if (peers[i].targetSocketID == socketID) {
+				return peers[i];
+			} 
+		}
 	}
 
 	//toggle to status light green/red for users transmitting

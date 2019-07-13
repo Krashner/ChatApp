@@ -79,7 +79,8 @@ io.on('connection', function(socket) {
 
     //change current user role
     socket.on('role change', function(socketID, role) {
-        socket.broadcast.emit('role change', socketID, role);
+		socket.broadcast.emit('role change', socketID, role);
+		console.log("test");
     });
     
     //toggle transmit light
