@@ -324,6 +324,7 @@ img {
 	background-color: #252629;
 }
 
+.active-role,
 .active-target {
 	background-color: #252629!important;
 }
