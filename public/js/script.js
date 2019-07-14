@@ -335,11 +335,7 @@ $(function() {
         e.preventDefault();
         var text = $("#chat-input").val();
         var role = currentRole;
-        if (
-            text.replace(/\s+/g, "") !== "" &&
-            role !== undefined &&
-            role !== "None"
-        ) {
+        if (text.replace(/\s+/g, "") !== "" && role !== undefined && role !== "None") {
             sendToServer(role, text);
             $("#chat-input").val("");
         }
@@ -458,7 +454,7 @@ $(function() {
     //cap the number of loaded messages at 100 for now
     function pruneMessages() {
         var msgs = $("#messages").children();
-        if (msgs.length > 100)
-            $("#messages").children().eq(0).remove();a
+        if (msgs!= null && msgs.length > 100)
+            $("#messages").children().eq(0).remove();
     }
 });
