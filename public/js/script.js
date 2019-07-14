@@ -134,12 +134,10 @@ $(function() {
             //create a non-initiating peer and return to sender
             var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
 	    console.log("OFFER",  p.localSocketID);
-	    //console.log("Offer Recieved:   Originator: " + p.localSocketID +" Target " +p.targetSocketID +" PeerID: " +d.sendingPeerID);
             p.signal(data);
             peers.push(p);
         } else {
 	    console.log("ANSWER",  d.signalOriginator);
-	    //console.log("Answer Recieved:   Originator: " + d.signalOriginator +" Target " +d.sendSignalTo +" PeerID: " +d.sendingPeerID);
             //if an answer is recieved, give data to original peer
             for (var i = 0; i < peers.length; i++) {
                 if (peers[i]._id === d.sendingPeerID) {
