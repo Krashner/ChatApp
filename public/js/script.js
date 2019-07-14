@@ -68,7 +68,8 @@ $(function() {
         peer.on("connect", function() {
             console.log("CONNECT", peer.targetSocketID);
             addUser(peer.targetSocketID, "None");
-
+	    if(peer.initiator == true)
+		socket.emit("peers connected", peer.localSocketID, peer.targetSocketID);
             //addAudioElement(peer.targetSocketID);
             //if (audio != null) audio.srcObject = stream;
         });
@@ -127,7 +128,7 @@ $(function() {
     });
 
     //peer response to signal
-    socket.on("peer response", function(data) {
+    socket.on("peer call", function(data) {
         var d = JSON.parse(data);
         //if an offer is recieved, create a non-iniator peer and respond
         if (d.type === "offer") {

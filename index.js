@@ -53,7 +53,7 @@ io.on('connection', function(socket) {
         //give this socket a initiator peer for every connected socket except one with their ID
         for (var i = 0; i < connectedSockets.length; i++) {
             if (socket.id !== connectedSockets[i].id) {
-                console.log(getTimestamp()+ "sending request || sender: " + socket.id + " reciever: " + connectedSockets[i].id);
+                console.log(getTimestamp()+ "initiating peer connection || sender: " + socket.id + " reciever: " + connectedSockets[i].id);
                 socket.emit('add peer', true, connectedSockets[i].id);
             }
         }
@@ -62,8 +62,8 @@ io.on('connection', function(socket) {
     //broadcast the response to specific socket
     socket.on('peer call', function(data) {
         var d = JSON.parse(data);
-        console.log(getTimestamp()+ "creating peer connection || sender: " + socket.id + " reciever: " + d.sendSignalTo);
-        io.to(d.sendSignalTo).emit('peer response', data);
+        console.log(getTimestamp(), "negotiating peer connection || sender:", socket.id, "reciever:", d.sendSignalTo);
+        io.to(d.sendSignalTo).emit('peer call', data);
     });
 
     //send roles to clients
@@ -80,6 +80,11 @@ io.on('connection', function(socket) {
 
     });
 
+    //confirm the peer connection
+    socket.on('peers connected', function(initiator, reciever) {
+        console.log(getTimestamp(), "peers connected || initiator:", initiator, "reciever:", reciever);
+    });
+    
     //change current user role
     socket.on('role change', function(socketID, role) {
 		socket.broadcast.emit('role change', socketID, role);
