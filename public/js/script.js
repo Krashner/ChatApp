@@ -1,10 +1,10 @@
 $(function() {
-    var socket = io();
-    var peers = [];
-    var currentRole;
-    var selectedRole;
-    var localStream;
-    var ingoreScroll = false;
+    var socket = io();		//socket connection to node server
+    var peers = [];		//array of peers to connect to
+    var currentRole;		//current chosen role
+    var selectedRole;		//selected role, saves to current role
+    var localStream;		//local mediastream object
+    var ingoreScroll = false;	//for toggling "jumpt to present button"
 
     //******************************************************************
     // stream functions
@@ -50,54 +50,81 @@ $(function() {
             });
     }
 
+    
     //******************************************************************
-    // peer listener functions
+    // peer functions
     //******************************************************************
 
+    //create a peer object and return it
+    function createPeer(isInitiator, localSocket, remoteSocket, peerID) {
+	var cloneStream;
+	if(localStream!=null)
+	    cloneStream = localStream.clone();
+        var peer = new SimplePeer({
+            initiator: isInitiator,
+            trickle: false,
+            //config: {"iceServers":[]}
+            stream: cloneStream
+        });
+	
+	//add some additional data for signal routing
+        peer.remoteSocketID = remoteSocket;
+        peer.initiatingPeerID = peerID;
+        if (peer.initiatingPeerID === null) 
+	    peer.initiatingPeerID = peer._id;
+
+        setPeerListeners(peer);
+        return peer;
+    }
+    
     function setPeerListeners(peer) {
-        //send signal to reciever
+        
+	//send offer/answer to the target peer
         peer.on("signal", function(data) {
-	    console.log(data);
-	    console.log("SIGNAL", peer.targetSocketID);
-            data.sendSignalTo = peer.targetSocketID;
-            data.signalOriginator = peer.localSocketID;
-            data.sendingPeerID = peer.sendingPeerID;
-            //socket.emit("peer call", JSON.stringify(data));
-	    if (data.type === "offer") {
+	    console.log("SIGNAL", data.type.toUpperCase(), peer.remoteSocketID);
+	    
+	    //data for routing
+	    data.sendSignalTo = peer.remoteSocketID;
+            data.signalOriginator = socket.id;
+            data.initiatingPeerID = peer.initiatingPeerID;
+	    
+	    if (data.type == "offer") {
 		socket.emit('peer offer', JSON.stringify(data));
-	    }else{
+	    }else if(data.type == "answer"){
 		socket.emit('peer answer', JSON.stringify(data));
+	    }else{
+		console.log("ERROR: Unrecognized signal");
 	    }
         });
 
         //peer connected
         peer.on("connect", function() {
-            console.log("CONNECT", peer.targetSocketID);
-            addUser(peer.targetSocketID, "None");
+            console.log("CONNECT", peer.remoteSocketID);
+            addUser(peer.remoteSocketID, "None");
 	    if(peer.initiator == true)
-		socket.emit("peers connected", peer.localSocketID, peer.targetSocketID);
-            //addAudioElement(peer.targetSocketID);
+		socket.emit("peers connected", socket.id, peer.remoteSocketID);
+            //addAudioElement(peer.remoteSocketID);
             //if (audio != null) audio.srcObject = stream;
         });
 
         //data channel is being used
         peer.on("data", function(data) {
-            console.log("DATA", peer.targetSocketID);
+            console.log("DATA", peer.remoteSocketID);
         });
 
         //streaming
         peer.on("stream", function(stream) {
-            console.log("STREAM", peer.targetSocketID);
+            console.log("STREAM", peer.remoteSocketID);
 
-            var audio = addAudioElement(peer.targetSocketID);
+            var audio = addAudioElement(peer.remoteSocketID);
             if (audio != null) audio.srcObject = stream;
             //togglePeerTrack(peer, false);
         });
 
         //close connection
         peer.on("close", function() {
-            console.log("CLOSE", peer.targetSocketID);
-            removeUser(peer.targetSocketID);
+            console.log("CLOSE", peer.remoteSocketID);
+            removeUser(peer.remoteSocketID);
         });
 
         //error
@@ -111,9 +138,9 @@ $(function() {
     //******************************************************************
 
     //create a new peer connection
-    socket.on("add peer", function(isInitiator, targetSocketID) {
-        console.log("ADD PEER", targetSocketID);
-        var p = createPeer(isInitiator, socket.id, targetSocketID, null);
+    socket.on("add peer", function(isInitiator, remoteSocketID) {
+        console.log("ADD PEER", remoteSocketID);
+        var p = createPeer(isInitiator, socket.id, remoteSocketID, null);
         peers.push(p);
     });
 
@@ -121,7 +148,7 @@ $(function() {
     socket.on("remove peer", function(socketID) {
         tempPeers = [];
         for (var i = 0; i < peers.length; i++) {
-            if (peers[i].targetSocketID !== socketID) {
+            if (peers[i].remoteSocketID !== socketID) {
                 //create new array without specific peer
                 tempPeers.push(peers[i]);
             } else {
@@ -137,8 +164,8 @@ $(function() {
     socket.on("peer offer", function(data) {
 	//create a non-initiating peer and send an answer to the sender
 	var d = JSON.parse(data);
-	var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
-	console.log("OFFER",  p.localSocketID);
+	var p = createPeer(false, socket.id, d.signalOriginator, d.initiatingPeerID);
+	console.log("OFFER",  socket.id);
 	p.signal(data);
 	peers.push(p);
     });
@@ -149,7 +176,7 @@ $(function() {
 	console.log("ANSWER",  d.signalOriginator);
 	//give the answer to the peer object that sent the offer
 	for (var i = 0; i < peers.length; i++) {
-	    if (peers[i]._id === d.sendingPeerID) {
+	    if (peers[i]._id === d.initiatingPeerID) {
 		peers[i].signal(data);
 	    }
 	}
@@ -179,33 +206,6 @@ $(function() {
         if(targetID.length == 0)
             return;
         return targetID.attr("id").slice(9);;
-    }
-
-    //gets the target socket to find the peer and toggles their stream track
-    function transmitAudio(transmit){
-        var socket = getTransmitTarget();
-        var peer =findPeerBySocketID(socket);
-        if(peer != null){
-            togglePeerTrack(peer, transmit);
-        }
-    }
-
-    //toggles the stream track on and off
-    function togglePeerTrack(peer, status){
-        peer.streams.forEach(function(stream) {
-            stream.getTracks().forEach(function(track) {
-                track.enabled = status;
-            });
-        });
-    }
-
-    //find the peer from the array based on the socket id
-    function findPeerBySocketID(socketID){
-        for (var i = 0; i < peers.length; i++) {
-            if (peers[i].targetSocketID == socketID) {
-                return peers[i];
-            } 
-        }
     }
 
     //toggle to status light green/red for users transmitting
@@ -242,6 +242,16 @@ $(function() {
         });
     });
 
+    //******************************************************************
+    // audio functions
+    //******************************************************************
+
+    //remove audio element
+    function removeAudioElement(socketID) {
+        var audio = document.getElementById("audio-" + socketID);
+        if (audio !== null) audio.parentElement.removeChild(audio);
+    }
+
     //check for a audio element for socket, create one if it doesn't exist
     function addAudioElement(socketID) {
         var audio = document.getElementById("audio-" + socketID);
@@ -254,39 +264,33 @@ $(function() {
         }
         return audio;
     }
-
-    //******************************************************************
-    // audio functions
-    //******************************************************************
-
-    //remove audio element
-    function removeAudioElement(socketID) {
-        var audio = document.getElementById("audio-" + socketID);
-        if (audio !== null) audio.parentElement.removeChild(audio);
+    
+    //gets the target socket to find the peer and toggles their stream track
+    function transmitAudio(transmit){
+        var socket = getTransmitTarget();
+        var peer =findPeerBySocketID(socket);
+        if(peer != null){
+            togglePeerTrack(peer, transmit);
+        }
     }
 
-    //create a peer object and return it
-    function createPeer(isInitiator, originatorID, sendToID, peerID) {
-	var cloneStream;
-	if(localStream!=null)
-	    cloneStream = localStream.clone();
-        var peer = new SimplePeer({
-            initiator: isInitiator,
-            trickle: false,
-            //config: {"iceServers":[]}
-            stream: cloneStream
+    //toggles the stream track on and off
+    function togglePeerTrack(peer, status){
+        peer.streams.forEach(function(stream) {
+            stream.getTracks().forEach(function(track) {
+                track.enabled = status;
+            });
         });
-        peer.localSocketID = originatorID;
-        peer.targetSocketID = sendToID;
-        peer.sendingPeerID = peerID;
-
-        if (peer.sendingPeerID === null) 
-	    peer.sendingPeerID = peer._id;
-
-        setPeerListeners(peer);
-        return peer;
     }
 
+    //find the peer from the array based on the socket id
+    function findPeerBySocketID(socketID){
+        for (var i = 0; i < peers.length; i++) {
+            if (peers[i].remoteSocketID == socketID) {
+                return peers[i];
+            } 
+        }
+    }
     //******************************************************************
     // chat functions
     //******************************************************************
@@ -320,6 +324,7 @@ $(function() {
         newTarget.appendTo(container).show();
     }
 
+    //add user to user list
     function addUser(socketID, role) {
         var container = $("#chat-target-container");
         var template = $("#target-template");
@@ -333,6 +338,7 @@ $(function() {
         newTarget.appendTo(container).show();
     }
 
+    //remove user from user list
     function removeUser(socketID) {
         var user = document.getElementById("selector-" + socketID);
         if (user !== null) user.parentElement.removeChild(user);
@@ -411,7 +417,10 @@ $(function() {
     $("#chat-box").scroll(function(event) {
         var maxScroll = $(this)[0].scrollHeight - $(this).outerHeight();
 
-        if (ingoreScroll === false) toggleJumpButton(true);
+        if (ingoreScroll === false){
+	    toggleJumpButton(true);
+	}
+	    
         ingoreScroll = false;
         event.preventDefault();
 
