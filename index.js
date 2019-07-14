@@ -46,17 +46,17 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 io.on('connection', function(socket) {
     console.log(getTimestamp(), "client connected || id:", socket.id);
     
-    //starts creating calls to all sockets, except self
-    socket.on('allow call', function(data) {
-        //add socket to array
-        connectedSockets.push(socket);
+    //sends message to all sockets to create a new peer
+    socket.on('find peers', function(data) {
         //give this socket a initiator peer for every connected socket except one with their ID
         for (var i = 0; i < connectedSockets.length; i++) {
             if (socket.id !== connectedSockets[i].id) {
                 console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[i].id);
-                socket.emit('add peer', true, connectedSockets[i].id);
+                socket.emit('create peer', true, connectedSockets[i].id);
             }
         }
+        //add this socket to the array
+        connectedSockets.push(socket);
     });
 
     //send socket a peer offer

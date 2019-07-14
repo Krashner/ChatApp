@@ -37,7 +37,7 @@ $(function() {
             .then(function(stream) {
                 localStream = stream;
 		console.log("START", socket.id);
-                socket.emit("allow call");
+                socket.emit("find peers");
                 togglePhoneIcon(true);
             })
             .catch(function(err) {
@@ -46,7 +46,7 @@ $(function() {
 		
 		//enable this for debugging
 		console.log("START", socket.id);
-                socket.emit("allow call");
+                socket.emit("find peers");
             });
     }
 
@@ -81,7 +81,7 @@ $(function() {
         
 	//send offer/answer to the target peer
         peer.on("signal", function(data) {
-	    console.log("SIGNAL", data.type.toUpperCase(), peer.remoteSocketID);
+	    console.log(data.type.toUpperCase(), "SENT", peer.remoteSocketID);
 	    
 	    //data for routing
 	    data.sendSignalTo = peer.remoteSocketID;
@@ -138,8 +138,8 @@ $(function() {
     //******************************************************************
 
     //create a new peer connection
-    socket.on("add peer", function(isInitiator, remoteSocketID) {
-        console.log("ADD PEER", remoteSocketID);
+    socket.on("create peer", function(isInitiator, remoteSocketID) {
+        console.log("CREATE NON-INITIATOR PEER", remoteSocketID);
         var p = createPeer(isInitiator, socket.id, remoteSocketID, null);
         peers.push(p);
     });
@@ -160,21 +160,20 @@ $(function() {
         removeAudioElement(socketID);
     });
     
-    //socket recieved a peer offer
+    //socket recieved a peer offer, create a non-initiating peer and send an answer to the sender
     socket.on("peer offer", function(data) {
-	//create a non-initiating peer and send an answer to the sender
+	console.log("CREATE INITIATOR PEER", socket.id);
 	var d = JSON.parse(data);
 	var p = createPeer(false, socket.id, d.signalOriginator, d.initiatingPeerID);
-	console.log("OFFER",  socket.id);
+	console.log("OFFER RECIEVED",  socket.id);
 	p.signal(data);
 	peers.push(p);
     });
     
-    //socket recieved a peer answer
+    //socket recieved a peer answer, hive the answer to the peer object that sent the offer
     socket.on("peer answer", function(data) {
 	var d = JSON.parse(data);
-	console.log("ANSWER",  d.signalOriginator);
-	//give the answer to the peer object that sent the offer
+	console.log("ANSWER RECIEVED",  d.signalOriginator);
 	for (var i = 0; i < peers.length; i++) {
 	    if (peers[i]._id === d.initiatingPeerID) {
 		peers[i].signal(data);
