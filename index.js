@@ -44,7 +44,7 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 
 //on socket connection
 io.on('connection', function(socket) {
-    console.log(getTimestamp() + "client connected || id: " + socket.id);
+    console.log(getTimestamp(), "client connected || id:", socket.id);
     
     //starts creating calls to all sockets, except self
     socket.on('allow call', function(data) {
@@ -53,7 +53,7 @@ io.on('connection', function(socket) {
         //give this socket a initiator peer for every connected socket except one with their ID
         for (var i = 0; i < connectedSockets.length; i++) {
             if (socket.id !== connectedSockets[i].id) {
-                console.log(getTimestamp()+ "initiating peer connection || sender: " + socket.id + " reciever: " + connectedSockets[i].id);
+                console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[i].id);
                 socket.emit('add peer', true, connectedSockets[i].id);
             }
         }
@@ -88,7 +88,6 @@ io.on('connection', function(socket) {
     //change current user role
     socket.on('role change', function(socketID, role) {
 		socket.broadcast.emit('role change', socketID, role);
-		console.log("test");
     });
     
     //toggle transmit light
@@ -104,7 +103,7 @@ io.on('connection', function(socket) {
     //To listen for a client's disconnection from server and intimate other clients about the same
     socket.on('disconnect', function(data) {
         connectedSockets = socketRemove(connectedSockets, socket);
-        console.log(getTimestamp()+ "client disconnected || id: " + socket.id);
+        console.log(getTimestamp(), "client disconnected || id:", socket.id);
         //remove peer for this socket from every client
         socket.broadcast.emit('remove peer', socket.id);
     });
@@ -131,7 +130,7 @@ function readFromDB(){
 
 //return a formatted timestamp for the console
 function getTimestamp(){
-    return "> " + timeNow() + " ";
+    return "> " + timeNow();
 }
 
 //get a timestamp
