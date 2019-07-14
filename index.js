@@ -46,6 +46,9 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
 io.on('connection', function(socket) {
     console.log(getTimestamp(), "client connected || id:", socket.id);
     
+    //send roles to clients
+    socket.emit('update roles', roles);
+    
     //sends message to all sockets to create a new peer
     socket.on('find peers', function(data) {
         //give this socket a initiator peer for every connected socket except one with their ID
@@ -73,9 +76,6 @@ io.on('connection', function(socket) {
         io.to(d.sendSignalTo).emit('peer answer', data);
     });
     
-    //send roles to clients
-    socket.emit('update roles', roles);
-
     //send the message out
     socket.on('chat message', function(data) { 
         socket.broadcast.emit('chat message', data);

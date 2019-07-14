@@ -10,12 +10,19 @@ $(function() {
     // stream functions
     //******************************************************************
 
-    //attempt to get the audio device
-    getAudio();
+    start();
+
+    //attempt to get the audio device and connect to peers
+    function start(){
+	getAudio();
+	console.log("START", socket.id);
+	socket.emit("find peers");
+    }
+	
 	
     //manually retry on button press
     $("#reconnect-button").click(function(e) {
-        if($("#connection-icon").hasClass("fas fa-phone-slash")){
+        if(localStream == null){
             console.log("Attempting to get audio device.");
             getAudio();
         }
@@ -23,8 +30,12 @@ $(function() {
 
     //toggle the connection icon on button
     function togglePhoneIcon(connected) {
-        if (connected) $("#connection-icon").attr("class", "fas fa-phone");
-        else $("#connection-icon").attr("class", "fas fa-phone-slash");
+	var icon =  $("#connection-icon");
+        if (connected){
+	    icon.attr("class", "fas fa-phone");
+	}else{
+	    icon.attr("class", "fas fa-phone-slash");
+	}
     }
 
     //get the audio and connect to peers
@@ -35,18 +46,12 @@ $(function() {
                 video: false
             })
             .then(function(stream) {
-                localStream = stream;
-		console.log("START", socket.id);
-                socket.emit("find peers");
+                localStream = stream;	
                 togglePhoneIcon(true);
             })
             .catch(function(err) {
                 console.log(err.name + ": " + err.message);
                 togglePhoneIcon(false);
-		
-		//enable this for debugging
-		console.log("START", socket.id);
-                socket.emit("find peers");
             });
     }
 
@@ -138,8 +143,9 @@ $(function() {
     //******************************************************************
 
     //create a new peer connection
+    //TODO: prevent peers from forming multiple connections to the same users
     socket.on("create peer", function(isInitiator, remoteSocketID) {
-        console.log("CREATE NON-INITIATOR PEER", remoteSocketID);
+        console.log("CREATE INITIATOR PEER", socket.id);
         var p = createPeer(isInitiator, socket.id, remoteSocketID, null);
         peers.push(p);
     });
@@ -162,7 +168,7 @@ $(function() {
     
     //socket recieved a peer offer, create a non-initiating peer and send an answer to the sender
     socket.on("peer offer", function(data) {
-	console.log("CREATE INITIATOR PEER", socket.id);
+	console.log("CREATE NON-INITIATOR PEER", socket.id);
 	var d = JSON.parse(data);
 	var p = createPeer(false, socket.id, d.signalOriginator, d.initiatingPeerID);
 	console.log("OFFER RECIEVED",  socket.id);
