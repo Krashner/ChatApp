@@ -132,28 +132,6 @@ $(function() {
         //remove audio element
         removeAudioElement(socketID);
     });
-
-    /*
-    //peer response to signal
-    socket.on("peer call", function(data) {
-        var d = JSON.parse(data);
-        //if an offer is recieved, create a non-iniator peer and respond
-        if (d.type === "offer") {
-            //create a non-initiating peer and return to sender
-            var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
-	    console.log("OFFER",  p.localSocketID);
-            p.signal(data);
-            peers.push(p);
-        } else {
-	    console.log("ANSWER",  d.signalOriginator);
-            //if an answer is recieved, give data to original peer
-            for (var i = 0; i < peers.length; i++) {
-                if (peers[i]._id === d.sendingPeerID) {
-                    peers[i].signal(data);
-                }
-            }
-        }
-    });*/
     
     //socket recieved a peer offer
     socket.on("peer offer", function(data) {

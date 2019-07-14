@@ -58,18 +58,7 @@ io.on('connection', function(socket) {
             }
         }
     });
-    /*
-    //broadcast the response to specific socket
-    socket.on('peer call', function(data) {
-        var d = JSON.parse(data);
-        console.log(getTimestamp(), "negotiating peer connection || sender:", socket.id, "reciever:", d.sendSignalTo);
-        if (d.type === "offer") {
-            io.to(d.sendSignalTo).emit('peer offer', data);
-        }else{
-            io.to(d.sendSignalTo).emit('peer answer', data);
-        }
-    });
-    */
+
     //send socket a peer offer
     socket.on('peer offer', function(data) {
         var d = JSON.parse(data);
