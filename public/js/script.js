@@ -57,11 +57,17 @@ $(function() {
     function setPeerListeners(peer) {
         //send signal to reciever
         peer.on("signal", function(data) {
+	    console.log(data);
 	    console.log("SIGNAL", peer.targetSocketID);
             data.sendSignalTo = peer.targetSocketID;
             data.signalOriginator = peer.localSocketID;
             data.sendingPeerID = peer.sendingPeerID;
-            socket.emit("peer call", JSON.stringify(data));
+            //socket.emit("peer call", JSON.stringify(data));
+	    if (data.type === "offer") {
+		socket.emit('peer offer', JSON.stringify(data));
+	    }else{
+		socket.emit('peer answer', JSON.stringify(data));
+	    }
         });
 
         //peer connected
@@ -127,6 +133,7 @@ $(function() {
         removeAudioElement(socketID);
     });
 
+    /*
     //peer response to signal
     socket.on("peer call", function(data) {
         var d = JSON.parse(data);
@@ -146,7 +153,30 @@ $(function() {
                 }
             }
         }
+    });*/
+    
+    //socket recieved a peer offer
+    socket.on("peer offer", function(data) {
+	//create a non-initiating peer and send an answer to the sender
+	var d = JSON.parse(data);
+	var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
+	console.log("OFFER",  p.localSocketID);
+	p.signal(data);
+	peers.push(p);
     });
+    
+    //socket recieved a peer answer
+    socket.on("peer answer", function(data) {
+	var d = JSON.parse(data);
+	console.log("ANSWER",  d.signalOriginator);
+	//give the answer to the peer object that sent the offer
+	for (var i = 0; i < peers.length; i++) {
+	    if (peers[i]._id === d.sendingPeerID) {
+		peers[i].signal(data);
+	    }
+	}
+    });
+    
     
     //update chat log with recieved message
     socket.on("chat message", function(data) {

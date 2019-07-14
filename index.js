@@ -58,14 +58,32 @@ io.on('connection', function(socket) {
             }
         }
     });
-
+    /*
     //broadcast the response to specific socket
     socket.on('peer call', function(data) {
         var d = JSON.parse(data);
         console.log(getTimestamp(), "negotiating peer connection || sender:", socket.id, "reciever:", d.sendSignalTo);
-        io.to(d.sendSignalTo).emit('peer call', data);
+        if (d.type === "offer") {
+            io.to(d.sendSignalTo).emit('peer offer', data);
+        }else{
+            io.to(d.sendSignalTo).emit('peer answer', data);
+        }
+    });
+    */
+    //send socket a peer offer
+    socket.on('peer offer', function(data) {
+        var d = JSON.parse(data);
+        console.log(getTimestamp(), "offering peer request || sender:", socket.id, "reciever:", d.sendSignalTo);
+        io.to(d.sendSignalTo).emit('peer offer', data);
     });
 
+    //send socket a peer answer
+    socket.on('peer answer', function(data) {
+        var d = JSON.parse(data);
+        console.log(getTimestamp(), "answering peer request || sender:", socket.id, "reciever:", d.sendSignalTo);
+        io.to(d.sendSignalTo).emit('peer answer', data);
+    });
+    
     //send roles to clients
     socket.emit('update roles', roles);
 
