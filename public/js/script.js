@@ -12,7 +12,7 @@ $(function() {
 
     //attempt to get the audio device
     getAudio();
-
+	
     //manually retry on button press
     $("#reconnect-button").click(function(e) {
         if($("#connection-icon").hasClass("fas fa-phone-slash")){
@@ -36,6 +36,7 @@ $(function() {
             })
             .then(function(stream) {
                 localStream = stream;
+		console.log("START", socket.id);
                 socket.emit("allow call");
                 togglePhoneIcon(true);
             })
@@ -44,6 +45,7 @@ $(function() {
                 togglePhoneIcon(false);
 		
 		//enable this for debugging
+		console.log("START", socket.id);
                 socket.emit("allow call");
             });
     }
@@ -54,17 +56,17 @@ $(function() {
 
     function setPeerListeners(peer) {
         //send signal to reciever
-        peer.on("SIGNAL", function(data) {
+        peer.on("signal", function(data) {
+	    console.log("SIGNAL", peer.targetSocketID);
             data.sendSignalTo = peer.targetSocketID;
             data.signalOriginator = peer.localSocketID;
             data.sendingPeerID = peer.sendingPeerID;
-            console.log("SIGNAL", JSON.stringify(data));
             socket.emit("peer call", JSON.stringify(data));
         });
 
         //peer connected
         peer.on("connect", function() {
-            console.log("CONNECT");
+            console.log("CONNECT", peer.targetSocketID);
             addUser(peer.targetSocketID, "None");
 
             //addAudioElement(peer.targetSocketID);
@@ -73,12 +75,12 @@ $(function() {
 
         //data channel is being used
         peer.on("data", function(data) {
-            console.log("DATA", data);
+            console.log("DATA", peer.targetSocketID);
         });
 
         //streaming
         peer.on("stream", function(stream) {
-            console.log("STREAM", stream);
+            console.log("STREAM", peer.targetSocketID);
 
             var audio = addAudioElement(peer.targetSocketID);
             if (audio != null) audio.srcObject = stream;
@@ -87,7 +89,7 @@ $(function() {
 
         //close connection
         peer.on("close", function() {
-            console.log("CLOSE");
+            console.log("CLOSE", peer.targetSocketID);
             removeUser(peer.targetSocketID);
         });
 
@@ -103,9 +105,8 @@ $(function() {
 
     //create a new peer connection
     socket.on("add peer", function(isInitiator, targetSocketID) {
-        console.log("ADD PEER", socket.id);
+        console.log("ADD PEER", targetSocketID);
         var p = createPeer(isInitiator, socket.id, targetSocketID, null);
-        p.socket = targetSocketID;
         peers.push(p);
     });
 
@@ -128,22 +129,20 @@ $(function() {
     //peer response to signal
     socket.on("peer response", function(data) {
         var d = JSON.parse(data);
-	console.log("test");
         //if an offer is recieved, create a non-iniator peer and respond
         if (d.type === "offer") {
             //create a non-initiating peer and return to sender
             var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
-            console.log("Offer Recieved");
-	    console.log("Offer Recieved:   Originator: " + p.localSocketID +" Target " +p.targetSocketID +" PeerID: " +d.sendingPeerID);
+	    console.log("OFFER",  p.localSocketID);
+	    //console.log("Offer Recieved:   Originator: " + p.localSocketID +" Target " +p.targetSocketID +" PeerID: " +d.sendingPeerID);
             p.signal(data);
             peers.push(p);
         } else {
-            console.log("Answer Recieved");
-	    console.log("Answer Recieved:   Originator: " + d.signalOriginator +" Target " +d.sendSignalTo +" PeerID: " +d.sendingPeerID);
+	    console.log("ANSWER",  d.signalOriginator);
+	    //console.log("Answer Recieved:   Originator: " + d.signalOriginator +" Target " +d.sendSignalTo +" PeerID: " +d.sendingPeerID);
             //if an answer is recieved, give data to original peer
             for (var i = 0; i < peers.length; i++) {
                 if (peers[i]._id === d.sendingPeerID) {
-                    console.log("Connecting Call");
                     peers[i].signal(data);
                 }
             }
@@ -260,24 +259,25 @@ $(function() {
     }
 
     //create a peer object and return it
-    function createPeer(initiator, originatorID, sendToID, peerID) {
+    function createPeer(isInitiator, originatorID, sendToID, peerID) {
 	var cloneStream;
 	if(localStream!=null)
 	    cloneStream = localStream.clone();
-        var p = new SimplePeer({
-            initiator: initiator,
+        var peer = new SimplePeer({
+            initiator: isInitiator,
             trickle: false,
             //config: {"iceServers":[]}
-            stream: localStream
+            stream: cloneStream
         });
-        p.localSocketID = originatorID;
-        p.targetSocketID = sendToID;
-        p.sendingPeerID = peerID;
+        peer.localSocketID = originatorID;
+        peer.targetSocketID = sendToID;
+        peer.sendingPeerID = peerID;
 
-        if (p.sendingPeerID === null) p.sendingPeerID = p._id;
+        if (peer.sendingPeerID === null) 
+	    peer.sendingPeerID = peer._id;
 
-        setPeerListeners(p);
-        return p;
+        setPeerListeners(peer);
+        return peer;
     }
 
     //******************************************************************
