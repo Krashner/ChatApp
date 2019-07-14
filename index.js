@@ -23,16 +23,19 @@ app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/
 //get html
 app.get('/', function(req, res) {res.sendFile(__dirname + '/index.html');});
 
+//create the https server
 var server = https.createServer({
-    key: fs.readFileSync('certificates/server.key'),
-    cert: fs.readFileSync('certificates/server.cert')
-  }, app).listen(3000, () => {
-    console.log('> listening on *:3000');
-    currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
-    if(fs.existsSync(__dirname + '/logs/') === false)
-        fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
-  })
-  var io = require('socket.io').listen(server);
+        key: fs.readFileSync('certificates/server.key'),
+        cert: fs.readFileSync('certificates/server.cert')
+    }, app).listen(3000, () => {
+        console.log('> listening on *:3000');
+        currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+        if(fs.existsSync(__dirname + '/logs/') === false)
+            fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+    })
+
+//require socketi.io to talk to websockets
+var io = require('socket.io').listen(server);
 
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function(err, contents) {

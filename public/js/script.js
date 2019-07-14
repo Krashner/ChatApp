@@ -42,7 +42,9 @@ $(function() {
             .catch(function(err) {
                 console.log(err.name + ": " + err.message);
                 togglePhoneIcon(false);
-                //     socket.emit("allow call");
+		
+		//enable this for debugging
+                socket.emit("allow call");
             });
     }
 
@@ -126,16 +128,18 @@ $(function() {
     //peer response to signal
     socket.on("peer response", function(data) {
         var d = JSON.parse(data);
+	console.log("test");
         //if an offer is recieved, create a non-iniator peer and respond
         if (d.type === "offer") {
-            console.log("create peer 2");
             //create a non-initiating peer and return to sender
             var p = createPeer(false, d.sendSignalTo, d.signalOriginator, d.sendingPeerID);
             console.log("Offer Recieved");
+	    console.log("Offer Recieved:   Originator: " + p.localSocketID +" Target " +p.targetSocketID +" PeerID: " +d.sendingPeerID);
             p.signal(data);
             peers.push(p);
         } else {
             console.log("Answer Recieved");
+	    console.log("Answer Recieved:   Originator: " + d.signalOriginator +" Target " +d.sendSignalTo +" PeerID: " +d.sendingPeerID);
             //if an answer is recieved, give data to original peer
             for (var i = 0; i < peers.length; i++) {
                 if (peers[i]._id === d.sendingPeerID) {
@@ -145,7 +149,7 @@ $(function() {
             }
         }
     });
-
+    
     //update chat log with recieved message
     socket.on("chat message", function(data) {
         addMessageToLog(data);
@@ -165,7 +169,6 @@ $(function() {
 
     //get the target to send audio to
     function getTransmitTarget() {
-        console.log($(".active-target"));
         var targetID = $(".active-target");
         if(targetID.length == 0)
             return;
@@ -258,13 +261,15 @@ $(function() {
 
     //create a peer object and return it
     function createPeer(initiator, originatorID, sendToID, peerID) {
+	var cloneStream;
+	if(localStream!=null)
+	    cloneStream = localStream.clone();
         var p = new SimplePeer({
             initiator: initiator,
             trickle: false,
             //config: {"iceServers":[]}
-            stream: localStream.clone()
+            stream: localStream
         });
-        console.log(localStream);
         p.localSocketID = originatorID;
         p.targetSocketID = sendToID;
         p.sendingPeerID = peerID;

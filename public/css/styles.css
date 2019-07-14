@@ -289,8 +289,6 @@ input {
 	background-color: #252629!important;
 }
 
-.active-target:hover {}
-
 #chat-target-row {
 	justify-content: center;
 	z-index: 0;
