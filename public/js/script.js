@@ -313,37 +313,6 @@ $(function() {
     // chat functions
     //******************************************************************
 
-    //adds the roles from the admin.json role list to the target container
-    function addTargets(roles) {
-        var container = $("#chat-target-container");
-        var template = $("#target-template");
-        for (var i = 0; i < roles.length; i++) {
-            if (roles[i] == "None") {
-		continue;
-	    }
-            var newTarget = template.clone();
-            newTarget
-                .attr("id", roles[i] + "-Selector")
-                .find(".chat-target-text")
-                .html(roles[i]);
-            newTarget.find(".status-light").attr("id", roles[i] + "-status");
-            newTarget.find(".mute-container").attr("id", roles[i] + "-mute");
-            newTarget.appendTo(container).show();
-        }
-
-        //create a button for all call, remove status light and mute
-        var newTarget = template.clone();
-        newTarget
-            .attr("id", "AllCall-Selector")
-            .find(".chat-target-text")
-            .html("All Call");
-        newTarget.find(".status-container").empty();
-        var mute = newTarget.find(".mute-container");
-        mute.empty();
-        mute.removeClass("mute-container");
-        newTarget.appendTo(container).show();
-    }
-
     //add user to user list
     function addUser(socketID, role) {
         var container = $("#chat-target-container");
@@ -395,6 +364,12 @@ $(function() {
         $(this).addClass("active-target");
     });
 
+    //toggle all call chat
+    $("#role-container").on("click", ".chat-target-btn", function(){
+        $(".chat-target-btn").removeClass("active-target");
+        $(this).addClass("active-target");
+    });
+    
     //toggle mute for target
     $("#chat-target-container").on("click", ".mute-container", function(){
         //get the socketid that follows after mute- of continer id

@@ -76,6 +76,11 @@
                   </div>
                </div>
                <div id="role-container" class="text-center">
+                  <div class="row">
+                     <button type="button" id="all-call-btn" class="col-sm-12 btn chat-target-btn">
+                        <div class="col-sm chat-target-text user-row">ALL CALL</div>
+                        </button>
+                  </div>
                   <div id="config-button-row" class="row">
                      <button id="roles-button" class="col-sm-4 btn btn-outline-dark config-button" data-toggle="modal" data-target="#modal-choose-role">
                         <i class="fas fa-list"></i>
@@ -100,7 +105,7 @@
          </div>
       </div>
       <div id="audio-container"></div>
-      <button type="button" id="role-template" class="role-select-item btn role-select-btn" style='display:none'>
+      <button type="button" id="role-template" class="role-select-item btn role-select-btn" style='display:none'></button>
       <button type="button" id="target-template" class="col-sm-12 btn chat-target-btn" style='display:none'>
          <div class="row target-btn-row">
             <div class ="status-container col-sm-3 user-row">

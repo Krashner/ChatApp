@@ -132,11 +132,11 @@ selected-role:focus {
 	background-color: #484c52;
 }
 
-.role-select-item {
+.role-select-btn {
 	color: #FFFFFF;
 }
 
-.role-select-item:hover {
+.role-select-btn:hover {
 	background-color: #36393f;
 	color: #FFFFFF;
 }
