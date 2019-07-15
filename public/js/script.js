@@ -10,16 +10,13 @@ $(function() {
     // stream functions
     //******************************************************************
 
-    start();
-
     //attempt to get the audio device and connect to peers
     function start(){
 	getAudio();
 	console.log("START", socket.id);
 	socket.emit("find peers");
     }
-	
-	
+		
     //manually retry on button press
     $("#reconnect-button").click(function(e) {
         if(localStream == null){
@@ -141,17 +138,33 @@ $(function() {
     //******************************************************************
     // socket functions
     //******************************************************************
-
-    //create a new peer connection
-    //TODO: prevent peers from forming multiple connections to the same users
-    socket.on("create peer", function(isInitiator, remoteSocketID) {
-        console.log("CREATE INITIATOR PEER", socket.id);
-        var p = createPeer(isInitiator, socket.id, remoteSocketID, null);
-        peers.push(p);
+    
+    //start setting up the peer connections
+    socket.on("connect", () => {
+        start();
     });
 
+    //create a new peer connection, if it doesn't already exist
+    socket.on("create peer", (isInitiator, remoteSocketID) => {
+	if(checkForPeer(remoteSocketID) == false){
+	    console.log("CREATE INITIATOR PEER", socket.id);
+	    var p = createPeer(isInitiator, socket.id, remoteSocketID, null);
+	    peers.push(p);
+	}
+    });
+    
+    //check through array to see if a peer for the given socket exists
+    function checkForPeer(remoteSocketID){
+	peers.forEach(function(peer) {
+	    if(peer.remoteSocketID == remoteSocketID){
+		return true;
+	    }
+	});
+	return false;
+    }
+
     //remove peer closed peer connection
-    socket.on("remove peer", function(socketID) {
+    socket.on("remove peer", (socketID) => {
         tempPeers = [];
         for (var i = 0; i < peers.length; i++) {
             if (peers[i].remoteSocketID !== socketID) {
@@ -167,17 +180,17 @@ $(function() {
     });
     
     //socket recieved a peer offer, create a non-initiating peer and send an answer to the sender
-    socket.on("peer offer", function(data) {
+    socket.on("peer offer", (data) => {
 	console.log("CREATE NON-INITIATOR PEER", socket.id);
 	var d = JSON.parse(data);
 	var p = createPeer(false, socket.id, d.signalOriginator, d.initiatingPeerID);
-	console.log("OFFER RECIEVED",  socket.id);
+	console.log("OFFER RECIEVED", d.signalOriginator);
 	p.signal(data);
 	peers.push(p);
     });
     
     //socket recieved a peer answer, hive the answer to the peer object that sent the offer
-    socket.on("peer answer", function(data) {
+    socket.on("peer answer", (data) => {
 	var d = JSON.parse(data);
 	console.log("ANSWER RECIEVED",  d.signalOriginator);
 	for (var i = 0; i < peers.length; i++) {
@@ -189,18 +202,18 @@ $(function() {
     
     
     //update chat log with recieved message
-    socket.on("chat message", function(data) {
+    socket.on("chat message", (data) => {
         addMessageToLog(data);
     });
 
     //signal that audio is being transmitted
-    $("#chat-transmit-btn").mousedown(function() {
+    $("#chat-transmit-btn").mousedown(() =>{
         socket.emit("transmit light", socket.id, getTransmitTarget(), true);
         //transmitAudio(true);
     });
 
     //signal that audio is not being transmitted
-    $("#chat-transmit-btn").mouseup(function() {
+    $("#chat-transmit-btn").mouseup(() =>{
         socket.emit("transmit light", socket.id, getTransmitTarget(), false);
         //transmitAudio(false);
     });
@@ -214,7 +227,7 @@ $(function() {
     }
 
     //toggle to status light green/red for users transmitting
-    socket.on("change light", function(socketID, isOn) {
+    socket.on("change light", (socketID, isOn) =>{
         if (isOn == true) {
             $("#selector-" + socketID)
                 .find(".status-light")
@@ -227,14 +240,14 @@ $(function() {
     });
 
     //update user role when server says they change it
-    socket.on("role change", function(socketID, role) {
+    socket.on("role change", (socketID, role) =>{
         $("#selector-" + socketID)
             .find(".chat-target-text")
             .text(role);
     });
 
     //get the user roles
-    socket.on("update roles", function(roles) {
+    socket.on("update roles", (roles) =>{
         $("#modal-role-row").empty();
         roles.forEach(function(entry) {
             $("#modal-role-row").append(
@@ -281,8 +294,8 @@ $(function() {
 
     //toggles the stream track on and off
     function togglePeerTrack(peer, status){
-        peer.streams.forEach(function(stream) {
-            stream.getTracks().forEach(function(track) {
+        peer.streams.forEach((stream) =>{
+            stream.getTracks().forEach((track) =>{
                 track.enabled = status;
             });
         });
@@ -305,7 +318,9 @@ $(function() {
         var container = $("#chat-target-container");
         var template = $("#target-template");
         for (var i = 0; i < roles.length; i++) {
-            if (roles[i] == "None") continue;
+            if (roles[i] == "None") {
+		continue;
+	    }
             var newTarget = template.clone();
             newTarget
                 .attr("id", roles[i] + "-Selector")
@@ -350,7 +365,7 @@ $(function() {
     }
 
     //send message, clear message box and add message to local chat
-    $("form").submit(function(e) {
+    $("form").submit((e) => {
         e.preventDefault();
         var text = $("#chat-input").val();
         var role = currentRole;
@@ -375,13 +390,13 @@ $(function() {
     }
 
     //get the current target to transmit to
-    $("#chat-target-container").on("click", ".chat-target-btn", function() {
+    $("#chat-target-container").on("click", ".chat-target-btn", function(){
         $(".chat-target-btn").removeClass("active-target");
         $(this).addClass("active-target");
     });
 
     //toggle mute for target
-    $("#chat-target-container").on("click", ".mute-container", function() {
+    $("#chat-target-container").on("click", ".mute-container", function(){
         //get the socketid that follows after mute- of continer id
         var socketID = $(this)
             .attr("id")
@@ -406,20 +421,20 @@ $(function() {
     });
 
     //get the selected role
-    $("#modal-role-row").on("click", ".role-select-btn", function(e) {
+    $("#modal-role-row").on("click", ".role-select-btn", function(e){
         $(".role-select-btn").removeClass("active-role");
         $(this).addClass("active-role");
         selectedRole = this.id;
     });
 
     //deselect unsaved role and select chosen role after closing modal
-    $("#modal-choose-role").on("hidden.bs.modal", function(e) {
+    $("#modal-choose-role").on("hidden.bs.modal", function(e){
         $(".role-select-btn").removeClass("active-role");
         $("#" + currentRole).addClass("active-role");
     });
 
     //show the jump to bottom button, unless we're at the bottom
-    $("#chat-box").scroll(function(event) {
+    $("#chat-box").scroll(function(e){
         var maxScroll = $(this)[0].scrollHeight - $(this).outerHeight();
 
         if (ingoreScroll === false){
@@ -427,7 +442,7 @@ $(function() {
 	}
 	    
         ingoreScroll = false;
-        event.preventDefault();
+        e.preventDefault();
 
         if ($(this).scrollTop() >= maxScroll - maxScroll * 0.5) {
             toggleJumpButton(false);
@@ -435,7 +450,7 @@ $(function() {
     });
 
     //jump to bottom of messages and hide the button
-    $("#btn-jump").click(function() {
+    $("#btn-jump").click(() =>{
         $("#chat-box").scrollTop(
             $("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight()
         );

@@ -42,8 +42,10 @@ fs.readFile('admin.json', 'utf8', function(err, contents) {
     roles = JSON.parse(contents).roles;
 });
 
-//on socket connection
+//on socket connection, set listeners
 io.on('connection', function(socket) {
+    
+    //record client connecting
     console.log(getTimestamp(), "client connected || id:", socket.id);
     
     //send roles to clients
@@ -53,7 +55,7 @@ io.on('connection', function(socket) {
     socket.on('find peers', function(data) {
         //give this socket a initiator peer for every connected socket except one with their ID
         for (var i = 0; i < connectedSockets.length; i++) {
-            if (socket.id !== connectedSockets[i].id) {
+            if (socket !== connectedSockets[i]) {
                 console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[i].id);
                 socket.emit('create peer', true, connectedSockets[i].id);
             }
