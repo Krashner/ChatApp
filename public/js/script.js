@@ -418,13 +418,13 @@ $(function() {
     $("#modal-role-row").on("click", ".role-select-btn", function(e){
         $(".role-select-btn").removeClass("active-role");
         $(this).addClass("active-role");
-        selectedRole = this.id;
+        selectedRole = $(this).text();
     });
 
     //deselect unsaved role and select chosen role after closing modal
     $("#modal-choose-role").on("hidden.bs.modal", function(e){
         $(".role-select-btn").removeClass("active-role");
-        $("#" + currentRole).addClass("active-role");
+        $("#" + currentRole + "-Selector").addClass("active-role");
     });
 
     //show the jump to bottom button, unless we're at the bottom
