@@ -11,17 +11,17 @@ var currentLogFile;                 //log file to write to & read from
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 //socket.io js
-app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io-client/dist'));
+app.use('/socket.io', express.static(path.join(__dirname, '/node_modules/socket.io-client/dist')));
 //bootstrap js
-app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap'));
+app.use('/bootstrap', express.static(path.join(__dirname, '/node_modules/bootstrap')));
 //jquery
-app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
+app.use('/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dist')));
 //simple peer
-app.use('/simple-peer', express.static(__dirname + '/node_modules/simple-peer'));
+app.use('/simple-peer', express.static(path.join(__dirname, '/node_modules/simple-peer')));
 //font awesome
-app.use('/font-awesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
+app.use('/font-awesome', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free')));
 //get html
-app.get('/', function(req, res) {res.sendFile(__dirname + '/index.html');});
+app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/index.html'));});
 
 //create the https server
 var server = https.createServer({

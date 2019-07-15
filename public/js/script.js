@@ -248,15 +248,15 @@ $(function() {
 
     //get the user roles
     socket.on("update roles", (roles) =>{
+	var container = $("#modal-role-row");
+	var template = $("#role-template");
         $("#modal-role-row").empty();
-        roles.forEach(function(entry) {
-            $("#modal-role-row").append(
-                $(
-                    '<button type="button" id="' +
-                        entry +
-                        '"class="role-select-item btn role-select-btn">'
-                ).text(entry)
-            );
+        roles.forEach(function(role) {
+            var newRole = template.clone();
+            newRole
+                .attr("id", role + "-Selector")
+                .html(role);
+            newRole.appendTo(container).show();  
         });
     });
 
