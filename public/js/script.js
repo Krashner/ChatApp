@@ -263,8 +263,12 @@ $(function() {
             .text(role);
     });
 
-    //get the user roles
+    //recieve the user roles from server and clear out all previous arrays
     socket.on("update roles", (roles) =>{
+	for(var i = 0; i < peers.length; i++)
+	    peers[i].destroy();
+	peers = [];
+	$("#chat-target-container").empty();
 	var container = $("#modal-role-row");
 	var template = $("#role-template");
         $("#modal-role-row").empty();
