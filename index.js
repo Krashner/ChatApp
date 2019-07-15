@@ -1,12 +1,12 @@
-var express = require('express');
-var app = express();
-var https = require('https');
-var fs = require('fs');
-var path = require('path');
+var express = require('express');   //used for serving content to user
+var app = express();                //not really needed?
+var https = require('https');       //for creating ssl connection
+var fs = require('fs');             //for reading and writing files
+var path = require('path');         //used for serving public folder to users
 
-var roles = [];
-var connectedSockets = [];
-var currentLogFile;
+var roles = [];                     //array of roles to give the users
+var connectedSockets = [];          //array of sockets connected to server
+var currentLogFile;                 //log file to write to & read from
   
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
