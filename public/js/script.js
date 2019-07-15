@@ -200,7 +200,6 @@ $(function() {
 	}
     });
     
-    
     //update chat log with recieved message
     socket.on("chat message", (data) => {
         addMessageToLog(data);
@@ -208,22 +207,40 @@ $(function() {
 
     //signal that audio is being transmitted
     $("#chat-transmit-btn").mousedown(() =>{
-        socket.emit("transmit light", socket.id, getTransmitTarget(), true);
+	var targets = getTransmitTargets();
+	targets.forEach((target) => {
+	    socket.emit("transmit light", socket.id, target, true);
+	});
         //transmitAudio(true);
     });
 
     //signal that audio is not being transmitted
     $("#chat-transmit-btn").mouseup(() =>{
-        socket.emit("transmit light", socket.id, getTransmitTarget(), false);
+	var targets = getTransmitTargets();
+	targets.forEach((target) => {
+	    socket.emit("transmit light", socket.id, target, false);
+	});
         //transmitAudio(false);
     });
 
     //get the target to send audio to
-    function getTransmitTarget() {
-        var targetID = $(".active-target");
-        if(targetID.length == 0)
-            return;
-        return targetID.attr("id").slice(9);;
+    function getTransmitTargets() {
+        var targetElements = $(".active-target");
+	var targetIDs = [];
+
+	//return the entire list of ids
+	if(targetElements.attr("id") == "all-call-btn")
+	{
+	    var allElements = $(".chat-target-btn");
+	    for(var i = 0; i < allElements.length; i++){
+		if(allElements[i].id.includes("selector-")){
+		    targetIDs.push(allElements[i].id.slice(9));
+		}
+	    }
+	}else if(targetElements.length == 1){
+	    targetIDs.push(targetElements.attr("id").slice(9));
+	}
+        return targetIDs;
     }
 
     //toggle to status light green/red for users transmitting
@@ -285,11 +302,13 @@ $(function() {
     
     //gets the target socket to find the peer and toggles their stream track
     function transmitAudio(transmit){
-        var socket = getTransmitTarget();
-        var peer =findPeerBySocketID(socket);
-        if(peer != null){
-            togglePeerTrack(peer, transmit);
-        }
+        var sockets = getTransmitTargets();
+	sockets.forEach((socket) =>{
+	    var peer =findPeerBySocketID(socket);
+	    if(peer != null){
+		togglePeerTrack(peer, transmit);
+	    }
+	});
     }
 
     //toggles the stream track on and off
