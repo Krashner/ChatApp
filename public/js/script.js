@@ -103,6 +103,7 @@ $(function() {
         peer.on("connect", function() {
             console.log("CONNECT", peer.remoteSocketID);
             addUser(peer.remoteSocketID, "None");
+	    socket.emit("get role", peer.remoteSocketID);
 	    if(peer.initiator == true)
 		socket.emit("peers connected", socket.id, peer.remoteSocketID);
             //addAudioElement(peer.remoteSocketID);
@@ -347,7 +348,7 @@ $(function() {
             .html(role);
         newTarget.find(".status-light").attr("id", "status-" + socketID);
         newTarget.find(".mute-container").attr("id", "mute-" + socketID);
-        newTarget.appendTo(container).show();
+	newTarget.appendTo(container).show();
     }
 
     //remove user from user list

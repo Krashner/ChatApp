@@ -5,7 +5,7 @@ var fs = require('fs');             //for reading and writing files
 var path = require('path');         //used for serving public folder to users
 
 var roles = [];                     //array of roles to give the users
-var connectedSockets = [];          //array of sockets connected to server
+var connectedSockets = {};          //object containing sockets connected to server
 var currentLogFile;                 //log file to write to & read from
   
 //server static files from "public" folder
@@ -54,14 +54,14 @@ io.on('connection', function(socket) {
     //sends message to all sockets to create a new peer
     socket.on('find peers', function(data) {
         //give this socket a initiator peer for every connected socket except one with their ID
-        for (var i = 0; i < connectedSockets.length; i++) {
-            if (socket !== connectedSockets[i]) {
-                console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[i].id);
-                socket.emit('create peer', true, connectedSockets[i].id);
-            }
+        for (var user in connectedSockets) {
+                console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[user].id);
+                socket.emit('create peer', true, connectedSockets[user].id);
         }
         //add this socket to the array
-        connectedSockets.push(socket);
+        connectedSockets[socket.id] = socket;
+        //set role to default to none
+        connectedSockets[socket.id].role = roles[0];
     });
 
     //send socket a peer offer
@@ -96,7 +96,18 @@ io.on('connection', function(socket) {
     
     //change current user role
     socket.on('role change', function(socketID, role) {
+        connectedSockets[socketID].role = role;
 		socket.broadcast.emit('role change', socketID, role);
+    });
+    
+    //gets the roles for the users connected to this socket
+    socket.on('get role', function(socketID) {
+        var role = connectedSockets[socketID].role;
+                    console.log(role);
+        if(roles.includes(role)){
+            console.log("test");
+            socket.emit('role change', socketID, role);
+        }
     });
     
     //toggle transmit light
@@ -104,21 +115,15 @@ io.on('connection', function(socket) {
         io.to(toSocketID).emit('change light', fromSocketID, isOn);
     });
 
-    //To listen for a client's disconnection from server and intimate other clients about the same
+    //To listen for a client's disconnection from server and inform other clients
     socket.on('disconnect', function(data) {
-        connectedSockets = socketRemove(connectedSockets, socket);
+        delete connectedSockets[socket.id];
         console.log(getTimestamp(), "client disconnected || id:", socket.id);
         //remove peer for this socket from every client
         socket.broadcast.emit('remove peer', socket.id);
     });
 });
 
-//remove socket from list of connected clients
-function socketRemove(arr, value) {
-    return arr.filter(function(ele) {
-        return ele != value;
-    });
-}
 
 //write message to database
 function writeToDB(data){
