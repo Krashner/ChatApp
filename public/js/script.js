@@ -1,5 +1,5 @@
 $(function() {
-    var socket = io();		//socket connection to node server
+    const socket = io();	//socket connection to node server
     var peers = [];		//array of peers to connect to
     var currentRole;		//current chosen role
     var selectedRole;		//selected role, saves to current role
