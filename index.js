@@ -23,7 +23,7 @@ app.use('/font-awesome', express.static(path.join(__dirname, '/node_modules/@for
 //js-cookie
 app.use('/js-cookie', express.static(path.join(__dirname, '/node_modules/js-cookie')));
 //get html
-app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/index.html'));});
+app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/public/index.html'));});
 
 //create the https server
 var server = https.createServer({
