@@ -12,6 +12,8 @@ $(function() {
 
     //attempt to get the audio device and connect to peers
     function start(){
+	selectedRole = Cookies.get('role');
+	UpdateRole();
 	getAudio();
 	console.log("START", socket.id);
 	socket.emit("find peers");
@@ -403,21 +405,29 @@ $(function() {
         if ($(this).hasClass("mute")) {
             $(this).html('<i class="mute-user fas fa-headphones">');
             $(this).removeClass("mute");
-            //$("#audio-"+socketID).muted = false;
             $("#audio-" + socketID).prop("muted", false);
         } else {
             $(this).html('<i class="mute-user fas fa-volume-mute">');
             $(this).addClass("mute");
-            //$("#audio-"+socketID).muted = true;
             $("#audio-" + socketID).prop("muted", true);
         }
     });
 
     //change the current role to selection and toggle the status lights
     $("#btn-select-role").click(function() {
-        if (selectedRole !== null) currentRole = selectedRole;
-        socket.emit("role change", socket.id, currentRole);
+	UpdateRole();
     });
+    
+    //changes the role, saves the new role as a cookie and sends info to server
+    function UpdateRole(){
+	if (selectedRole !== null){
+	    currentRole = selectedRole;
+	    Cookies.set('role', currentRole);
+	}else{
+	    currentRole = selectedRole = "None";
+	}
+	socket.emit("role change", socket.id, currentRole);
+    }
 
     //get the selected role
     $("#modal-role-row").on("click", ".role-select-btn", function(e){

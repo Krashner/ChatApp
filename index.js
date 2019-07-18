@@ -20,6 +20,8 @@ app.use('/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dis
 app.use('/simple-peer', express.static(path.join(__dirname, '/node_modules/simple-peer')));
 //font awesome
 app.use('/font-awesome', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free')));
+//js-cookie
+app.use('/js-cookie', express.static(path.join(__dirname, '/node_modules/js-cookie')));
 //get html
 app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/index.html'));});
 
@@ -54,14 +56,18 @@ io.on('connection', function(socket) {
     //sends message to all sockets to create a new peer
     socket.on('find peers', function(data) {
         //give this socket a initiator peer for every connected socket except one with their ID
-        for (var user in connectedSockets) {
-                console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[user].id);
-                socket.emit('create peer', true, connectedSockets[user].id);
+        for (var userID in connectedSockets) {
+            if(userID != socket.id){
+                console.log(getTimestamp(), "initiating peer connection || sender:", socket.id, "reciever:", connectedSockets[userID].id);
+                socket.emit('create peer', true, connectedSockets[userID].id);
+            }
         }
         //add this socket to the array
-        connectedSockets[socket.id] = socket;
-        //set role to default to none
-        connectedSockets[socket.id].role = roles[0];
+        if(connectedSockets[socket.id] == null)
+            connectedSockets[socket.id] = socket;
+        //set role to default if null
+        if(connectedSockets[socket.id].role == null)
+            connectedSockets[socket.id].role = roles[0];
     });
 
     //send socket a peer offer
@@ -96,6 +102,8 @@ io.on('connection', function(socket) {
     
     //change current user role
     socket.on('role change', function(socketID, role) {
+        if(connectedSockets[socketID] == null)
+            connectedSockets[socketID] = socket;
         connectedSockets[socketID].role = role;
 		socket.broadcast.emit('role change', socketID, role);
     });
@@ -103,9 +111,7 @@ io.on('connection', function(socket) {
     //gets the roles for the users connected to this socket
     socket.on('get role', function(socketID) {
         var role = connectedSockets[socketID].role;
-                    console.log(role);
         if(roles.includes(role)){
-            console.log("test");
             socket.emit('role change', socketID, role);
         }
     });
