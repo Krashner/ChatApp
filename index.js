@@ -1,5 +1,5 @@
 const express = require('express');   //used for serving content to user
-const app = express();                //not really needed?
+const app = express();                //used for routing
 const https = require('https');       //for creating ssl connection
 const fs = require('fs');             //for reading and writing files
 const path = require('path');         //used for serving public folder to users

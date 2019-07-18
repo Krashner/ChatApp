@@ -360,7 +360,7 @@ $(function() {
     }
 
     //send message, clear message box and add message to local chat
-    $("form").submit((e) => {
+    $("form").submit( function(e) {
         e.preventDefault();
         var text = $("#chat-input").val();
         var role = currentRole;
