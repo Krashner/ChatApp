@@ -1,8 +1,8 @@
-var express = require('express');   //used for serving content to user
-var app = express();                //not really needed?
-var https = require('https');       //for creating ssl connection
-var fs = require('fs');             //for reading and writing files
-var path = require('path');         //used for serving public folder to users
+const express = require('express');   //used for serving content to user
+const app = express();                //not really needed?
+const https = require('https');       //for creating ssl connection
+const fs = require('fs');             //for reading and writing files
+const path = require('path');         //used for serving public folder to users
 
 var roles = [];                     //array of roles to give the users
 var connectedSockets = {};          //object containing sockets connected to server
