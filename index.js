@@ -27,8 +27,8 @@ app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/public/inde
 
 //create the https server
 var server = https.createServer({
-        key: fs.readFileSync('certificates/server.key'),
-        cert: fs.readFileSync('certificates/server.cert')
+        key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
+        cert: fs.readFileSync('certificates/chatappLocalhost.cer')
     }, app).listen(3000, () => {
         console.log('> listening on *:3000');
         currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 

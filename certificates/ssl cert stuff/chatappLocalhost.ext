@@ -1,0 +1,10 @@
+subjectAltName = @alt_names
+extendedKeyUsage = serverAuth
+
+[alt_names]
+DNS.1   = localhost
+DNS.2   = chatapp
+DNS.3   = node-server
+# IP address
+IP.1 = 192.168.1.100
+IP.2 = 127.0.0.1

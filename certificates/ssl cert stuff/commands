@@ -1,0 +1,22 @@
+run the following commands to generate new SSL data. First line creates the Certificate Authority, second line creates the client key, third creates the client cert and signs it
+
+openssl req -x509 -newkey rsa:2048 -out ./certs/chatappCA.cer -outform PEM -keyout ./certs/chatappCA.pvk -days 10000 -verbose -config chatappCA.cnf -nodes -sha256 -subj "/CN=Chat App CA"
+
+openssl req -newkey rsa:2048 -keyout ./certs/chatappLocalhost.pvk -out ./certs/chatappLocalhost.req -subj /CN=localhost -sha256 -nodes
+
+openssl x509 -req -CA ./certs/chatappCA.cer -CAkey ./certs/chatappCA.pvk -in ./certs/chatappLocalhost.req -out ./certs/chatappLocalhost.cer -days 10000 -extfile chatappLocalhost.ext -sha256 -set_serial 0x1111
+
+
+
+test, go to localhost:15000
+
+openssl s_server -accept 15000 -cert ./certs/chatappLocalhost.cer -key ./certs/chatappLocalhost.pvk -CAfile ./certs/chatappCA.cer -WWW
+
+
+
+#for addingt to .ext file, if needed
+# IP address
+IP.1 = 192.168.2.221
+IP.2 = 127.0.0.1
+
+

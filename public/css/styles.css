@@ -219,6 +219,7 @@ input {
 	align-items: center;
 	width: 100%;
 	text-align: center;
+    max-height: 100%;
 }
 
 #logo {
