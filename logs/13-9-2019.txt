@@ -1,4 +1,0 @@
->HF 20:04: 
--I am testing the log
->AUX 20:04: 
--Cool, I too shall test them.
