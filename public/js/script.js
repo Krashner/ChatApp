@@ -12,7 +12,7 @@ $(function() {
 
     //attempt to get the audio device and connect to peers
     function start(){
-	selectedRole = Cookies.get('role');
+	currentRole = selectedRole = Cookies.get('role');
 	UpdateRole();
 	getAudio();
 	console.log("START", socket.id);
@@ -282,6 +282,10 @@ $(function() {
                 .html(role);
             newRole.appendTo(container).show();  
         });
+	$(".role-select-btn").removeClass("active-role");
+        $("#" + selectedRole + "-Selector").addClass("active-role");
+	//show the modal
+	$("#modal-choose-role").modal("show");	
     });
 
     //******************************************************************
@@ -413,19 +417,23 @@ $(function() {
         }
     });
 
-    //change the current role to selection and toggle the status lights
+    //change the current role to selection
     $("#btn-select-role").click(function() {
 	UpdateRole();
     });
     
     //changes the role, saves the new role as a cookie and sends info to server
     function UpdateRole(){
-	if (selectedRole !== null){
-	    currentRole = selectedRole;
-	    Cookies.set('role', currentRole);
+	if (selectedRole !== "None"){
+	    $("#chat-input").prop("readonly", false);
+	    $("#chat-input").prop("placeholder", "Send message as " + selectedRole + "...");
 	}else{
-	    currentRole = selectedRole = "None";
+	    $("#chat-input").prop("readonly", true);
+	    $("#chat-input").prop("placeholder", "Select a role to chat...");
+	    
 	}
+	currentRole = selectedRole;
+	Cookies.set('role', currentRole);
 	socket.emit("role change", socket.id, currentRole);
     }
 
