@@ -1,16 +1,4 @@
-CUL 19:00: 
-ads
-CUL 19:00: 
-gas
-AUX 19:01: 
-wdweqe
-AUX 19:01: 
-qr
-AUX 19:01: 
-we
-AUX 19:01: 
-we
-AUX 19:01: 
-qwe
-HF 19:48: 
-raerawe
+>HF 20:04: 
+-I am testing the log
+>AUX 20:04: 
+-Cool, I too shall test them.

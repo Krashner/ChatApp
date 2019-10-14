@@ -130,11 +130,20 @@ io.on('connection', function(socket) {
     });
 });
 
+//prints a list of connected clients
+function printCurrentClients()
+{
+    console.log(getTimestamp(), "Currently Connected Clients");
+    for (var client in connectedSockets) {
+        console.log("       id:", client);
+    }
+
+}
 
 //write message to database
 function writeToDB(data){
     var d = JSON.parse(data)
-    fs.appendFile(currentLogFile, d.header + "\n" + d.message + "\n", function(err){if(err)throw err;});
+    fs.appendFile(currentLogFile, ">" + d.header + "\n" + "-" + d.message + "\n", function(err){if(err)throw err;});
 }
 
 //retrieve message from database
