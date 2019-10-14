@@ -206,6 +206,7 @@ $(function() {
     //update chat log with recieved message
     socket.on("chat message", (data) => {
         addMessageToLog(data);
+	$("#notification-sound")[0].play();
     });
 
     //signal that audio is being transmitted
