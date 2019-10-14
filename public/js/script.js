@@ -13,6 +13,8 @@ $(function() {
     //attempt to get the audio device and connect to peers
     function start(){
 	currentRole = selectedRole = Cookies.get('role');
+	if(currentRole == null)
+	    currentRole = selectedRole = "None";
 	UpdateRole();
 	getAudio();
 	console.log("START", socket.id);
@@ -284,9 +286,10 @@ $(function() {
             newRole.appendTo(container).show();  
         });
 	$(".role-select-btn").removeClass("active-role");
-        $("#" + selectedRole + "-Selector").addClass("active-role");
-	//show the modal
-	$("#modal-choose-role").modal("show");	
+        $("#" + currentRole + "-Selector").addClass("active-role");
+	//show the modal if no role is selected
+	if(currentRole == null || currentRole == "None")
+	    $("#modal-choose-role").modal("show");	
     });
 
     //******************************************************************
