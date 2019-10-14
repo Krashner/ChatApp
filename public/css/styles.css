@@ -160,12 +160,14 @@ selected-role:focus {
 	border-style: solid;
 	border-width: 0px 0px 1px 0px;
 	width: 100%;
+    max-height: 100%;
 }
 
 #chat-col {
 	background-color: #36393f;
 	padding-left: 1%;
 	padding-right: 1%;
+    max-height: 100%;
 }
 
 #chat-input-container {
