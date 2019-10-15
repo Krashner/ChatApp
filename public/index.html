@@ -53,8 +53,12 @@
       <div class="container-fluid">
          <div class="row" id="chat-control-row">
             <div class="col d-flex flex-column" id="chat-col">
+               <div id="load-btn-container">
+                  <div id="btn-load-arrow" class="up-arrow hide-btn"></div>
+                  <button type="button" id="btn-load" class="btn btn-secondary btn-load hide-btn">Load More Messages</button>
+               </div>
                <div class="row flex-grow-1" id="chat-box">
-                  <ul id="messages"></ul>
+                  <ol id="messages"></ol>
                </div>
                <div id="jump-btn-container">
                   <button type="button" id="btn-jump" class="btn btn-secondary btn-jump hide-btn">Jump To Bottom</button>

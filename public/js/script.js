@@ -207,10 +207,20 @@ $(function() {
     
     //update chat log with recieved message
     socket.on("chat message", (data) => {
-        addMessageToLog(data);
-	$("#notification-sound")[0].play();
+        addMessageToLog(data, false);
+	//$("#notification-sound")[0].play();
     });
 
+    //update chat log with all the previous message
+    socket.on("retrieve log", (dataArr) => {
+	var arr = JSON.parse(dataArr);
+	console.log(arr);
+	for(var i = 0; i < arr.length; i++){
+	    var data = arr[i];
+	    addMessageToLog(data, true);
+	}
+    });
+    
     //signal that audio is being transmitted
     $("#chat-transmit-btn").mousedown(() =>{
 	var targets = getTransmitTargets();
@@ -384,7 +394,6 @@ $(function() {
     function sendToServer(role, msg) {
         var data = {
             sender: role,
-            header: role + " " + timeNow(),
             timeStamp: timeNow(),
             message: msg
         };
@@ -458,6 +467,8 @@ $(function() {
     $("#chat-box").scroll(function(e){
         var maxScroll = $(this)[0].scrollHeight - $(this).outerHeight();
 
+	toggleLoadButton(true);
+	 
         if (ingoreScroll === false){
 	    toggleJumpButton(true);
 	}
@@ -465,9 +476,16 @@ $(function() {
         ingoreScroll = false;
         e.preventDefault();
 
+	//hide the jump button
         if ($(this).scrollTop() >= maxScroll - maxScroll * 0.5) {
             toggleJumpButton(false);
         }
+	
+	//hide the load button
+	if ($(this).scrollTop() <= maxScroll - maxScroll * 0.75) {
+            toggleLoadButton(true);
+        }else
+	    toggleLoadButton(false);
     });
 
     //jump to bottom of messages and hide the button
@@ -478,8 +496,26 @@ $(function() {
         toggleJumpButton(false);
         ingoreScroll = true;
     });
+    
+    //load more messages and hide the button
+    $("#btn-load").click(() =>{
+	var topMesage = $("#messages li:first");
+	var text = topMesage.text().split(" ");
+	var sender = text[0];
+	var timeStamp = text[1];
+	var message = topMesage.children(".message-content").text();
+	
+	var data = {
+                sender: sender,
+                timeStamp: timeStamp,
+                message: message
+            };
+	
+	socket.emit("retrieve messages", JSON.stringify(data), 25);
+        toggleLoadButton(false);
+    });
 
-    //toggle showing the button, true show false hide
+    //toggle showing the jump button, true show false hide
     function toggleJumpButton(showButton) {
         if (showButton) {
             $("#btn-jump").removeClass("hide-btn");
@@ -489,12 +525,26 @@ $(function() {
             $("#btn-jump-arrow").addClass("hide-btn");
         }
     }
+    
+    //toggle showing the load more button, true show false hide
+    function toggleLoadButton(showButton) {
+        if (showButton) {
+            $("#btn-load").removeClass("hide-btn");
+            $("#btn-load-arrow").removeClass("hide-btn");
+        } else {
+            $("#btn-load").addClass("hide-btn");
+            $("#btn-load-arrow").addClass("hide-btn");
+        }
+    }
+
 
     //add messages to log
-    function addMessageToLog(data) {
-        var d = JSON.parse(data);
+    function addMessageToLog(data, isJSON) {
+	var d = data;
+	if(!isJSON)
+	    d = JSON.parse(data);
         var message = $('<li class="message-header message-group">').text(
-            d.header
+            d.sender + " " + d.timeStamp,
         );
         message.append($('<li class="message-content">').text(d.message));
         $("#messages").append(message);
@@ -506,7 +556,7 @@ $(function() {
         var d = new Date(),
             h = (d.getHours() < 10 ? "0" : "") + d.getHours(),
             m = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
-        return h + ":" + m + ": ";
+        return h + ":" + m;
     }
 
     //cap the number of loaded messages at 100 for now
