@@ -109,8 +109,8 @@ io.on('connection', function(socket) {
 
     //socket has joined channel, temporarily not used
     socket.on('retrieve messages', function(data, amount) {
-        var arr = getPreviousMessages(data, amount)
-        socket.emit('retrieve log', JSON.stringify(arr));
+        //getPreviousMessages(socket, data, amount)
+        getIDAndMessages(socket, data);
     });
     
     //confirm the peer connection
@@ -164,7 +164,7 @@ function writeToDB(data){
     //fs.appendFile(currentLogFile, ">" + d.header + "\n" + "-" + d.message + "\n", function(err){if(err)throw err;});
     chatLogDB.run("INSERT INTO messages(author, time, message) values(?,?,?)", d.sender, d.timeStamp, d.message, function(err){if(err)throw err;});
 }
-
+/*
 //retrieve message from database
 function readFromDB(index){
     
@@ -181,13 +181,14 @@ function readFromDB(index){
         }
     });
 }
+*/
 
-//gets the last 25 messages from the db
+//gets the most recent 25 messages from the db
 function GetCurrentLog(socket){
+    var dataArr = [];
     var sql = `SELECT * FROM messages LIMIT 25 OFFSET (SELECT COUNT(*) FROM messages)-25`;
     chatLogDB.each(sql, [], (err, row) =>
     {
-        var dataArr = [];
         if(err){
             throw err;
         }else if(row!== undefined){
@@ -198,25 +199,25 @@ function GetCurrentLog(socket){
                 message: row.message
             };
             dataArr.push(data);
+            
         }
-        
-        socket.emit('retrieve log', JSON.stringify(dataArr));
+    }, (err, count) =>
+    {
+        socket.emit('retrieve log append', JSON.stringify(dataArr));
     });
 }
 
-//to do, some sort of error here. Work on data retrieval
-//gets the specified range from database
-function getPreviousMessages(data, amount){
+
+//gets id, then gets the specified range from database
+function getIDAndMessages(socket, data){
+    var dataArr = [];
     var d = JSON.parse(data)
-    var start = getMessageID(d.sender, d.timeStamp, d.message);
-    var end = start-25;
     var sql = `SELECT *
                FROM messages 
-               WHERE id = ? AND id >= ? 
-               ORDER BY id`; 
-               
-    var dataArr = [];         
-    chatLogDB.each(sql, [start, end], (err, row) =>
+               WHERE id BETWEEN 0 AND (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)
+               ORDER BY id DESC`; 
+
+    chatLogDB.each(sql, [d.sender, d.timeStamp, d.message], (err, row) =>
     {
         if(err){
             throw err;
@@ -229,10 +230,17 @@ function getPreviousMessages(data, amount){
             };
             dataArr.push(data);
         }
-    });   
-    return dataArr;
+    }, (err, count) =>
+    {
+        console.log(dataArr);
+        socket.emit('retrieve log prepend', JSON.stringify(dataArr));
+    });
 }
 
+
+
+
+/*
 //gets the specified range from database
 function getMessageID(author, time, message){
     
@@ -241,19 +249,76 @@ function getMessageID(author, time, message){
                WHERE author = ?
                  AND time = ?
                  AND message = ?`;
-    
+                 
     chatLogDB.get(sql, [author, time, message], (err, row) =>
     {
         if(err){
             throw err;
         }else{
-            if(row !== undefined)
-                return row.id;
-            else
-                return -1;
+           callback(row.id);
         }
     });
+
 }
+
+
+
+
+
+
+//gets the specified range from database
+function getPreviousMessages(socket, data, amount){
+    var d = JSON.parse(data)
+    var start = getMessageID(d.sender, d.timeStamp, d.message);
+    var end = start-25;
+    var sql = `SELECT *
+               FROM messages 
+               WHERE id = ? AND id >= ? 
+               ORDER BY id`; 
+               
+               
+    var dataArr = [];         
+    chatLogDB.each(sql, [], (err, row) =>
+    {
+        if(err){
+            throw err;
+        }else if(row!== undefined){
+            
+            var data = {
+                sender: row.author,
+                timeStamp: row.time,
+                message: row.message
+            };
+            dataArr.push(data);
+            
+        }
+    }, (err, count) =>
+    {
+        console.log(dataArr);
+        socket.emit('retrieve log', JSON.stringify(dataArr));
+    });
+}
+
+//gets the specified range from database
+function getMessageID(author, time, message, callback){
+    
+    var sql = `SELECT *
+               FROM messages 
+               WHERE author = ?
+                 AND time = ?
+                 AND message = ?`;
+                 
+    chatLogDB.get(sql, [author, time, message], (err, row) =>
+    {
+        if(err){
+            throw err;
+        }else{
+           callback(row.id);
+        }
+    });
+
+}
+* */
 
 //return a formatted timestamp for the console
 function getTimestamp(){

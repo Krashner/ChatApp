@@ -211,8 +211,8 @@ $(function() {
 	//$("#notification-sound")[0].play();
     });
 
-    //update chat log with all the previous message
-    socket.on("retrieve log", (dataArr) => {
+    //update chat log with all the previous message and add to bottom
+    socket.on("retrieve log append", (dataArr) => {
 	var arr = JSON.parse(dataArr);
 	console.log(arr);
 	for(var i = 0; i < arr.length; i++){
@@ -220,6 +220,16 @@ $(function() {
 	    addMessageToLog(data, true);
 	}
     });
+    
+    //update chat log with all the previous message and add to top
+    socket.on("retrieve log prepend", (dataArr) => {
+	var arr = JSON.parse(dataArr);
+	for(var i = 0; i < arr.length; i++){
+	    var data = arr[i];
+	    prependMessageToLog(data, true);
+	}
+    });
+    
     
     //signal that audio is being transmitted
     $("#chat-transmit-btn").mousedown(() =>{
@@ -499,11 +509,12 @@ $(function() {
     
     //load more messages and hide the button
     $("#btn-load").click(() =>{
-	var topMesage = $("#messages li:first");
-	var text = topMesage.text().split(" ");
+	var topMesageGroup = $("#messages li:first");
+	var header = topMesageGroup.children(".message-header").text();
+	var text = header.split(" ");
 	var sender = text[0];
 	var timeStamp = text[1];
-	var message = topMesage.children(".message-content").text();
+	var message = topMesageGroup.children(".message-content").text();
 	
 	var data = {
                 sender: sender,
@@ -543,11 +554,22 @@ $(function() {
 	var d = data;
 	if(!isJSON)
 	    d = JSON.parse(data);
-        var message = $('<li class="message-header message-group">').text(
-            d.sender + " " + d.timeStamp,
-        );
+        var message = $('<li class="message-group">');
+	message.append($('<li class="message-header">').text(d.sender + " " + d.timeStamp));
         message.append($('<li class="message-content">').text(d.message));
         $("#messages").append(message);
+        pruneMessages();
+    }
+    
+    //add messages to log
+    function prependMessageToLog(data, isJSON) {
+	var d = data;
+	if(!isJSON)
+	    d = JSON.parse(data);
+        var message = $('<li class="message-group">');
+	message.append($('<li class="message-header">').text(d.sender + " " + d.timeStamp));
+        message.append($('<li class="message-content">').text(d.message));
+        $("#messages").prepend(message);
         pruneMessages();
     }
 
