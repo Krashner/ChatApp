@@ -245,6 +245,7 @@ input {
 
 #control-col {
 	background-color: #2f3136;
+    max-height: 100%;
 }
 
 #control-title {
