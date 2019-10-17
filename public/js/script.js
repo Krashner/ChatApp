@@ -4,8 +4,9 @@ $(function() {
 	var currentRole; //current chosen role
 	var selectedRole; //selected role, saves to current role
 	var localStream; //local mediastream object
-	var ingoreScroll = false; //for toggling "jumpt to present button"
-    var ignoreLoad = false;
+	var ignoreScroll = false; //for toggling "jump to present button"
+    var ignoreLoad = false; //for toggling "load more messages button"
+    var canPrune = false; //for toggling pruning
 	//******************************************************************
 	// stream functions
 	//******************************************************************
@@ -225,7 +226,6 @@ $(function() {
 	socket.on("retrieve log prepend", dataArr => {
         var arr = JSON.parse(dataArr);
         arr = arr.reverse();
-        console.log(arr);
 		for (var i = 0; i < arr.length; i++) {
             var data = arr[i];
             if(data.id == 1)
@@ -490,20 +490,12 @@ $(function() {
 	//show the jump to bottom button, unless we're at the bottom
 	$("#chat-box").scroll(function(e) {
 		var maxScroll = $(this)[0].scrollHeight - $(this).outerHeight();
-
-		toggleLoadButton(true);
-
-		if (ingoreScroll === false) {
-			toggleJumpButton(true);
-		}
-
-		ingoreScroll = false;
 		e.preventDefault();
 
 		//hide the jump button
-		if ($(this).scrollTop() >= maxScroll - maxScroll * 0.25) {
+		if ($(this).scrollTop() >= maxScroll - maxScroll * 0.25 && ignoreScroll === true) {
 			toggleJumpButton(false);
-		}
+		}else toggleJumpButton(true);
 
 		//hide the load button
 		if ($(this).scrollTop() <= maxScroll - maxScroll * 0.75 && ignoreLoad === false) {
@@ -515,9 +507,11 @@ $(function() {
 	$("#btn-jump").click(() => {
 		$("#chat-box").scrollTop(
 			$("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight()
-		);
+        );
+        canPrune = true;
+        pruneMessages();
 		toggleJumpButton(false);
-		ingoreScroll = true;
+		ignoreScroll = true;
 	});
 
 	//load more messages and hide the button
@@ -535,6 +529,7 @@ $(function() {
 			message: message
 		};
 
+        canPrune = false;
 		socket.emit("retrieve messages", JSON.stringify(data), 25);
 		toggleLoadButton(false);
 	});
@@ -554,7 +549,7 @@ $(function() {
 	function toggleLoadButton(showButton) {
 		if (showButton) {
 			$("#btn-load").removeClass("hide-btn");
-			$("#btn-load-arrow").removeClass("hide-btn");
+            $("#btn-load-arrow").removeClass("hide-btn");
 		} else {
 			$("#btn-load").addClass("hide-btn");
 			$("#btn-load-arrow").addClass("hide-btn");
@@ -597,13 +592,13 @@ $(function() {
 
 	//cap the number of loaded messages at 100 for now
 	function pruneMessages() {
-		var msgs = $("#messages").children();
-		if (msgs != null && msgs.length > 100){
-			$("#messages")
-				.children()
-				.eq(0)
-                .remove();
+        var msgs = $("#messages").children();
+		if (msgs != null && msgs.length > 100 && canPrune){
+            console.log("PRUNING MESSAGES");
+            while($("#messages").children().length > 100){
+                $("#messages").children().eq(0).remove();
                 ignoreLoad = false;
+            }
         }
 	}
 });

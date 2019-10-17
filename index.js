@@ -164,24 +164,7 @@ function writeToDB(data){
     //fs.appendFile(currentLogFile, ">" + d.header + "\n" + "-" + d.message + "\n", function(err){if(err)throw err;});
     chatLogDB.run("INSERT INTO messages(author, time, message) values(?,?,?)", d.sender, d.timeStamp, d.message, function(err){if(err)throw err;});
 }
-/*
-//retrieve message from database
-function readFromDB(index){
-    
-    var sql = `SELECT *
-               FROM messages 
-               WHERE id = ?`;
-               
-    chatLogDB.get(sql, [index], (err, row) =>
-    {
-        if(err){
-            throw err;
-        }else{
-            return row;
-        }
-    });
-}
-*/
+
 
 //gets the most recent 25 messages from the db
 function GetCurrentLog(socket){
@@ -203,23 +186,20 @@ function GetCurrentLog(socket){
         }
     }, (err, count) =>
     {
+        if(err)
+            throw err;
+        else
         socket.emit('retrieve log append', JSON.stringify(dataArr));
     });
 }
-
 
 //gets id, then gets the specified range from database
 function getIDAndMessages(socket, data){
     var dataArr = [];
     var d = JSON.parse(data)
-    // var sql = `SELECT * 
-    //            FROM messages
-    //            WHERE id BETWEEN 0 AND (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)
-    //            ORDER BY id DESC`;
-    console.log(data);
     var sql = `SELECT * 
                FROM messages 
-               LIMIT 5 OFFSET (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)-6`;
+               LIMIT 25 OFFSET (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)-26`;
 
     chatLogDB.each(sql, [d.sender, d.timeStamp, d.message], (err, row) =>
     {
@@ -243,89 +223,6 @@ function getIDAndMessages(socket, data){
             socket.emit('retrieve log prepend', JSON.stringify(dataArr));
     });
 }
-
-
-
-
-/*
-//gets the specified range from database
-function getMessageID(author, time, message){
-    
-    var sql = `SELECT *
-               FROM messages 
-               WHERE author = ?
-                 AND time = ?
-                 AND message = ?`;
-                 
-    chatLogDB.get(sql, [author, time, message], (err, row) =>
-    {
-        if(err){
-            throw err;
-        }else{
-           callback(row.id);
-        }
-    });
-
-}
-
-
-
-
-
-
-//gets the specified range from database
-function getPreviousMessages(socket, data, amount){
-    var d = JSON.parse(data)
-    var start = getMessageID(d.sender, d.timeStamp, d.message);
-    var end = start-25;
-    var sql = `SELECT *
-               FROM messages 
-               WHERE id = ? AND id >= ? 
-               ORDER BY id`; 
-               
-               
-    var dataArr = [];         
-    chatLogDB.each(sql, [], (err, row) =>
-    {
-        if(err){
-            throw err;
-        }else if(row!== undefined){
-            
-            var data = {
-                sender: row.author,
-                timeStamp: row.time,
-                message: row.message
-            };
-            dataArr.push(data);
-            
-        }
-    }, (err, count) =>
-    {
-        console.log(dataArr);
-        socket.emit('retrieve log', JSON.stringify(dataArr));
-    });
-}
-
-//gets the specified range from database
-function getMessageID(author, time, message, callback){
-    
-    var sql = `SELECT *
-               FROM messages 
-               WHERE author = ?
-                 AND time = ?
-                 AND message = ?`;
-                 
-    chatLogDB.get(sql, [author, time, message], (err, row) =>
-    {
-        if(err){
-            throw err;
-        }else{
-           callback(row.id);
-        }
-    });
-
-}
-* */
 
 //return a formatted timestamp for the console
 function getTimestamp(){
