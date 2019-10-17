@@ -95,7 +95,7 @@ io.on('connection', function(socket) {
         console.log(getTimestamp(), "answering peer request || sender:", socket.id, "reciever:", d.sendSignalTo);
         io.to(d.sendSignalTo).emit('peer answer', data);
     });
-    
+
     //send the message out
     socket.on('chat message', function(data) { 
         socket.broadcast.emit('chat message', data);
@@ -212,10 +212,14 @@ function GetCurrentLog(socket){
 function getIDAndMessages(socket, data){
     var dataArr = [];
     var d = JSON.parse(data)
-    var sql = `SELECT *
+    // var sql = `SELECT * 
+    //            FROM messages
+    //            WHERE id BETWEEN 0 AND (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)
+    //            ORDER BY id DESC`;
+    console.log(data);
+    var sql = `SELECT * 
                FROM messages 
-               WHERE id BETWEEN 0 AND (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)
-               ORDER BY id DESC`; 
+               LIMIT 5 OFFSET (SELECT id FROM messages WHERE author = ? AND time = ? AND message = ?)-6`;
 
     chatLogDB.each(sql, [d.sender, d.timeStamp, d.message], (err, row) =>
     {
@@ -226,14 +230,17 @@ function getIDAndMessages(socket, data){
             var data = {
                 sender: row.author,
                 timeStamp: row.time,
-                message: row.message
+                message: row.message,
+                id: row.id
             };
             dataArr.push(data);
         }
     }, (err, count) =>
-    {
-        console.log(dataArr);
-        socket.emit('retrieve log prepend', JSON.stringify(dataArr));
+    {   
+        if(err)
+            throw err;
+        else
+            socket.emit('retrieve log prepend', JSON.stringify(dataArr));
     });
 }
 
