@@ -8,7 +8,8 @@ var chatLogDB;                                  //chat log database
 var roles = [];                                 //array of roles to give the users
 var connectedSockets = {};                      //object containing sockets connected to server
 var currentLogFile;                             //log file to write to & read from
-  
+const PORT = process.env.PORT || 3000;		//added for web server deployment
+
 //server static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 //socket.io js
@@ -30,8 +31,8 @@ app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/public/inde
 var server = https.createServer({
         key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
         cert: fs.readFileSync('certificates/chatappLocalhost.cer')
-    }, app).listen(3000, () => {
-        console.log('> listening on *:3000');
+    }, app).listen(PORT, () => {
+        console.log(`> listening on *:${ PORT }`);
         currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
         if(!fs.existsSync(__dirname + '/logs/'))
             fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
