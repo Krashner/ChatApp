@@ -14,5 +14,8 @@
     "webrtc-adapter": "^7.2.4",
     "wrtc": "^0.4.1"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  }
 }
