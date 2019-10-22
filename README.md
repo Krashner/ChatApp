@@ -17,8 +17,7 @@ node index.js
 Then simply open a browser and connect to the server via IP or domain name.
 
 ## HTTPS issue/site not secure 
-In order to for the browser to use a user's microphone, it requires that the site use HTTPS. For this, you must have an SSl certificate, there are instructions for generating your own included, alternatively you can acquire one online. 
-
+In order to for the browser to use a user's microphone, it requires that the site use HTTPS. For this, you must have an SSL certificate, there are instructions for generating your own included, alternatively you can acquire one online. 
 
 ## License
 
