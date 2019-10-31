@@ -169,6 +169,7 @@ function writeToDB(data){
 
 //gets the most recent 25 messages from the db
 function GetCurrentLog(socket){
+    socket.emit('clear messages');
     var dataArr = [];
     var sql = `SELECT * FROM messages LIMIT 25 OFFSET (SELECT COUNT(*) FROM messages)-25`;
     chatLogDB.each(sql, [], (err, row) =>

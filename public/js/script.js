@@ -13,6 +13,8 @@ $(function() {
 
 	//attempt to get the audio device and connect to peers
 	function start() {
+		peers = [];
+		$("#chat-target-row").empty;
 		currentRole = selectedRole = Cookies.get("role");
 		if (currentRole == null) currentRole = selectedRole = "None";
 		UpdateRole();
@@ -301,7 +303,7 @@ $(function() {
 	});
 
 	//recieve the user roles from server and clear out all previous arrays
-	socket.on("update roles", roles => {
+	socket.on("update roles", roles => {		
 		for (var i = 0; i < peers.length; i++) peers[i].destroy();
 		peers = [];
 		$("#chat-target-container").empty();
@@ -319,7 +321,12 @@ $(function() {
 		if (currentRole == null || currentRole == "None")
 			$("#modal-choose-role").modal("show");
 	});
-
+	
+	//clear all messages from the chat log
+	socket.on("clear messages", roles => {
+		$("#messages").empty();
+	});
+	
 	//******************************************************************
 	// audio functions
 	//******************************************************************
