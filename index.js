@@ -1,6 +1,6 @@
 const express = require('express');             //used for serving content to user
 const app = express();                          //used for routing
-const http = require('http');                 //for creating ssl connection
+const http = require('http');                   //for creating ssl connection
 const fs = require('fs');                       //for reading and writing files
 const path = require('path');                   //used for serving public folder to users
 const sqlite3 = require('sqlite3').verbose();   //for using the database
@@ -8,8 +8,10 @@ var chatLogDB;                                  //chat log database
 var roles = [];                                 //array of roles to give the users
 var connectedSockets = {};                      //object containing sockets connected to server
 var currentLogFile;                             //log file to write to & read from
-const PORT = 3000;		//added for web server deployment
-const hostname = 'localhost';
+const PORT = process.env.PORT || 3000;		//added for web server deployment
+const hostname = 'localhost';			//for reverse proxy
+var server;					//the server
+var io;						//socket io
 
 //server static files from "public" folder
 app.use(express.static('public'));
@@ -27,52 +29,50 @@ app.use('/font-awesome', express.static('node_modules/@fortawesome/fontawesome-f
 app.use('/js-cookie', express.static('node_modules/js-cookie'));
 //database
 app.use(express.static('database'));
-//get html
-//app.get('/', function(req, res) {
-//res.send("Hdsasdjasfjag;lsdhs;kjas;dkjasdl;kj");
-//res.sendFile('public/index.html');
 
-//});
-//this worked last
-//const server = http.createServer((req, res) => {
-  //res.statusCode = 200;
-  //res.setHeader('Content-Type', 'text/plain');
-  //res.end('Hell3o World!\n');
-//});
+function startHTTPS{
+	//create the https server
+	var server = https.createServer({
+		key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
+		cert: fs.readFileSync('certificates/chatappLocalhost.cer')
+	    }, app).listen(PORT, () => {
+		console.log(`> listening on *:${ PORT }`);
+		//currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+		//if(!fs.existsSync(__dirname + '/logs/'))
+		    //fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+		chatLogDB  = new sqlite3.Database(__dirname + "/database/chatlog.db");  
+		chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
+		    if(table === undefined)
+		    {
+			console.log('> Creating Database Table');
+			chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
+		    }
+		});
+	});
+	//require socketi.io to talk to websockets
+	io = require('socket.io').listen(server);
+}
 
-//server.listen(PORT, hostname, () => {
-//  console.log(`Server running at http://${hostname}:${PORT}/`);
-//});
-
-/*
-//create the https server
-var server = http.createServer({
-//        key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
-  //      cert: fs.readFileSync('certificates/chatappLocalhost.cer')
-    }, app).listen(PORT, () => {
-});
-*/
-
-var server = app.listen(PORT, hostname, () => {
-  console.log(`Server running at http://${hostname}:${PORT}/`);
-        console.log(`> listening on *:${ PORT }`);
-//        currentLogFile = '/logs/' + dateNow() + '.txt'; 
-//        if(!fs.existsSync('/logs/'))
-//            fs.mkdir('/logs/', {recursive:true}, function(err){if(err)throw err;})
-        chatLogDB  = new sqlite3.Database("./database/chatlog.db");  
-        chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
-            if(table === undefined)
-            {
-                console.log('> Creating Database Table');
-               chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
-            }
-        });
-
-});
-
-
-//require socketi.io to talk to websockets
-var io = require('socket.io').listen(server);
+function startNginx{
+	var server = app.listen(PORT, hostname, () => {
+	  console.log(`Server running at http://${hostname}:${PORT}/`);
+		console.log(`> listening on *:${ PORT }`);
+	//        currentLogFile = '/logs/' + dateNow() + '.txt'; 
+	//        if(!fs.existsSync('/logs/'))
+	//            fs.mkdir('/logs/', {recursive:true}, function(err){if(err)throw err;})
+		chatLogDB  = new sqlite3.Database("./database/chatlog.db");  
+		chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
+		    if(table === undefined)
+		    {
+			console.log('> Creating Database Table');
+		       chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
+		    }
+		});
+		
+	});
+	//require socketi.io to talk to websockets
+	io = require('socket.io').listen(server);
+}
 
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function(err, contents) {
