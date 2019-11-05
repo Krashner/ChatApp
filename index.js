@@ -30,6 +30,9 @@ app.use('/js-cookie', express.static('node_modules/js-cookie'));
 //database
 app.use(express.static('database'));
 
+//temp
+startNginx();
+
 function startHTTPS{
 	//create the https server
 	var server = https.createServer({
