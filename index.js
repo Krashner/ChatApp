@@ -1,6 +1,6 @@
 const express = require('express');             //used for serving content to user
 const app = express();                          //used for routing
-const https = require('https');                 //for creating ssl connection
+const http = require('http');                   //for creating ssl connection
 const fs = require('fs');                       //for reading and writing files
 const path = require('path');                   //used for serving public folder to users
 const sqlite3 = require('sqlite3').verbose();   //for using the database
@@ -9,46 +9,73 @@ var roles = [];                                 //array of roles to give the use
 var connectedSockets = {};                      //object containing sockets connected to server
 var currentLogFile;                             //log file to write to & read from
 const PORT = process.env.PORT || 3000;		//added for web server deployment
+const hostname = 'localhost';			//for reverse proxy
+var server;					//the server
+var io;						//socket io
 
 //server static files from "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 //socket.io js
-app.use('/socket.io', express.static(path.join(__dirname, '/node_modules/socket.io-client/dist')));
+app.use('/socket.io', express.static('node_modules/socket.io-client/dist'));
 //bootstrap js
-app.use('/bootstrap', express.static(path.join(__dirname, '/node_modules/bootstrap')));
+app.use('/bootstrap', express.static('node_modules/bootstrap'));
 //jquery
-app.use('/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dist')));
+app.use('/jquery', express.static('node_modules/jquery/dist'));
 //simple peer
-app.use('/simple-peer', express.static(path.join(__dirname, '/node_modules/simple-peer')));
+app.use('/simple-peer', express.static('node_modules/simple-peer'));
 //font awesome
-app.use('/font-awesome', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free')));
+app.use('/font-awesome', express.static('node_modules/@fortawesome/fontawesome-free'));
 //js-cookie
-app.use('/js-cookie', express.static(path.join(__dirname, '/node_modules/js-cookie')));
-//get html
-app.get('/', function(req, res) {res.sendFile(path.join(__dirname, '/public/index.html'));});
+app.use('/js-cookie', express.static('node_modules/js-cookie'));
+//database
+app.use(express.static('database'));
 
-//create the https server
-var server = https.createServer({
-        key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
-        cert: fs.readFileSync('certificates/chatappLocalhost.cer')
-    }, app).listen(PORT, () => {
-        console.log(`> listening on *:${ PORT }`);
-        currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
-        if(!fs.existsSync(__dirname + '/logs/'))
-            fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
-        chatLogDB  = new sqlite3.Database(__dirname + "/database/chatlog.db");  
-        chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
-            if(table === undefined)
-            {
-                console.log('> Creating Database Table');
-                chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
-            }
-        });
-});
+//temp
+startNginx();
 
+function startHTTPS(){
+	//create the https server
+	server = https.createServer({
+		key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
+		cert: fs.readFileSync('certificates/chatappLocalhost.cer')
+	    }, app).listen(PORT, () => {
+		console.log(`> listening on *:${ PORT }`);
+		//currentLogFile = __dirname + '/logs/' + dateNow() + '.txt'; 
+		//if(!fs.existsSync(__dirname + '/logs/'))
+		    //fs.mkdir(__dirname + '/logs/', {recursive:true}, function(err){if(err)throw err;})
+		chatLogDB  = new sqlite3.Database(__dirname + "/database/chatlog.db");  
+		chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
+		    if(table === undefined)
+		    {
+			console.log('> Creating Database Table');
+			chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
+		    }
+		});
+	});
+	//require socketi.io to talk to websockets
+	io = require('socket.io').listen(server);
+}
 
-//require socketi.io to talk to websockets
-var io = require('socket.io').listen(server);
+function startNginx(){
+	server = app.listen(PORT, hostname, () => {
+	  console.log(`Server running at http://${hostname}:${PORT}/`);
+		console.log(`> listening on *:${ PORT }`);
+	//        currentLogFile = '/logs/' + dateNow() + '.txt'; 
+	//        if(!fs.existsSync('/logs/'))
+	//            fs.mkdir('/logs/', {recursive:true}, function(err){if(err)throw err;})
+		chatLogDB  = new sqlite3.Database("./database/chatlog.db");  
+		chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
+		    if(table === undefined)
+		    {
+			console.log('> Creating Database Table');
+		       chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
+		    }
+		});
+		
+	});
+	//require socketi.io to talk to websockets
+	io = require('socket.io').listen(server);
+}
 
 //get the roles from admin file
 fs.readFile('admin.json', 'utf8', function(err, contents) {
