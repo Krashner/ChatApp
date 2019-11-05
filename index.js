@@ -33,9 +33,9 @@ app.use(express.static('database'));
 //temp
 startNginx();
 
-function startHTTPS{
+function startHTTPS(){
 	//create the https server
-	var server = https.createServer({
+	server = https.createServer({
 		key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
 		cert: fs.readFileSync('certificates/chatappLocalhost.cer')
 	    }, app).listen(PORT, () => {
@@ -56,8 +56,8 @@ function startHTTPS{
 	io = require('socket.io').listen(server);
 }
 
-function startNginx{
-	var server = app.listen(PORT, hostname, () => {
+function startNginx(){
+	server = app.listen(PORT, hostname, () => {
 	  console.log(`Server running at http://${hostname}:${PORT}/`);
 		console.log(`> listening on *:${ PORT }`);
 	//        currentLogFile = '/logs/' + dateNow() + '.txt'; 
