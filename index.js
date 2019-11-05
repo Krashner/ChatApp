@@ -28,7 +28,7 @@ app.use('/font-awesome', express.static('node_modules/@fortawesome/fontawesome-f
 //js-cookie
 app.use('/js-cookie', express.static('node_modules/js-cookie'));
 //database
-app.use(express.static('database'));
+app.use('/database', express.static('/database'));
 
 //temp
 startNginx();
