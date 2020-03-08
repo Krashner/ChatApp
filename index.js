@@ -239,14 +239,15 @@ function getIDAndMessages(socket, data) {
     var sql = `SELECT * 
                 FROM messages
                 WHERE username = '`+ d.sender + `' AND date = '` + d.timeStamp + `' AND message = '` + d.message + `';`;
-
+    //get the id
     query(sql, (res) => {
         var id = res.rows[0].id;
         if (id === 0)
             return;
         var sql = `SELECT * 
                     FROM (SELECT * FROM messages ORDER BY id DESC) T
-                    WHERE id < ` + id + ` LIMIT 5;`;
+                    WHERE id < ` + id + ` LIMIT 25;`;
+        //get the previous 25 messages
         query(sql, (res) => {
             res.rows.forEach((row) => {
                 var data = {

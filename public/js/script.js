@@ -215,7 +215,7 @@ $(function() {
 		//$("#notification-sound")[0].play();
 	});
 
-	//update chat log with all the previous message and add to bottom
+	//update chat log with all the previous message and add to bottom og log
 	socket.on("retrieve log append", dataArr => {
         var arr = JSON.parse(dataArr);
 		for (var i = 0; i < arr.length; i++) {
@@ -224,8 +224,7 @@ $(function() {
 		}
 	});
 
-	//update chat log with all the previous message and add to top
-	//may be useless soon
+	//update chat log with all the previous message and add to top of log
 	socket.on("retrieve log prepend", dataArr => {
         var arr = JSON.parse(dataArr);
         arr = arr.reverse();
@@ -256,6 +255,7 @@ $(function() {
         stopTransmittingAudio();
     });
 
+	//end the transmission, change light color to red
     function stopTransmittingAudio(){
 		var targets = getTransmitTargets();
 		targets.forEach(target => {
