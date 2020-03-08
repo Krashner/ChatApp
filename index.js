@@ -1,30 +1,25 @@
 const express = require('express');             //used for serving content to user
 const app = express();                          //used for routing
 const http = require('http');                   //for creating ssl connection
-const https = require('https');                   //for creating ssl connection
+const https = require('https');                 //for creating ssl connection
 const fs = require('fs');                       //for reading and writing files
 const path = require('path');                   //used for serving public folder to users
-//const sqlite3 = require('sqlite3').verbose();   //for using the database
-var chatLogDB;                                  //chat log database
 var roles = [];                                 //array of roles to give the users
 var connectedSockets = {};                      //object containing sockets connected to server
-var currentLogFile;                             //log file to write to & read from
 const PORT = process.env.PORT || 3000;		    //added for web server deployment
 const hostname = 'localhost';			        //for reverse proxy
-var server;					                    //the server
+var server;					                    //this server
 var io;						                    //socket io
-
-var pgtools = require("pgtools");
-const config = {
+var pgtools = require("pgtools");               //for creating a database if none exists
+const config = {                                //config for the database
     user: "postgres",
     host: "localhost",
+    database: "ChatAppDB",
     password: "emaint",
     port: 5432
 };
-
-const { Pool, Client } = require("pg");
-
-const pool = new Pool({
+const { Pool, Client } = require("pg");         //for postgres database
+const pool = new Pool({                         //for accessing the database
     user: "postgres",
     host: "localhost",
     database: "ChatAppDB",
@@ -46,8 +41,6 @@ app.use('/simple-peer', express.static('node_modules/simple-peer'));
 app.use('/font-awesome', express.static('node_modules/@fortawesome/fontawesome-free'));
 //js-cookie
 app.use('/js-cookie', express.static('node_modules/js-cookie'));
-//database
-app.use('/database', express.static('/database'));
 
 //temp
 //startNginx();
@@ -62,14 +55,6 @@ function startHTTPS() {
     }, app).listen(PORT, () => {
         console.log(`> listening on *:${PORT}`);
         createDB();
-        //chatLogDB  = new sqlite3.Database(__dirname + "/database/chatlog.db");  
-        // chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
-        //     if(table === undefined)
-        //     {
-        //         console.log('> Creating Database Table');
-        //         chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
-        //     }
-        // });
     });
     //require socketi.io to talk to websockets
     io = require('socket.io').listen(server);
@@ -81,36 +66,20 @@ function startNginx() {
         console.log(`Server running at http://${hostname}:${PORT}/`);
         console.log(`> listening on *:${PORT}`);
         createDB();
-        //chatLogDB  = new sqlite3.Database("./database/chatlog.db");  
-        //chatLogDB.get("SELECT name From sqlite_master WHERE type ='table' AND name='messages'",function(err, table){
-        //     if(table === undefined)
-        //     {
-        //         console.log('> Creating Database Table');
-        //         chatLogDB.run('CREATE TABLE messages(id INTEGER primary key, author TEXT, time TEXT, message TEXT)');     
-        //     }
-        // });
-
     });
     //require socketi.io to talk to websockets
     io = require('socket.io').listen(server);
 }
 
+//attempt to create a database, if it doesn't exist then also create the messages table
 function createDB() {
-    //pgtools.dropdb(config, "ChatAppDB", function (err, res) {});
-
     pgtools.createdb(config, "ChatAppDB", function (err, res) {
         if (err) {
-            // pool.query("INSERT INTO messages(username, date, message)VALUES('Krashner', '3-5-20 10:00', 'Hey, man!');", (err, res) => {
-            //     console.error(err, res);
-            //     pool.end();
-            // });
+            console.log('> Database Found');
         } else {
             console.log('> Creating Database');
+            console.log('> Creating Table');
             query("CREATE TABLE messages(id SERIAL PRIMARY KEY, username TEXT, date TEXT, message TEXT);", (res) => { });
-            // pool.query("CREATE TABLE messages(id SERIAL PRIMARY KEY, username TEXT, date TEXT, message TEXT);", (err, res) => {
-            //     //console.error(err, res);
-            //     //pool.end();
-            // });
         }
     });
 }
@@ -226,13 +195,8 @@ function printCurrentClients() {
 //write message to database
 function writeToDB(data) {
     var d = JSON.parse(data)
-    //fs.appendFile(currentLogFile, ">" + d.header + "\n" + "-" + d.message + "\n", function(err){if(err)throw err;});
-    //chatLogDB.run("INSERT INTO messages(author, time, message) values(?,?,?)", d.sender, d.timeStamp, d.message, function(err){if(err)throw err;});
-    //"INSERT INTO messages(author, time, message)VALUES("+d.sender+","+ d.timeStamp+","+ d.message+ ");"
-    pool.query("INSERT INTO messages(username, date, message)VALUES('" + d.sender + "','" + d.timeStamp + "','" + d.message + "');", (err, res) => {
-        if (err)
-            console.error(err, res);
-    });
+    var sql = "INSERT INTO messages(username, date, message)VALUES('" + d.sender + "','" + d.timeStamp + "','" + d.message + "');"
+    query(sql, (res) => {});
 }
 
 
@@ -240,7 +204,6 @@ function writeToDB(data) {
 function GetCurrentLog(socket) {
     socket.emit('clear messages');
     var dataArr = [];
-    //var sql = `SELECT * FROM messages LIMIT 25 OFFSET (SELECT COUNT(*) FROM messages)-25`;
     var sql = `SELECT * FROM messages ORDER BY id DESC LIMIT 25`;
 
     query(sql, (res) => {
@@ -255,33 +218,20 @@ function GetCurrentLog(socket) {
         });
         socket.emit('retrieve log append', JSON.stringify(dataArr));
     });
-
-    // pool.query(sql, (err, res) => {
-    //     if (err) {
-    //         console.error(err, res);
-    //     } else {
-    //         res.rows.forEach((row) => {
-    //             var data = {
-    //                 id: row.id,
-    //                 sender: row.username,
-    //                 timeStamp: row.date,
-    //                 message: row.message
-    //             };
-    //             dataArr.unshift(data);
-    //         });
-    //         socket.emit('retrieve log append', JSON.stringify(dataArr));
-    //     }
-    // });
 }
 
+//do sql query and then call the callback
 function query(sql, callback) {
     pool.query(sql, (err, res) => {
-        if (!err)
+        if (!err && callback)
             callback(res);
+        else
+            console.error(err, res);
     });
 }
 
 //gets id, then gets the specified range from database
+//maybe I can set a variable for id in the query, and then use a subquery to reduce to a single call?
 function getIDAndMessages(socket, data) {
     var dataArr = [];
     var d = JSON.parse(data)
@@ -289,8 +239,6 @@ function getIDAndMessages(socket, data) {
     var sql = `SELECT * 
                 FROM messages
                 WHERE username = '`+ d.sender + `' AND date = '` + d.timeStamp + `' AND message = '` + d.message + `';`;
-
-
 
     query(sql, (res) => {
         var id = res.rows[0].id;
@@ -312,75 +260,6 @@ function getIDAndMessages(socket, data) {
             socket.emit('retrieve log prepend', JSON.stringify(dataArr));
         });
     });
-
-/* 
-    //get id, then get range of messages
-    pool.query(sql, (err, res) => {
-        if (!err) {
-            var id = res.rows[0].id;
-            if (id === 0)
-                return;
-            var sql = `SELECT * 
-                        FROM (SELECT * FROM messages ORDER BY id DESC) T
-                        WHERE id < ` + id + ` LIMIT 5;`;
-            pool.query(sql, (err, res) => {
-                if (!err) {
-                    var dataArr = [];
-                    res.rows.forEach((row) => {
-                        var data = {
-                            id: row.id,
-                            sender: row.username,
-                            timeStamp: row.date,
-                            message: row.message
-                        };
-                        dataArr.unshift(data);
-                    });
-                    socket.emit('retrieve log prepend', JSON.stringify(dataArr));
-                }
-            });
-        }
-    }); */
-
-
-
-    // pool.query(sql, (err, res) => {
-    //     if (err) {
-    //         console.error(err, res);
-    //     } else {
-    //         res.rows.forEach((row) => {
-    //             var data = {
-    //                 id: row.id,
-    //                 sender: row.username,
-    //                 timeStamp: row.date,
-    //                 message: row.message
-    //             };
-    //             dataArr.push(data);
-    //         });
-    //         socket.emit('retrieve log prepend', JSON.stringify(dataArr));
-    //     }
-    // });
-
-    // chatLogDB.each(sql, [d.sender, d.timeStamp, d.message], (err, row) =>
-    // {
-    //     if(err){
-    //         throw err;
-    //     }else if(row!== undefined){
-
-    //         var data = {
-    //             sender: row.author,
-    //             timeStamp: row.time,
-    //             message: row.message,
-    //             id: row.id
-    //         };
-    //         dataArr.push(data);
-    //     }
-    // }, (err, count) =>
-    // {   
-    //     if(err)
-    //         throw err;
-    //     else
-    //         socket.emit('retrieve log prepend', JSON.stringify(dataArr));
-    // });
 }
 
 //return a formatted timestamp for the console
