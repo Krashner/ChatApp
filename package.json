@@ -8,9 +8,10 @@
     "express": "^4.17.1",
     "jquery": "^3.4.1",
     "js-cookie": "^2.2.0",
+    "pg": "^7.18.2",
+    "pgtools": "^0.3.0",
     "simple-peer": "^9.4.0",
     "socket.io": "^2.2.0",
-    "sqlite3": "^4.1.0",
     "webrtc-adapter": "^7.2.4",
     "wrtc": "^0.4.1"
   },

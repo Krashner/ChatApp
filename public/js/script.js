@@ -211,7 +211,7 @@ $(function() {
 
 	//update chat log with recieved message
 	socket.on("chat message", data => {
-		addMessageToLog(data, false);
+		appendMessageToLog(data, false);
 		//$("#notification-sound")[0].play();
 	});
 
@@ -220,11 +220,12 @@ $(function() {
         var arr = JSON.parse(dataArr);
 		for (var i = 0; i < arr.length; i++) {
 			var data = arr[i];
-			addMessageToLog(data, true);
+			appendMessageToLog(data, true);
 		}
 	});
 
 	//update chat log with all the previous message and add to top
+	//may be useless soon
 	socket.on("retrieve log prepend", dataArr => {
         var arr = JSON.parse(dataArr);
         arr = arr.reverse();
@@ -426,7 +427,7 @@ $(function() {
 			timeStamp: timeNow(),
 			message: msg
 		};
-		addMessageToLog(JSON.stringify(data)); //add to local log
+		appendMessageToLog(JSON.stringify(data)); //add to local log
 		socket.emit("chat message", JSON.stringify(data));
 	}
 
@@ -564,29 +565,26 @@ $(function() {
 	}
 
 	//add messages to log
-	function addMessageToLog(data, isJSON) {
-		var d = data;
-		if (!isJSON) d = JSON.parse(data);
-		var message = $('<li class="message-group">');
-		message.append(
-			$('<li class="message-header">').text(d.sender + " " + d.timeStamp)
-		);
-		message.append($('<li class="message-content">').text(d.message));
-		$("#messages").append(message);
+	function appendMessageToLog(data, jsonData) {
+		$("#messages").append(createMessage(data, jsonData));
 		pruneMessages();
 	}
 
 	//add messages to log
-	function prependMessageToLog(data, isJSON) {
+	function prependMessageToLog(data, jsonData) {
+		$("#messages").prepend(createMessage(data, jsonData));
+		pruneMessages();
+	}
+
+	function createMessage(data, jsonData){
         var d = data;
-		if (!isJSON) d = JSON.parse(data);
+		if (!jsonData) d = JSON.parse(data);
 		var message = $('<li class="message-group">');
 		message.append(
 			$('<li class="message-header">').text(d.sender + " " + d.timeStamp)
 		);
 		message.append($('<li class="message-content">').text(d.message));
-		$("#messages").prepend(message);
-		pruneMessages();
+		return message;
 	}
 
 	//get a timestamp
