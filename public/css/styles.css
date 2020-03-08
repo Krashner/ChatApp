@@ -148,6 +148,7 @@ body {
 	border-color: #2f3136;
 	border-width: 0.25vh 0.25vw 0.25vh 0.25vw;
 	border-radius: 0;
+	padding: 0;
 }
 
 .config-button:hover {
@@ -219,6 +220,7 @@ selected-role:focus {
 	resize: none;
 	outline: none!important;
 	padding: 0 2% 0 2%;
+	height: 100%;
 }
 
 form {
