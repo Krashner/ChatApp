@@ -48,18 +48,22 @@ main()
 //read the command line args to determine what type of server to run
 function main() {
     var myArgs = process.argv.slice(2);
-    switch (myArgs[0].toLowerCase()) {
-        case 'http':
-            startServer("http");
-            break;
-        case 'https':
-            startServer("https");
-            break;
-        case 'https-ss':
-            startServer("https-ss");
-            break;
-        default:
-            startServer("https");
+    if (myArgs !== undefined && myArgs.length > 0) {
+        switch (myArgs[0].toLowerCase()) {
+            case 'http':
+                startServer("http");
+                break;
+            case 'https':
+                startServer("https");
+                break;
+            case 'https-ss':
+                startServer("https-ss");
+                break;
+            default:
+                startServer("https");
+        }
+    } else {
+        startServer("http");
     }
 }
 
