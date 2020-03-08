@@ -55,20 +55,35 @@ function main() {
         case 'https':
             startServer("https");
             break;
+        case 'https-ss':
+            startServer("https-ss");
+            break;
         default:
             startServer("https");
     }
 }
 
 //start either an http or https server
-//http is for running with a reverse proxy server
-//https is for running without one
+//http: use with a reverse proxy server
+//https: use without a reverse proxy server
+//https-ss: same as https, but using a self-signed certificate
+//SSL keys must be acquired from a trusted CA or generated and self-signed
 function startServer(type) {
     if (type === "https") {
-        //create a https server
+        //create a https server using a trusted certificate authority
         server = https.createServer({
-            key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
-            cert: fs.readFileSync('certificates/chatappLocalhost.cer')
+            cert: fs.readFileSync('certificates/cert.crt'),
+            ca: fs.readFileSync('certificates/ca.crt'),
+            key: fs.readFileSync('certificates/private.key')
+        }, app).listen(PORT, () => {
+            console.log(`> HTTPS server listening on *:${PORT}`);
+            createDB();
+        });
+    } else if (type === "https-ss") {
+        //create a https server with a self-signed certificate
+        server = https.createServer({
+            cert: fs.readFileSync('certificates/exampleCert.crt'),
+            key: fs.readFileSync('certificates/exampleKey.key')
         }, app).listen(PORT, () => {
             console.log(`> HTTPS server listening on *:${PORT}`);
             createDB();
@@ -76,8 +91,8 @@ function startServer(type) {
     } else {
         //create a http server
         server = app.listen(PORT, hostname, () => {
-        console.log(`> HTTP server listening on *:${PORT}`);
-        createDB();
+            console.log(`> HTTP server listening on *:${PORT}`);
+            createDB();
         });
     }
     //require socket.io to communicate with websockets

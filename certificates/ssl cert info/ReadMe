@@ -14,7 +14,7 @@ The removable device containing the CA key only needs to be connected when the C
 ---------------------------------------------------------------------------------------------------------------------------------------------
 Note: replace all instances of MyCompanyCA and MyCompanyLocalhost with your desired names.
 
-1. Create configuration file for your CA named MyCompanyCA.cnf with contents (you can change it to your needs):
+1. Create configuration file for your CA named MyCompanyCA.cnf with contents (you may change it fit to your needs):
 
 [ req ]
 distinguished_name  = req_distinguished_name
@@ -39,6 +39,7 @@ basicConstraints            = critical, CA:true
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 2. Create the extensions configuration file MyCompanyLocalhost.ext for your web server certificate:
+   (be sure to change the DNS names to the ones you want to use)
 
 subjectAltName = @alt_names
 extendedKeyUsage = serverAuth
@@ -46,7 +47,6 @@ extendedKeyUsage = serverAuth
 [alt_names]
 DNS.1   = localhost
 DNS.2   = mypc.mycompany.com
-Then execute the following commands:
 #IP address, optional, uncomment to use.
 #IP.1 = 192.168.2.221
 #IP.2 = 127.0.0.1
@@ -54,7 +54,7 @@ Then execute the following commands:
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 3. Then execute the following commands:
-
+   (be sure to change all instances of "MyCompany" with the filenames used previously)
 
 openssl req -x509 -newkey rsa:2048 -out MyCompanyCA.cer -outform PEM -keyout MyCompanyCA.pvk -days 10000 -verbose -config MyCompanyCA.cnf -nodes -sha256 -subj "/CN=MyCompany CA"
 
@@ -62,16 +62,22 @@ openssl req -newkey rsa:2048 -keyout MyCompanyLocalhost.pvk -out MyCompanyLocalh
 
 openssl x509 -req -CA MyCompanyCA.cer -CAkey MyCompanyCA.pvk -in MyCompanyLocalhost.req -out MyCompanyLocalhost.cer -days 10000 -extfile MyCompanyLocalhost.ext -sha256 -set_serial 0x1111
 
+
 ---------------------------------------------------------------------------------------------------------------------------------------------
-4. As result you will get MyCompanyCA.cer, MyCompanyLocalhost.cer and MyCompanyLocalhost.pvk files that you can install to the web server.
+4. The previous step should create MyCompanyCA.cer, MyCompanyLocalhost.cer and MyCompanyLocalhost.pvk. 
+   You can then install on the web server in the /chatapp/certificates/ folder.
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 5. How to check that it works with Chrome before installing certificates to the web server. Execute the following command on your local PC to run web server simulator:
+   (be sure to change all instances of "MyCompany" with the filenames used previously)
 
 openssl s_server -accept 15000 -cert MyCompanyLocalhost.cer -key MyCompanyLocalhost.pvk -CAfile MyCompanyCA.cer -WWW
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
-6. Then you can access this page at https://localhost:15000/ You will see an error that MyCompanyLocalhost.cer is not trusted, if you want to eliminate this error also - then install MyCompanyCA.cer to the certificate trusted list of your OS.
+6. Then you can access this page at https://localhost:15000/ 
+   You will see an error that MyCompanyLocalhost.cer is not trusted,
+   if you want to eliminate this error, install MyCompanyCA.cer to the certificate trusted list of your OS or browser.
+
 
