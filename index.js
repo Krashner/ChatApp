@@ -42,32 +42,45 @@ app.use('/font-awesome', express.static('node_modules/@fortawesome/fontawesome-f
 //js-cookie
 app.use('/js-cookie', express.static('node_modules/js-cookie'));
 
-//temp
-//startNginx();
-startHTTPS();
+//start the app
+main()
 
-//start a https serversome_db
-function startHTTPS() {
-    //create the https server
-    server = https.createServer({
-        key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
-        cert: fs.readFileSync('certificates/chatappLocalhost.cer')
-    }, app).listen(PORT, () => {
-        console.log(`> listening on *:${PORT}`);
-        createDB();
-    });
-    //require socketi.io to talk to websockets
-    io = require('socket.io').listen(server);
+//read the command line args to determine what type of server to run
+function main() {
+    var myArgs = process.argv.slice(2);
+    switch (myArgs[0].toLowerCase()) {
+        case 'http':
+            startServer("http");
+            break;
+        case 'https':
+            startServer("https");
+            break;
+        default:
+            startServer("https");
+    }
 }
 
-//start a http server that using nginx as a reverse proxy
-function startNginx() {
-    server = app.listen(PORT, hostname, () => {
-        console.log(`Server running at http://${hostname}:${PORT}/`);
-        console.log(`> listening on *:${PORT}`);
+//start either an http or https server
+//http is for running with a reverse proxy server
+//https is for running without one
+function startServer(type) {
+    if (type === "https") {
+        //create a https server
+        server = https.createServer({
+            key: fs.readFileSync('certificates/chatappLocalhost.pvk'),
+            cert: fs.readFileSync('certificates/chatappLocalhost.cer')
+        }, app).listen(PORT, () => {
+            console.log(`> HTTPS server listening on *:${PORT}`);
+            createDB();
+        });
+    } else {
+        //create a http server
+        server = app.listen(PORT, hostname, () => {
+        console.log(`> HTTP server listening on *:${PORT}`);
         createDB();
-    });
-    //require socketi.io to talk to websockets
+        });
+    }
+    //require socket.io to communicate with websockets
     io = require('socket.io').listen(server);
 }
 
@@ -196,7 +209,7 @@ function printCurrentClients() {
 function writeToDB(data) {
     var d = JSON.parse(data)
     var sql = "INSERT INTO messages(username, date, message)VALUES('" + d.sender + "','" + d.timeStamp + "','" + d.message + "');"
-    query(sql, (res) => {});
+    query(sql, (res) => { });
 }
 
 
