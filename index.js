@@ -93,8 +93,8 @@ function startServer(type) {
             createDB();
         });
     } else {
-        //create a http server
-        server = app.listen(PORT, hostname, () => {
+        server = http.createServer({
+        }, app).listen(PORT, () => {
             console.log(`> HTTP server listening on *:${PORT}`);
             createDB();
         });
@@ -267,7 +267,6 @@ function query(sql, callback) {
 function getIDAndMessages(socket, data) {
     var dataArr = [];
     var d = JSON.parse(data)
-    console.log(d);
     var sql = `SELECT * 
                 FROM messages
                 WHERE username = '`+ d.sender + `' AND date = '` + d.timeStamp + `' AND message = '` + d.message + `';`;
