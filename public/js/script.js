@@ -4,9 +4,9 @@ $(function () {
 	var currentRole; //current chosen role
 	var selectedRole; //selected role, saves to current role
 	var localStream; //local mediastream object
-	var ignoreScroll = false; //for toggling "jump to present button"
-	var ignoreLoad = false; //for toggling "load more messages button"
+	var ignoreLoad = false; //for preventing "load more messages button" when at top of database
 	var canPrune = false; //for toggling pruning
+	
 	//******************************************************************
 	// stream functions
 	//******************************************************************
@@ -81,7 +81,7 @@ $(function () {
 
 		setPeerListeners(peer);
 		return peer;
-	}	
+	}
 
 	function setPeerListeners(peer) {
 		//send offer/answer to the target peer
@@ -502,14 +502,18 @@ $(function () {
 		e.preventDefault();
 
 		//hide the jump button
-		if ($(this).scrollTop() >= maxScroll - maxScroll * 0.25 && ignoreScroll === true) {
+		if ($(this).scrollTop() <= maxScroll - maxScroll * 0.25) {
+			toggleJumpButton(true);
+		} else {
 			toggleJumpButton(false);
-		} else toggleJumpButton(true);
+		}
 
 		//hide the load button
 		if ($(this).scrollTop() <= maxScroll - maxScroll * 0.75 && ignoreLoad === false) {
 			toggleLoadButton(true);
-		} else toggleLoadButton(false);
+		} else {
+			toggleLoadButton(false);
+		}
 	});
 
 	//jump to bottom of messages and hide the button
@@ -520,7 +524,6 @@ $(function () {
 		canPrune = true;
 		pruneMessages();
 		toggleJumpButton(false);
-		ignoreScroll = true;
 	});
 
 	//load more messages and hide the button
@@ -577,6 +580,7 @@ $(function () {
 		pruneMessages();
 	}
 
+	//create a message with the given data and return it
 	function createMessage(data, jsonData) {
 		var d = data;
 		if (!jsonData) d = JSON.parse(data);
@@ -603,7 +607,6 @@ $(function () {
 			console.log("PRUNING MESSAGES");
 			while ($("#messages").children().length > 100) {
 				$("#messages").children().eq(0).remove();
-				ignoreLoad = false;
 			}
 		}
 	}
