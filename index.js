@@ -13,7 +13,7 @@ var io;						                    //socket io
 var pgtools = require("pgtools");               //for creating a database if none exists
 const config = {                                //config for the database
     user: "postgres",
-    host: "http://",
+    host: "142.93.62.143",//localhost
     database: "ChatAppDB",
     password: "emaint",
     port: 5432
@@ -21,7 +21,7 @@ const config = {                                //config for the database
 const { Pool, Client } = require("pg");         //for postgres database
 const pool = new Pool({                         //for accessing the database
     user: "postgres",
-    host: "localhost",
+    host: "142.93.62.143",//localhost
     database: "ChatAppDB",
     password: "emaint",
     port: "5432"
