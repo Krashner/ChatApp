@@ -9,7 +9,7 @@ A web app for realtime communication using Node.js and SimplePeer.
 - supports **text chat**
 
 ## Usage
-First, be sure to grab Node dependencies
+First, be sure to grab Node dependencies:
 ```
 npm install dependencies
 ```
