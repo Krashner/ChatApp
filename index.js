@@ -93,8 +93,7 @@ function startServer(type) {
             createDB();
         });
     } else {
-        server = http.createServer({
-        }, app).listen(PORT, () => {
+        server = app.listen(PORT, hostname, () => {
             console.log(`> HTTP server listening on *:${PORT}`);
             createDB();
         });
