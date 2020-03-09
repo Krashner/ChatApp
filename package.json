@@ -10,6 +10,7 @@
     "js-cookie": "^2.2.1",
     "pg": "^7.18.2",
     "pgtools": "^0.3.0",
+    "popper.js": "^1.16.1",
     "simple-peer": "^9.6.2",
     "socket.io": "^2.3.0",
     "webrtc-adapter": "^7.5.0",
