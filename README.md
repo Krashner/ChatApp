@@ -9,17 +9,17 @@ A web app for realtime communication using Node.js and SimplePeer.
 - supports **text chat**
 
 ## Usage
-If using a reverse proxy server
+If using a reverse proxy server:
 ```
 node index.js http
 ```
 
-For running with an SSL certificate from a trusted CA
+For running with an SSL certificate from a trusted CA:
 ```
 node index.js https
 ```
 
-For running with a self-signed SSL certificate
+For running with a self-signed SSL certificate:
 ```
 node index.js https-ss
 ```
