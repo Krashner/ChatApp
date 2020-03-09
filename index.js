@@ -13,7 +13,7 @@ var io;						                    //socket io
 var pgtools = require("pgtools");               //for creating a database if none exists
 const config = {                                //config for the database
     user: "postgres",
-    host: "localhost",
+    host: "http://",
     database: "ChatAppDB",
     password: "emaint",
     port: 5432
@@ -105,9 +105,9 @@ function startServer(type) {
 //attempt to create a database, if it doesn't exist then also create the messages table
 function createDB() {
     pgtools.createdb(config, "ChatAppDB", function (err, res) {
+        console.log(err, res);
         if (err) {
             console.log('> Database Found');
-            console.log(err);
         } else {
             console.log('> Creating Database');
             console.log('> Creating Table');
