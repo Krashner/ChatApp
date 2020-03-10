@@ -10,19 +10,19 @@ const PORT = process.env.PORT || 3000;		    //added for web server deployment
 const hostname = 'localhost';			        //for reverse proxy
 var server;					                    //this server
 var io;						                    //socket io
-var pgtools = require("pgtools");               //for creating a database if none exists
-const config = {                                //config for the database
-    user: "postgres",
-    host: "localhost",
-    password: "emaint",
-    port: 5432
-};
+// var pgtools = require("pgtools");               //for creating a database if none exists
+// const config = {                                //config for the database
+//     user: "postgres",                           //set this to a db user with permission to create databases
+//     host: "localhost",                          //leave local since this is run on the server
+//     password: "emaint",                         //set this to the db user's password,
+//     port: 5432
+// };
 const { Pool, Client } = require("pg");         //for postgres database
 const pool = new Pool({                         //for accessing the database
-    user: "postgres",
-    host: "localhost",
-    database: "ChatAppDB",
-    password: "emaint",
+    user: "postgres",                           //set this to the db user with relation privileges
+    host: "localhost",                          //leave local since this is run on the server
+    database: "ChatAppDB",                      //Name of database
+    password: "emaint",                         //set this to the db user's password,
     port: "5432"
 });
 
@@ -80,7 +80,6 @@ function startServer(type) {
             key: fs.readFileSync('certificates/private.key')
         }, app).listen(PORT, () => {
             console.log(`> HTTPS server listening on *:${PORT}`);
-            createDB();
         });
     } else if (type === "https-ss") {
         //create a https server with a self-signed certificate
@@ -89,30 +88,37 @@ function startServer(type) {
             key: fs.readFileSync('certificates/exampleKey.key')
         }, app).listen(PORT, () => {
             console.log(`> HTTPS server listening on *:${PORT}`);
-            createDB();
         });
     } else {
         server = app.listen(PORT, hostname, () => {
             console.log(`> HTTP server listening on *:${PORT}`);
-            createDB();
         });
     }
+
+    //if(server!==undefined)
+    // createDB();
+
     //require socket.io to communicate with websockets
     io = require('socket.io').listen(server);
 }
 
 //attempt to create a database, if it doesn't exist then also create the messages table
+//it is preferable to create one manually
 function createDB() {
     pgtools.createdb(config, "ChatAppDB", function (err, res) {
-        console.log(err, res);
-        if (err) {
-            console.log('> Database Found');
+        if (!err) {
+            console.error(err, res);
         } else {
             console.log('> Creating Database');
-            console.log('> Creating Table');
-            query("CREATE TABLE messages(id SERIAL PRIMARY KEY, username TEXT, date TEXT, message TEXT);", (res) => { });
+            initializeDatabase();
         }
     });
+}
+
+//this creates the messages table
+function initializeDatabase() {
+    console.log('> Creating Table');
+    query("CREATE TABLE messages(id SERIAL PRIMARY KEY, username TEXT, date TEXT, message TEXT);", (res) => { });
 }
 
 //get the roles from admin file
