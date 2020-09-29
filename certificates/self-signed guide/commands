@@ -1,0 +1,27 @@
+Thse are the formatted commands used to generate the current SSL certificate
+
+run the following commands to generate new SSL data. First line creates the Certificate Authority, second line creates the client key, third creates the client cert and signs it
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+openssl req -x509 -newkey rsa:2048 -out chatappCA.cer -outform PEM -keyout chatappCA.pvk -days 10000 -verbose -config chatappCA.cnf -nodes -sha256 -subj "/CN=Chat App CA"
+
+openssl req -newkey rsa:2048 -keyout chatappLocalhost.pvk -out chatappLocalhost.req -subj /CN=localhost -sha256 -nodes
+
+openssl x509 -req -CA chatappCA.cer -CAkey chatappCA.pvk -in chatappLocalhost.req -out chatappLocalhost.cer -days 10000 -extfile chatappLocalhost.ext -sha256 -set_serial 0x1111
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+test, go to localhost:15000
+
+openssl s_server -accept 15000 -cert chatappLocalhost.cer -key chatappLocalhost.pvk -CAfile chatappCA.cer -WWW
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#for adding to .ext file, if needed
+# IP address
+IP.1 = 192.168.2.221
+IP.2 = 127.0.0.1
+
+

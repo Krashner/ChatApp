@@ -1,27 +1,29 @@
-$(function() {
+$(function () {
 	const socket = io(); //socket connection to node server
 	var peers = []; //array of peers to connect to
 	var currentRole; //current chosen role
 	var selectedRole; //selected role, saves to current role
 	var localStream; //local mediastream object
-	var ignoreScroll = false; //for toggling "jump to present button"
-    var ignoreLoad = false; //for toggling "load more messages button"
-    var canPrune = false; //for toggling pruning
+	var ignoreLoad = false; //for preventing "load more messages button" when at top of database
+	var canPrune = false; //for toggling pruning
+	
 	//******************************************************************
 	// stream functions
 	//******************************************************************
 
 	//attempt to get the audio device and connect to peers
 	function start() {
+		peers = [];
+		$("#chat-target-row").empty;
 		currentRole = selectedRole = Cookies.get("role");
 		if (currentRole == null) currentRole = selectedRole = "None";
 		UpdateRole();
-        getAudio();
+		getAudio();
 		console.log("START", socket.id);
 	}
 
 	//manually retry on button press
-	$("#reconnect-button").click(function(e) {
+	$("#reconnect-button").click(function (e) {
 		if (localStream == null) {
 			console.log("Attempting to get audio device.");
 			getAudio();
@@ -45,15 +47,15 @@ $(function() {
 				audio: true,
 				video: false
 			})
-			.then(function(stream) {
+			.then(function (stream) {
 				localStream = stream;
-                togglePhoneIcon(true);          
-                socket.emit("find peers");
+				togglePhoneIcon(true);
+				socket.emit("find peers");
 			})
-			.catch(function(err) {
+			.catch(function (err) {
 				console.log(err.name + ": " + err.message);
-                togglePhoneIcon(false);
-                socket.emit("find peers");
+				togglePhoneIcon(false);
+				socket.emit("find peers");
 			});
 	}
 
@@ -64,7 +66,7 @@ $(function() {
 	//create a peer object and return it
 	function createPeer(isInitiator, localSocket, remoteSocket, peerID) {
 		var cloneStream;
-        if (localStream != null) cloneStream = localStream.clone();
+		if (localStream != null) cloneStream = localStream.clone();
 		var peer = new SimplePeer({
 			initiator: isInitiator,
 			trickle: false,
@@ -83,7 +85,7 @@ $(function() {
 
 	function setPeerListeners(peer) {
 		//send offer/answer to the target peer
-		peer.on("signal", function(data) {
+		peer.on("signal", function (data) {
 			console.log(data.type.toUpperCase(), "SENT", peer.remoteSocketID);
 
 			//data for routing
@@ -101,7 +103,7 @@ $(function() {
 		});
 
 		//peer connected
-		peer.on("connect", function() {
+		peer.on("connect", function () {
 			console.log("CONNECT", peer.remoteSocketID);
 			addUser(peer.remoteSocketID, "None");
 			socket.emit("get role", peer.remoteSocketID);
@@ -112,27 +114,27 @@ $(function() {
 		});
 
 		//data channel is being used
-		peer.on("data", function(data) {
+		peer.on("data", function (data) {
 			console.log("DATA", peer.remoteSocketID);
 		});
 
 		//streaming
-		peer.on("stream", function(stream) {
+		peer.on("stream", function (stream) {
 			console.log("STREAM", peer.remoteSocketID);
-            togglePeerTrack(peer, false);
+			togglePeerTrack(peer, false);
 			var audio = addAudioElement(peer.remoteSocketID);
 			if (audio != null) audio.srcObject = stream;
 			//togglePeerTrack(peer, false);
 		});
 
 		//close connection
-		peer.on("close", function() {
+		peer.on("close", function () {
 			console.log("CLOSE", peer.remoteSocketID);
 			removeUser(peer.remoteSocketID);
 		});
 
 		//error
-		peer.on("error", function(err) {
+		peer.on("error", function (err) {
 			console.log("ERROR", err);
 		});
 	}
@@ -156,13 +158,14 @@ $(function() {
 	});
 
 	//check through array to see if a peer for the given socket exists
-	function checkForPeer(remoteSocketID) {
-		peers.forEach(function(peer) {
-			if (peer.remoteSocketID == remoteSocketID) {
-				return true;
+	function checkForPeer(socketID) {
+		var exists = false;
+		peers.forEach(function (peer) {
+			if (peer.remoteSocketID === socketID) {
+				exists = true;
 			}
 		});
-		return false;
+		return exists;
 	}
 
 	//remove peer closed peer connection
@@ -209,27 +212,27 @@ $(function() {
 
 	//update chat log with recieved message
 	socket.on("chat message", data => {
-		addMessageToLog(data, false);
+		appendMessageToLog(data, false);
 		//$("#notification-sound")[0].play();
 	});
 
-	//update chat log with all the previous message and add to bottom
+	//update chat log with all the previous message and add to bottom og log
 	socket.on("retrieve log append", dataArr => {
-        var arr = JSON.parse(dataArr);
+		var arr = JSON.parse(dataArr);
 		for (var i = 0; i < arr.length; i++) {
 			var data = arr[i];
-			addMessageToLog(data, true);
+			appendMessageToLog(data, true);
 		}
 	});
 
-	//update chat log with all the previous message and add to top
+	//update chat log with all the previous message and add to top of log
 	socket.on("retrieve log prepend", dataArr => {
-        var arr = JSON.parse(dataArr);
-        arr = arr.reverse();
+		var arr = JSON.parse(dataArr);
+		arr = arr.reverse();
 		for (var i = 0; i < arr.length; i++) {
-            var data = arr[i];
-            if(data.id == 1)
-                ignoreLoad = true;
+			var data = arr[i];
+			if (data.id == 1)
+				ignoreLoad = true;
 			prependMessageToLog(data, true);
 		}
 	});
@@ -245,22 +248,23 @@ $(function() {
 
 	//signal that audio is not being transmitted
 	$("#chat-transmit-btn").mouseup(() => {
-        stopTransmittingAudio();
+		stopTransmittingAudio();
 	});
 
-    //mouse left button, stop transmitting
-    $("#chat-transmit-btn").mouseleave(() => {
-        stopTransmittingAudio();
-    });
+	//mouse left button, stop transmitting
+	$("#chat-transmit-btn").mouseleave(() => {
+		stopTransmittingAudio();
+	});
 
-    function stopTransmittingAudio(){
+	//end the transmission, change light color to red
+	function stopTransmittingAudio() {
 		var targets = getTransmitTargets();
 		targets.forEach(target => {
 			socket.emit("transmit light", socket.id, target, false);
 		});
 		transmitAudio(false);
-    }
-    
+	}
+
 	//get the target to send audio to
 	function getTransmitTargets() {
 		var targetElements = $(".active-target");
@@ -308,7 +312,7 @@ $(function() {
 		var container = $("#modal-role-row");
 		var template = $("#role-template");
 		$("#modal-role-row").empty();
-		roles.forEach(function(role) {
+		roles.forEach(function (role) {
 			var newRole = template.clone();
 			newRole.attr("id", role + "-Selector").html(role);
 			newRole.appendTo(container).show();
@@ -318,6 +322,11 @@ $(function() {
 		//show the modal if no role is selected
 		if (currentRole == null || currentRole == "None")
 			$("#modal-choose-role").modal("show");
+	});
+
+	//clear all messages from the chat log
+	socket.on("clear messages", roles => {
+		$("#messages").empty();
 	});
 
 	//******************************************************************
@@ -396,7 +405,7 @@ $(function() {
 	}
 
 	//send message, clear message box and add message to local chat
-	$("form").submit(function(e) {
+	$("form").submit(function (e) {
 		e.preventDefault();
 		var text = $("#chat-input").val();
 		var role = currentRole;
@@ -419,24 +428,24 @@ $(function() {
 			timeStamp: timeNow(),
 			message: msg
 		};
-		addMessageToLog(JSON.stringify(data)); //add to local log
+		appendMessageToLog(JSON.stringify(data)); //add to local log
 		socket.emit("chat message", JSON.stringify(data));
 	}
 
 	//get the current target to transmit to
-	$("#chat-target-container").on("click", ".chat-target-btn", function() {
+	$("#chat-target-container").on("click", ".chat-target-btn", function () {
 		$(".chat-target-btn").removeClass("active-target");
 		$(this).addClass("active-target");
 	});
 
 	//toggle all call chat
-	$("#role-container").on("click", ".chat-target-btn", function() {
+	$("#role-container").on("click", ".chat-target-btn", function () {
 		$(".chat-target-btn").removeClass("active-target");
 		$(this).addClass("active-target");
 	});
 
 	//toggle mute for target
-	$("#chat-target-container").on("click", ".mute-container", function() {
+	$("#chat-target-container").on("click", ".mute-container", function () {
 		//get the socketid that follows after mute- of continer id
 		var socketID = $(this)
 			.attr("id")
@@ -453,7 +462,7 @@ $(function() {
 	});
 
 	//change the current role to selection
-	$("#btn-select-role").click(function() {
+	$("#btn-select-role").click(function () {
 		UpdateRole();
 	});
 
@@ -475,43 +484,46 @@ $(function() {
 	}
 
 	//get the selected role
-	$("#modal-role-row").on("click", ".role-select-btn", function(e) {
+	$("#modal-role-row").on("click", ".role-select-btn", function (e) {
 		$(".role-select-btn").removeClass("active-role");
 		$(this).addClass("active-role");
 		selectedRole = $(this).text();
 	});
 
 	//deselect unsaved role and select chosen role after closing modal
-	$("#modal-choose-role").on("hidden.bs.modal", function(e) {
+	$("#modal-choose-role").on("hidden.bs.modal", function (e) {
 		$(".role-select-btn").removeClass("active-role");
 		$("#" + currentRole + "-Selector").addClass("active-role");
 	});
 
 	//show the jump to bottom button, unless we're at the bottom
-	$("#chat-box").scroll(function(e) {
+	$("#chat-box").scroll(function (e) {
 		var maxScroll = $(this)[0].scrollHeight - $(this).outerHeight();
 		e.preventDefault();
 
 		//hide the jump button
-		if ($(this).scrollTop() >= maxScroll - maxScroll * 0.25 && ignoreScroll === true) {
+		if ($(this).scrollTop() <= maxScroll - maxScroll * 0.25) {
+			toggleJumpButton(true);
+		} else {
 			toggleJumpButton(false);
-		}else toggleJumpButton(true);
+		}
 
 		//hide the load button
 		if ($(this).scrollTop() <= maxScroll - maxScroll * 0.75 && ignoreLoad === false) {
 			toggleLoadButton(true);
-		} else toggleLoadButton(false);
+		} else {
+			toggleLoadButton(false);
+		}
 	});
 
 	//jump to bottom of messages and hide the button
 	$("#btn-jump").click(() => {
 		$("#chat-box").scrollTop(
 			$("#chat-box")[0].scrollHeight - $("#chat-box").outerHeight()
-        );
-        canPrune = true;
-        pruneMessages();
+		);
+		canPrune = true;
+		pruneMessages();
 		toggleJumpButton(false);
-		ignoreScroll = true;
 	});
 
 	//load more messages and hide the button
@@ -529,7 +541,7 @@ $(function() {
 			message: message
 		};
 
-        canPrune = false;
+		canPrune = false;
 		socket.emit("retrieve messages", JSON.stringify(data), 25);
 		toggleLoadButton(false);
 	});
@@ -549,7 +561,7 @@ $(function() {
 	function toggleLoadButton(showButton) {
 		if (showButton) {
 			$("#btn-load").removeClass("hide-btn");
-            $("#btn-load-arrow").removeClass("hide-btn");
+			$("#btn-load-arrow").removeClass("hide-btn");
 		} else {
 			$("#btn-load").addClass("hide-btn");
 			$("#btn-load-arrow").addClass("hide-btn");
@@ -557,29 +569,27 @@ $(function() {
 	}
 
 	//add messages to log
-	function addMessageToLog(data, isJSON) {
-		var d = data;
-		if (!isJSON) d = JSON.parse(data);
-		var message = $('<li class="message-group">');
-		message.append(
-			$('<li class="message-header">').text(d.sender + " " + d.timeStamp)
-		);
-		message.append($('<li class="message-content">').text(d.message));
-		$("#messages").append(message);
+	function appendMessageToLog(data, jsonData) {
+		$("#messages").append(createMessage(data, jsonData));
 		pruneMessages();
 	}
 
 	//add messages to log
-	function prependMessageToLog(data, isJSON) {
-        var d = data;
-		if (!isJSON) d = JSON.parse(data);
+	function prependMessageToLog(data, jsonData) {
+		$("#messages").prepend(createMessage(data, jsonData));
+		pruneMessages();
+	}
+
+	//create a message with the given data and return it
+	function createMessage(data, jsonData) {
+		var d = data;
+		if (!jsonData) d = JSON.parse(data);
 		var message = $('<li class="message-group">');
 		message.append(
 			$('<li class="message-header">').text(d.sender + " " + d.timeStamp)
 		);
 		message.append($('<li class="message-content">').text(d.message));
-		$("#messages").prepend(message);
-		pruneMessages();
+		return message;
 	}
 
 	//get a timestamp
@@ -592,13 +602,12 @@ $(function() {
 
 	//cap the number of loaded messages at 100 for now
 	function pruneMessages() {
-        var msgs = $("#messages").children();
-		if (msgs != null && msgs.length > 100 && canPrune){
-            console.log("PRUNING MESSAGES");
-            while($("#messages").children().length > 100){
-                $("#messages").children().eq(0).remove();
-                ignoreLoad = false;
-            }
-        }
+		var msgs = $("#messages").children();
+		if (msgs != null && msgs.length > 100 && canPrune) {
+			console.log("PRUNING MESSAGES");
+			while ($("#messages").children().length > 100) {
+				$("#messages").children().eq(0).remove();
+			}
+		}
 	}
 });

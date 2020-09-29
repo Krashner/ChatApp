@@ -9,16 +9,28 @@ A web app for realtime communication using Node.js and SimplePeer.
 - supports **text chat**
 
 ## Usage
-On the server, type the following command in the terminal.
+First, be sure to grab Node dependencies:
+```
+npm install dependencies
+```
 
+If using a reverse proxy server:
 ```
-node index.js
+node index.js http
 ```
-Then simply open a browser and connect to the server via IP or domain name.
+
+For running with an SSL certificate from a trusted CA:
+```
+node index.js https
+```
+
+For running with a self-signed SSL certificate:
+```
+node index.js https-ss
+```
 
 ## HTTPS issue/site not secure 
-In order to for the browser to use a user's microphone, it requires that the site use HTTPS. For this, you must have an SSl certificate, there are instructions for generating your own included, alternatively you can acquire one online. 
-
+In order for the browser to access a user's microphone orcamera, it requires that the site use HTTPS. For this, you must have an SSL certificate, which can be acquired online through trusted certificate authorities, or by generating and self-signing one.
 
 ## License
 
