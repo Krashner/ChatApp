@@ -6,7 +6,7 @@
     "@fortawesome/fontawesome-free": "^5.12.1",
     "bootstrap": "^4.4.1",
     "dependencies": "0.0.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jquery": "^3.5.0",
     "js-cookie": "^2.2.1",
     "pg": "^7.18.2",
